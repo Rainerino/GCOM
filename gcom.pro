@@ -18,3 +18,5 @@ SOURCES += main.cpp\
 HEADERS  += gcomcontroller.hpp
 
 FORMS    += gcomcontroller.ui
+
+INCLUDEPATH += Mavlink
