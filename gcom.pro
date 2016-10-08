@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,8 +15,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
         gcomcontroller.cpp
 
-HEADERS  += gcomcontroller.hpp
+HEADERS  += gcomcontroller.hpp \
+    dcnc.h
 
 FORMS    += gcomcontroller.ui
 
 INCLUDEPATH += Mavlink
+
+CONFIG += c++14
