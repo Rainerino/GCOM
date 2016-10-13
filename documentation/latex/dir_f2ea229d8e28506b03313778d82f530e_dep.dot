@@ -1,0 +1,11 @@
+digraph "Mavlink/slugs" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_c1a4da077515c6906d4cf31a479036ae {
+    graph [ bgcolor="#ddddee", pencolor="black", label="Mavlink" fontname="Helvetica", fontsize="10", URL="dir_c1a4da077515c6906d4cf31a479036ae.html"]
+  dir_f2ea229d8e28506b03313778d82f530e [shape=box, label="slugs", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_f2ea229d8e28506b03313778d82f530e.html"];
+  }
+  dir_4c057851c48f94592cfeafad14b1565d [shape=box label="common" URL="dir_4c057851c48f94592cfeafad14b1565d.html"];
+  dir_f2ea229d8e28506b03313778d82f530e->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000007_000004.html"];
+}

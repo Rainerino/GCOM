@@ -1,0 +1,39 @@
+digraph "Mavlink/uAvionix/mavlink.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node0 [label="Mavlink/uAvionix/mavlink.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node0 -> Node1 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 [label="version.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$u_avionix_2version_8h.html",tooltip="MAVLink comm protocol built from uAvionix.xml. "];
+  Node0 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="uAvionix.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$u_avionix_8h.html",tooltip="MAVLink comm protocol generated from uAvionix.xml. "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="../protocol.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$protocol_8h_source.html"];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="string.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="mavlink_types.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__types_8h_source.html"];
+  Node5 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="stdint.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node3 -> Node7 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="mavlink_helpers.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__helpers_8h_source.html"];
+  Node7 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node8 [label="checksum.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$checksum_8h_source.html"];
+  Node8 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 -> Node9 [color="midnightblue",fontsize="10",style="solid"];
+  Node9 [label="mavlink_conversions.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__conversions_8h.html"];
+  Node9 -> Node10 [color="midnightblue",fontsize="10",style="solid"];
+  Node10 [label="math.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node7 -> Node11 [color="midnightblue",fontsize="10",style="solid"];
+  Node11 [label="stdio.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node7 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
+  Node12 [label="mavlink_sha256.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__sha256_8h_source.html"];
+  Node2 -> Node13 [color="midnightblue",fontsize="10",style="solid"];
+  Node13 [label="./mavlink_msg_uavionix\l_adsb_out_cfg.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__msg__uavionix__adsb__out__cfg_8h_source.html"];
+  Node2 -> Node14 [color="midnightblue",fontsize="10",style="solid"];
+  Node14 [label="./mavlink_msg_uavionix\l_adsb_out_dynamic.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__msg__uavionix__adsb__out__dynamic_8h_source.html"];
+  Node2 -> Node15 [color="midnightblue",fontsize="10",style="solid"];
+  Node15 [label="./mavlink_msg_uavionix\l_adsb_transceiver_health\l_report.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$mavlink__msg__uavionix__adsb__transceiver__health__report_8h_source.html"];
+}

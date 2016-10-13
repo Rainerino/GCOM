@@ -1,0 +1,158 @@
+.TH "Mavlink/mavlink_conversions.h" 3 "Mon Oct 10 2016" "Version 1.0" "G-COM" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Mavlink/mavlink_conversions.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <math\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBM_PI_2\fP   ((float)asin(1))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_quaternion_to_dcm\fP (const float quaternion[4], float dcm[3][3])"
+.br
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_dcm_to_euler\fP (const float dcm[3][3], float *roll, float *pitch, float *yaw)"
+.br
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_quaternion_to_euler\fP (const float quaternion[4], float *roll, float *pitch, float *yaw)"
+.br
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_euler_to_quaternion\fP (float roll, float pitch, float yaw, float quaternion[4])"
+.br
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_dcm_to_quaternion\fP (const float dcm[3][3], float quaternion[4])"
+.br
+.ti -1c
+.RI "MAVLINK_HELPER void \fBmavlink_euler_to_dcm\fP (float roll, float pitch, float yaw, float dcm[3][3])"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+These conversion functions follow the NASA rotation standards definition file available online\&.
+.PP
+Their intent is to lower the barrier for MAVLink adopters to use gimbal-lock free (both rotation matrices, sometimes called DCM, and quaternions are gimbal-lock free) rotation representations\&. Euler angles (roll, pitch, yaw) will be phased out of the protocol as widely as possible\&.
+.PP
+\fBAuthor:\fP
+.RS 4
+James Goppert 
+.PP
+Thomas Gubler thomasgubler@gmail.com 
+.RE
+.PP
+
+.PP
+Definition in file \fBmavlink_conversions\&.h\fP\&.
+.SH "Function Documentation"
+.PP 
+.SS "MAVLINK_HELPER void mavlink_dcm_to_euler (const float dcm[3][3], float * roll, float * pitch, float * yaw)"
+Converts a rotation matrix to euler angles
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdcm\fP a 3x3 rotation matrix 
+.br
+\fIroll\fP the roll angle in radians 
+.br
+\fIpitch\fP the pitch angle in radians 
+.br
+\fIyaw\fP the yaw angle in radians 
+.RE
+.PP
+
+.PP
+Definition at line 68 of file mavlink_conversions\&.h\&.
+.SS "MAVLINK_HELPER void mavlink_dcm_to_quaternion (const float dcm[3][3], float quaternion[4])"
+Converts a rotation matrix to a quaternion Reference:
+.IP "\(bu" 2
+Shoemake, Quaternions, http://www.cs.ucr.edu/~vbz/resources/quatut.pdf
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdcm\fP a 3x3 rotation matrix 
+.br
+\fIquaternion\fP a [w, x, y, z] ordered quaternion (null-rotation being 1 0 0 0) 
+.RE
+.PP
+
+.PP
+Definition at line 146 of file mavlink_conversions\&.h\&.
+.SS "MAVLINK_HELPER void mavlink_euler_to_dcm (float roll, float pitch, float yaw, float dcm[3][3])"
+Converts euler angles to a rotation matrix
+.PP
+\fBParameters:\fP
+.RS 4
+\fIroll\fP the roll angle in radians 
+.br
+\fIpitch\fP the pitch angle in radians 
+.br
+\fIyaw\fP the yaw angle in radians 
+.br
+\fIdcm\fP a 3x3 rotation matrix 
+.RE
+.PP
+
+.PP
+Definition at line 189 of file mavlink_conversions\&.h\&.
+.SS "MAVLINK_HELPER void mavlink_euler_to_quaternion (float roll, float pitch, float yaw, float quaternion[4])"
+Converts euler angles to a quaternion
+.PP
+\fBParameters:\fP
+.RS 4
+\fIroll\fP the roll angle in radians 
+.br
+\fIpitch\fP the pitch angle in radians 
+.br
+\fIyaw\fP the yaw angle in radians 
+.br
+\fIquaternion\fP a [w, x, y, z] ordered quaternion (null-rotation being 1 0 0 0) 
+.RE
+.PP
+
+.PP
+Definition at line 118 of file mavlink_conversions\&.h\&.
+.SS "MAVLINK_HELPER void mavlink_quaternion_to_dcm (const float quaternion[4], float dcm[3][3])"
+Converts a quaternion to a rotation matrix
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquaternion\fP a [w, x, y, z] ordered quaternion (null-rotation being 1 0 0 0) 
+.br
+\fIdcm\fP a 3x3 rotation matrix 
+.RE
+.PP
+
+.PP
+Definition at line 38 of file mavlink_conversions\&.h\&.
+.SS "MAVLINK_HELPER void mavlink_quaternion_to_euler (const float quaternion[4], float * roll, float * pitch, float * yaw)"
+Converts a quaternion to euler angles
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquaternion\fP a [w, x, y, z] ordered quaternion (null-rotation being 1 0 0 0) 
+.br
+\fIroll\fP the roll angle in radians 
+.br
+\fIpitch\fP the pitch angle in radians 
+.br
+\fIyaw\fP the yaw angle in radians 
+.RE
+.PP
+
+.PP
+Definition at line 102 of file mavlink_conversions\&.h\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for G-COM from the source code\&.

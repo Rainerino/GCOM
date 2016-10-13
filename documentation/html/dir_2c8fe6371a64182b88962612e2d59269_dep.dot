@@ -1,0 +1,11 @@
+digraph "Mavlink/matrixpilot" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_c1a4da077515c6906d4cf31a479036ae {
+    graph [ bgcolor="#ddddee", pencolor="black", label="Mavlink" fontname="Helvetica", fontsize="10", URL="dir_c1a4da077515c6906d4cf31a479036ae.html"]
+  dir_2c8fe6371a64182b88962612e2d59269 [shape=box, label="matrixpilot", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_2c8fe6371a64182b88962612e2d59269.html"];
+  }
+  dir_4c057851c48f94592cfeafad14b1565d [shape=box label="common" URL="dir_4c057851c48f94592cfeafad14b1565d.html"];
+  dir_2c8fe6371a64182b88962612e2d59269->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000005_000004.html"];
+}

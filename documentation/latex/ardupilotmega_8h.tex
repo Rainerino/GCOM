@@ -1,0 +1,61 @@
+\hypertarget{ardupilotmega_8h}{}\section{Mavlink/ardupilotmega/ardupilotmega.h File Reference}
+\label{ardupilotmega_8h}\index{Mavlink/ardupilotmega/ardupilotmega.\+h@{Mavlink/ardupilotmega/ardupilotmega.\+h}}
+
+
+M\+A\+V\+Link comm protocol generated from ardupilotmega.\+xml.  
+
+
+{\ttfamily \#include \char`\"{}../protocol.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+sensor\+\_\+offsets.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+set\+\_\+mag\+\_\+offsets.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+meminfo.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+ap\+\_\+adc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+digicam\+\_\+configure.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+digicam\+\_\+control.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+mount\+\_\+configure.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+mount\+\_\+control.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+mount\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+fence\+\_\+point.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+fence\+\_\+fetch\+\_\+point.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+fence\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+ahrs.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+simstate.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+hwstatus.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+radio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+limits\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+wind.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+data16.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+data32.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+data64.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+data96.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+rangefinder.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+airspeed\+\_\+autocal.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+rally\+\_\+point.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+rally\+\_\+fetch\+\_\+point.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+compassmot\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+ahrs2.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+camera\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+camera\+\_\+feedback.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+battery2.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+ahrs3.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+autopilot\+\_\+version\+\_\+request.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+remote\+\_\+log\+\_\+data\+\_\+block.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+remote\+\_\+log\+\_\+block\+\_\+status.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+led\+\_\+control.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+mag\+\_\+cal\+\_\+progress.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+mag\+\_\+cal\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+ekf\+\_\+status\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+pid\+\_\+tuning.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gimbal\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gimbal\+\_\+control.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gimbal\+\_\+torque\+\_\+cmd\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gopro\+\_\+heartbeat.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gopro\+\_\+get\+\_\+request.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gopro\+\_\+get\+\_\+response.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gopro\+\_\+set\+\_\+request.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+gopro\+\_\+set\+\_\+response.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+rpm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../common/common.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../u\+Avionix/u\+Avionix.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../mavlink\+\_\+get\+\_\+info.\+h\char`\"{}}\newline
+This graph shows which files directly or indirectly include this file\+:

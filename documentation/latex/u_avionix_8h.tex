@@ -1,0 +1,196 @@
+\hypertarget{u_avionix_8h}{}\section{Mavlink/u\+Avionix/u\+Avionix.h File Reference}
+\label{u_avionix_8h}\index{Mavlink/u\+Avionix/u\+Avionix.\+h@{Mavlink/u\+Avionix/u\+Avionix.\+h}}
+
+
+M\+A\+V\+Link comm protocol generated from u\+Avionix.\+xml.  
+
+
+{\ttfamily \#include \char`\"{}../protocol.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+uavionix\+\_\+adsb\+\_\+out\+\_\+cfg.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+uavionix\+\_\+adsb\+\_\+out\+\_\+dynamic.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+uavionix\+\_\+adsb\+\_\+transceiver\+\_\+health\+\_\+report.\+h\char`\"{}}\newline
+Include dependency graph for u\+Avionix.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{u_avionix_8h_aa90005429262b658c881fa203c4de208}{}\label{u_avionix_8h_aa90005429262b658c881fa203c4de208} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+L\+E\+N\+G\+T\+HS}~\{\}
+\item 
+\hypertarget{u_avionix_8h_a3f709d5835acb54a11202a5fdc7a6bfe}{}\label{u_avionix_8h_a3f709d5835acb54a11202a5fdc7a6bfe} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+C\+R\+CS}~\{\{10001, 209, 20, 0, 0, 0\}, \{10002, 186, 41, 0, 0, 0\}, \{10003, 4, 1, 0, 0, 0\}\}
+\item 
+\hypertarget{u_avionix_8h_a12224bb3d52618c5637edc93f5e6b634}{}\label{u_avionix_8h_a12224bb3d52618c5637edc93f5e6b634} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+E\+N\+A\+B\+L\+E\+D\+\_\+\+U\+A\+V\+I\+O\+N\+IX}
+\item 
+\hypertarget{u_avionix_8h_af1c205039b83f88094655effde6b78a1}{}\label{u_avionix_8h_af1c205039b83f88094655effde6b78a1} 
+\#define \hyperlink{u_avionix_8h_af1c205039b83f88094655effde6b78a1}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+TE}
+\begin{DoxyCompactList}\small\item\em State flags for A\+D\+S-\/B transponder dynamic report. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a69eba354ec31a3d1585d69b8d3ecefe5}{}\label{u_avionix_8h_a69eba354ec31a3d1585d69b8d3ecefe5} 
+\#define \hyperlink{u_avionix_8h_a69eba354ec31a3d1585d69b8d3ecefe5}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+CT}
+\begin{DoxyCompactList}\small\item\em Transceiver RF control flags for A\+D\+S-\/B transponder dynamic reports. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a5d803b7285930e2eaeeb6d020372482c}{}\label{u_avionix_8h_a5d803b7285930e2eaeeb6d020372482c} 
+\#define \hyperlink{u_avionix_8h_a5d803b7285930e2eaeeb6d020372482c}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+IX}
+\begin{DoxyCompactList}\small\item\em Status for A\+D\+S-\/B transponder dynamic input. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a6fc3e325c8ad087ce58381f979c6240b}{}\label{u_avionix_8h_a6fc3e325c8ad087ce58381f979c6240b} 
+\#define \hyperlink{u_avionix_8h_a6fc3e325c8ad087ce58381f979c6240b}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+TH}
+\begin{DoxyCompactList}\small\item\em Status flags for A\+D\+S-\/B transponder dynamic output. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_af58ebeab440111060fe0fd1122299ea6}{}\label{u_avionix_8h_af58ebeab440111060fe0fd1122299ea6} 
+\#define \hyperlink{u_avionix_8h_af58ebeab440111060fe0fd1122299ea6}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+ZE}
+\begin{DoxyCompactList}\small\item\em Definitions for aircraft size. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a1f139b92dea07fc61f4750977b11167f}{}\label{u_avionix_8h_a1f139b92dea07fc61f4750977b11167f} 
+\#define \hyperlink{u_avionix_8h_a1f139b92dea07fc61f4750977b11167f}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+AT}
+\begin{DoxyCompactList}\small\item\em G\+PS lataral offset encoding. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a534d47f2056a2e0bcdd90c7279ae509a}{}\label{u_avionix_8h_a534d47f2056a2e0bcdd90c7279ae509a} 
+\#define \hyperlink{u_avionix_8h_a534d47f2056a2e0bcdd90c7279ae509a}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+ON}
+\begin{DoxyCompactList}\small\item\em G\+PS longitudinal offset encoding. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a43d18873c60ae325e86f7c590c6ea658}{}\label{u_avionix_8h_a43d18873c60ae325e86f7c590c6ea658} 
+\#define \hyperlink{u_avionix_8h_a43d18873c60ae325e86f7c590c6ea658}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+E\+M\+E\+R\+G\+E\+N\+C\+Y\+\_\+\+S\+T\+A\+T\+US}
+\begin{DoxyCompactList}\small\item\em Emergency status encoding. \end{DoxyCompactList}\item 
+\hypertarget{u_avionix_8h_a713480f83cc8ffd484a19a4b9b690215}{}\label{u_avionix_8h_a713480f83cc8ffd484a19a4b9b690215} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+V\+E\+R\+S\+I\+ON}~2
+\item 
+\hypertarget{u_avionix_8h_a384e37b2c133fdf33407436a982d2fb7}{}\label{u_avionix_8h_a384e37b2c133fdf33407436a982d2fb7} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+FO}~\{M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+F\+O\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+FG, M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+F\+O\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+IC, M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+F\+O\+\_\+\+U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+T\+R\+A\+N\+S\+C\+E\+I\+V\+E\+R\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+R\+E\+P\+O\+RT\}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{u_avionix_8h_ae36e7acafe5944f9701069dfbf16b541}{}\label{u_avionix_8h_ae36e7acafe5944f9701069dfbf16b541} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+TE {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+TE}
+\item 
+\hypertarget{u_avionix_8h_a0f4ab0b5732149ff2f6a37592af4afa8}{}\label{u_avionix_8h_a0f4ab0b5732149ff2f6a37592af4afa8} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+CT {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+CT}
+\item 
+\hypertarget{u_avionix_8h_aa6a9e6b505e20ca3da91deb2f641222f}{}\label{u_avionix_8h_aa6a9e6b505e20ca3da91deb2f641222f} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+IX {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+IX}
+\item 
+\hypertarget{u_avionix_8h_aa274db9183bc12dde889126c27fc667d}{}\label{u_avionix_8h_aa274db9183bc12dde889126c27fc667d} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+TH {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+TH}
+\item 
+\hypertarget{u_avionix_8h_a1092a56a791b7f6dabe0052c4d5f74cc}{}\label{u_avionix_8h_a1092a56a791b7f6dabe0052c4d5f74cc} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+ZE {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+ZE}
+\item 
+\hypertarget{u_avionix_8h_a8ca72ef86c91cad96184223924d552c6}{}\label{u_avionix_8h_a8ca72ef86c91cad96184223924d552c6} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+AT {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+AT}
+\item 
+\hypertarget{u_avionix_8h_a41a627ca05fb337504c0a183607bcc60}{}\label{u_avionix_8h_a41a627ca05fb337504c0a183607bcc60} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+ON {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+ON}
+\item 
+\hypertarget{u_avionix_8h_ae10ebbae99c6764e0e6d70aa7eb8fa3b}{}\label{u_avionix_8h_ae10ebbae99c6764e0e6d70aa7eb8fa3b} 
+typedef enum U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+E\+M\+E\+R\+G\+E\+N\+C\+Y\+\_\+\+S\+T\+A\+T\+US {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+E\+M\+E\+R\+G\+E\+N\+C\+Y\+\_\+\+S\+T\+A\+T\+US}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{u_avionix_8h_a355654c671b32d3b6bfda4a7b10b46ea}{}\label{u_avionix_8h_a355654c671b32d3b6bfda4a7b10b46ea} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+TE} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+I\+N\+T\+E\+N\+T\+\_\+\+C\+H\+A\+N\+GE} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+E\+N\+A\+B\+L\+ED} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+N\+I\+C\+B\+A\+R\+O\+\_\+\+C\+R\+O\+S\+S\+C\+H\+E\+C\+K\+ED} =4, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+O\+N\+\_\+\+G\+R\+O\+U\+ND} =8, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+I\+D\+E\+NT} =16, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+S\+T\+A\+T\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =17
+ \}
+\item 
+\hypertarget{u_avionix_8h_ad62cfb08905fff4df65ad8377ec3d101}{}\label{u_avionix_8h_ad62cfb08905fff4df65ad8377ec3d101} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+CT} \{ {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+C\+T\+\_\+\+S\+T\+A\+N\+D\+BY} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+C\+T\+\_\+\+R\+X\+\_\+\+E\+N\+A\+B\+L\+ED} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+C\+T\+\_\+\+T\+X\+\_\+\+E\+N\+A\+B\+L\+ED} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+F\+\_\+\+S\+E\+L\+E\+C\+T\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =3
+ \}
+\item 
+\hypertarget{u_avionix_8h_a76c978ae356133e2b3cb28784bc67997}{}\label{u_avionix_8h_a76c978ae356133e2b3cb28784bc67997} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+IX} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+\+N\+O\+N\+E\+\_\+0} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+\+N\+O\+N\+E\+\_\+1} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+2D} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+3D} =3, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+\+D\+G\+PS} =4, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+\+R\+TK} =5, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+G\+P\+S\+\_\+\+F\+I\+X\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =6
+ \}
+\item 
+\hypertarget{u_avionix_8h_ae24b5af1757923c7ed227c05f6b7afbf}{}\label{u_avionix_8h_ae24b5af1757923c7ed227c05f6b7afbf} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+TH} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+I\+NG} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+OK} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+F\+A\+I\+L\+\_\+\+TX} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+F\+A\+I\+L\+\_\+\+RX} =16, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+R\+F\+\_\+\+H\+E\+A\+L\+T\+H\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =17
+ \}
+\item 
+\hypertarget{u_avionix_8h_aa7a19406347b37d6292758a6444fb450}{}\label{u_avionix_8h_aa7a19406347b37d6292758a6444fb450} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+ZE} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+N\+O\+\_\+\+D\+A\+TA} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L15\+M\+\_\+\+W23M} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L25\+M\+\_\+\+W28\+P5M} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L25\+\_\+34M} =3, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L35\+\_\+33M} =4, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L35\+\_\+38M} =5, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L45\+\_\+39\+P5M} =6, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L45\+\_\+45M} =7, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L55\+\_\+45M} =8, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L55\+\_\+52M} =9, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L65\+\_\+59\+P5M} =10, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L65\+\_\+67M} =11, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L75\+\_\+\+W72\+P5M} =12, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L75\+\_\+\+W80M} =13, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L85\+\_\+\+W80M} =14, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+L85\+\_\+\+W90M} =15, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+S\+I\+Z\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =16
+ \}
+\item 
+\hypertarget{u_avionix_8h_aba7eb16b34895b32031d9b34223302fb}{}\label{u_avionix_8h_aba7eb16b34895b32031d9b34223302fb} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+AT} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+N\+O\+\_\+\+D\+A\+TA} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+L\+E\+F\+T\+\_\+2M} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+L\+E\+F\+T\+\_\+4M} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+L\+E\+F\+T\+\_\+6M} =3, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+R\+I\+G\+H\+T\+\_\+0M} =4, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+R\+I\+G\+H\+T\+\_\+2M} =5, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+R\+I\+G\+H\+T\+\_\+4M} =6, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+R\+I\+G\+H\+T\+\_\+6M} =7, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+A\+T\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =8
+ \}
+\item 
+\hypertarget{u_avionix_8h_a38cd30c47828d1768ad3033b36383c45}{}\label{u_avionix_8h_a38cd30c47828d1768ad3033b36383c45} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+ON} \{ {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+O\+N\+\_\+\+N\+O\+\_\+\+D\+A\+TA} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+O\+N\+\_\+\+A\+P\+P\+L\+I\+E\+D\+\_\+\+B\+Y\+\_\+\+S\+E\+N\+S\+OR} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+C\+F\+G\+\_\+\+G\+P\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+L\+O\+N\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =2
+ \}
+\item 
+\hypertarget{u_avionix_8h_a54991c43658932a20fbf810fa807d39c}{}\label{u_avionix_8h_a54991c43658932a20fbf810fa807d39c} 
+enum {\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+E\+M\+E\+R\+G\+E\+N\+C\+Y\+\_\+\+S\+T\+A\+T\+US} \{ \newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+N\+O\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =0, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+G\+E\+N\+E\+R\+A\+L\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =1, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+L\+I\+F\+E\+G\+U\+A\+R\+D\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =2, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+M\+I\+N\+I\+M\+U\+M\+\_\+\+F\+U\+E\+L\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =3, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+N\+O\+\_\+\+C\+O\+M\+M\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =4, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+U\+N\+L\+A\+W\+F\+U\+L\+\_\+\+I\+N\+T\+E\+R\+F\+E\+R\+A\+N\+C\+E\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =5, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+D\+O\+W\+N\+E\+D\+\_\+\+A\+I\+R\+C\+R\+A\+F\+T\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =6, 
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+O\+U\+T\+\_\+\+R\+E\+S\+E\+R\+V\+ED} =7, 
+\newline
+{\bfseries U\+A\+V\+I\+O\+N\+I\+X\+\_\+\+A\+D\+S\+B\+\_\+\+E\+M\+E\+R\+G\+E\+N\+C\+Y\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =8
+ \}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+M\+A\+V\+Link comm protocol generated from u\+Avionix.\+xml. 
+
+\begin{DoxySeeAlso}{See also}
+\href{http://mavlink.org}{\tt http\+://mavlink.\+org} 
+\end{DoxySeeAlso}

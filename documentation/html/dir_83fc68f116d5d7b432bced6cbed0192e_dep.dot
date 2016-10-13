@@ -1,0 +1,13 @@
+digraph "Mavlink/ardupilotmega" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_c1a4da077515c6906d4cf31a479036ae {
+    graph [ bgcolor="#ddddee", pencolor="black", label="Mavlink" fontname="Helvetica", fontsize="10", URL="dir_c1a4da077515c6906d4cf31a479036ae.html"]
+  dir_83fc68f116d5d7b432bced6cbed0192e [shape=box, label="ardupilotmega", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_83fc68f116d5d7b432bced6cbed0192e.html"];
+  }
+  dir_bcd2bb1aa02f875b186a4aa98bbb035f [shape=box label="uAvionix" URL="dir_bcd2bb1aa02f875b186a4aa98bbb035f.html"];
+  dir_4c057851c48f94592cfeafad14b1565d [shape=box label="common" URL="dir_4c057851c48f94592cfeafad14b1565d.html"];
+  dir_83fc68f116d5d7b432bced6cbed0192e->dir_bcd2bb1aa02f875b186a4aa98bbb035f [headlabel="2", labeldistance=1.5 headhref="dir_000001_000009.html"];
+  dir_83fc68f116d5d7b432bced6cbed0192e->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000001_000004.html"];
+}

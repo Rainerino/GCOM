@@ -1,0 +1,12 @@
+digraph "Mavlink/uAvionix/uAvionix.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node14 [label="Mavlink/uAvionix/uAvionix.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node14 -> Node15 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node15 [label="Mavlink/ardupilotmega\l/ardupilotmega.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ardupilotmega_8h.html",tooltip="MAVLink comm protocol generated from ardupilotmega.xml. "];
+  Node15 -> Node16 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node16 [label="Mavlink/ardupilotmega\l/mavlink.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ardupilotmega_2mavlink_8h.html",tooltip="MAVLink comm protocol built from ardupilotmega.xml. "];
+  Node14 -> Node17 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node17 [label="Mavlink/uAvionix/mavlink.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$u_avionix_2mavlink_8h.html",tooltip="MAVLink comm protocol built from uAvionix.xml. "];
+}

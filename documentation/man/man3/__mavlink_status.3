@@ -1,0 +1,71 @@
+.TH "__mavlink_status" 3 "Mon Oct 10 2016" "Version 1.0" "G-COM" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+__mavlink_status \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "uint8_t \fBmsg_received\fP"
+.br
+.RI "Number of received messages\&. "
+.ti -1c
+.RI "uint8_t \fBbuffer_overrun\fP"
+.br
+.RI "Number of buffer overruns\&. "
+.ti -1c
+.RI "uint8_t \fBparse_error\fP"
+.br
+.RI "Number of parse errors\&. "
+.ti -1c
+.RI "mavlink_parse_state_t \fBparse_state\fP"
+.br
+.RI "Parsing state machine\&. "
+.ti -1c
+.RI "uint8_t \fBpacket_idx\fP"
+.br
+.RI "Index in current packet\&. "
+.ti -1c
+.RI "uint8_t \fBcurrent_rx_seq\fP"
+.br
+.RI "Sequence number of last packet received\&. "
+.ti -1c
+.RI "uint8_t \fBcurrent_tx_seq\fP"
+.br
+.RI "Sequence number of last packet sent\&. "
+.ti -1c
+.RI "uint16_t \fBpacket_rx_success_count\fP"
+.br
+.RI "Received packets\&. "
+.ti -1c
+.RI "uint16_t \fBpacket_rx_drop_count\fP"
+.br
+.RI "Number of packet drops\&. "
+.ti -1c
+.RI "uint8_t \fBflags\fP"
+.br
+.RI "MAVLINK_STATUS_FLAG_*\&. "
+.ti -1c
+.RI "uint8_t \fBsignature_wait\fP"
+.br
+.RI "number of signature bytes left to receive "
+.ti -1c
+.RI "struct \fB__mavlink_signing\fP * \fBsigning\fP"
+.br
+.RI "optional signing state "
+.ti -1c
+.RI "struct \fB__mavlink_signing_streams\fP * \fBsigning_streams\fP"
+.br
+.RI "global record of stream timestamps "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 213 of file mavlink_types\&.h\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for G-COM from the source code\&.

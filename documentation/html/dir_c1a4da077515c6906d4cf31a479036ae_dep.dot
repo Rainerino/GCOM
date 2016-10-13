@@ -1,0 +1,24 @@
+digraph "Mavlink" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_c1a4da077515c6906d4cf31a479036ae {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_c1a4da077515c6906d4cf31a479036ae.html"];
+    dir_c1a4da077515c6906d4cf31a479036ae [shape=plaintext label="Mavlink"];
+    dir_83fc68f116d5d7b432bced6cbed0192e [shape=box label="ardupilotmega" color="black" fillcolor="white" style="filled" URL="dir_83fc68f116d5d7b432bced6cbed0192e.html"];
+    dir_547b956d4166df78c42c5049894a4888 [shape=box label="ASLUAV" color="black" fillcolor="white" style="filled" URL="dir_547b956d4166df78c42c5049894a4888.html"];
+    dir_006c5adde132422c936285061c441fd6 [shape=box label="autoquad" color="black" fillcolor="white" style="filled" URL="dir_006c5adde132422c936285061c441fd6.html"];
+    dir_4c057851c48f94592cfeafad14b1565d [shape=box label="common" color="black" fillcolor="white" style="filled" URL="dir_4c057851c48f94592cfeafad14b1565d.html"];
+    dir_2c8fe6371a64182b88962612e2d59269 [shape=box label="matrixpilot" color="black" fillcolor="white" style="filled" URL="dir_2c8fe6371a64182b88962612e2d59269.html"];
+    dir_0da6529a5eada8fcebcd8e4c2a5a9bb4 [shape=box label="minimal" color="black" fillcolor="white" style="filled" URL="dir_0da6529a5eada8fcebcd8e4c2a5a9bb4.html"];
+    dir_f2ea229d8e28506b03313778d82f530e [shape=box label="slugs" color="black" fillcolor="white" style="filled" URL="dir_f2ea229d8e28506b03313778d82f530e.html"];
+    dir_6439a1e482aa07981dd6ab8c460c3ef8 [shape=box label="test" color="black" fillcolor="white" style="filled" URL="dir_6439a1e482aa07981dd6ab8c460c3ef8.html"];
+    dir_bcd2bb1aa02f875b186a4aa98bbb035f [shape=box label="uAvionix" color="black" fillcolor="white" style="filled" URL="dir_bcd2bb1aa02f875b186a4aa98bbb035f.html"];
+  }
+  dir_547b956d4166df78c42c5049894a4888->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000002_000004.html"];
+  dir_006c5adde132422c936285061c441fd6->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000003_000004.html"];
+  dir_2c8fe6371a64182b88962612e2d59269->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000005_000004.html"];
+  dir_f2ea229d8e28506b03313778d82f530e->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000007_000004.html"];
+  dir_83fc68f116d5d7b432bced6cbed0192e->dir_bcd2bb1aa02f875b186a4aa98bbb035f [headlabel="2", labeldistance=1.5 headhref="dir_000001_000009.html"];
+  dir_83fc68f116d5d7b432bced6cbed0192e->dir_4c057851c48f94592cfeafad14b1565d [headlabel="2", labeldistance=1.5 headhref="dir_000001_000004.html"];
+}

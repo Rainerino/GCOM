@@ -1,0 +1,13 @@
+digraph "__mavlink_signing"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="__mavlink_signing",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" accept_unsigned_callback" ,fontname="Helvetica"];
+  Node2 [label="__mavlink_status",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$struct____mavlink__status.html"];
+  Node1 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" signing" ,fontname="Helvetica"];
+  Node3 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" signing_streams" ,fontname="Helvetica"];
+  Node3 [label="__mavlink_signing_streams",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$struct____mavlink__signing__streams.html"];
+  Node4 -> Node3 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" stream" ,fontname="Helvetica"];
+  Node4 [label="__mavlink_signing_streams\l::__mavlink_signing_stream",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$struct____mavlink__signing__streams_1_1____mavlink__signing__stream.html"];
+}

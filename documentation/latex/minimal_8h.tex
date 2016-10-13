@@ -1,0 +1,259 @@
+\hypertarget{minimal_8h}{}\section{Mavlink/minimal/minimal.h File Reference}
+\label{minimal_8h}\index{Mavlink/minimal/minimal.\+h@{Mavlink/minimal/minimal.\+h}}
+
+
+M\+A\+V\+Link comm protocol generated from minimal.\+xml.  
+
+
+{\ttfamily \#include \char`\"{}../protocol.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}./mavlink\+\_\+msg\+\_\+heartbeat.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../mavlink\+\_\+get\+\_\+info.\+h\char`\"{}}\newline
+Include dependency graph for minimal.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{minimal_8h_aa90005429262b658c881fa203c4de208}{}\label{minimal_8h_aa90005429262b658c881fa203c4de208} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+L\+E\+N\+G\+T\+HS}~\{\}
+\item 
+\hypertarget{minimal_8h_a3f709d5835acb54a11202a5fdc7a6bfe}{}\label{minimal_8h_a3f709d5835acb54a11202a5fdc7a6bfe} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+C\+R\+CS}~\{\{0, 50, 9, 0, 0, 0\}\}
+\item 
+\hypertarget{minimal_8h_a913ac6f00a03f60361fe388081758e72}{}\label{minimal_8h_a913ac6f00a03f60361fe388081758e72} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+E\+N\+A\+B\+L\+E\+D\+\_\+\+M\+I\+N\+I\+M\+AL}
+\item 
+\hypertarget{minimal_8h_a2e111ba3d51671c7c15302296b1637a3}{}\label{minimal_8h_a2e111ba3d51671c7c15302296b1637a3} 
+\#define \hyperlink{minimal_8h_a2e111ba3d51671c7c15302296b1637a3}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+OT}
+\begin{DoxyCompactList}\small\item\em Micro air vehicle / autopilot classes. This identifies the individual model. \end{DoxyCompactList}\item 
+\hypertarget{minimal_8h_a3b4a4b640a6f693143693967d9c4186f}{}\label{minimal_8h_a3b4a4b640a6f693143693967d9c4186f} 
+\#define {\bfseries H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+M\+A\+V\+\_\+\+T\+Y\+PE}
+\item 
+\hypertarget{minimal_8h_a4d10e65452d104b7a6f725423e01f83a}{}\label{minimal_8h_a4d10e65452d104b7a6f725423e01f83a} 
+\#define \hyperlink{minimal_8h_a4d10e65452d104b7a6f725423e01f83a}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+AG}
+\begin{DoxyCompactList}\small\item\em These flags encode the M\+AV mode. \end{DoxyCompactList}\item 
+\hypertarget{minimal_8h_af64abdf9b0014e46b8228dbd5c8d49e5}{}\label{minimal_8h_af64abdf9b0014e46b8228dbd5c8d49e5} 
+\#define \hyperlink{minimal_8h_af64abdf9b0014e46b8228dbd5c8d49e5}{H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+ON}
+\begin{DoxyCompactList}\small\item\em These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base\+\_\+mode variable with A\+ND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not. \end{DoxyCompactList}\item 
+\hypertarget{minimal_8h_a1dd10ffbd73c33a555cb151a5c92e812}{}\label{minimal_8h_a1dd10ffbd73c33a555cb151a5c92e812} 
+\#define {\bfseries H\+A\+V\+E\+\_\+\+E\+N\+U\+M\+\_\+\+M\+A\+V\+\_\+\+S\+T\+A\+TE}
+\item 
+\hypertarget{minimal_8h_a713480f83cc8ffd484a19a4b9b690215}{}\label{minimal_8h_a713480f83cc8ffd484a19a4b9b690215} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+V\+E\+R\+S\+I\+ON}~2
+\item 
+\hypertarget{minimal_8h_a384e37b2c133fdf33407436a982d2fb7}{}\label{minimal_8h_a384e37b2c133fdf33407436a982d2fb7} 
+\#define {\bfseries M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+FO}~\{M\+A\+V\+L\+I\+N\+K\+\_\+\+M\+E\+S\+S\+A\+G\+E\+\_\+\+I\+N\+F\+O\+\_\+\+H\+E\+A\+R\+T\+B\+E\+AT\}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{minimal_8h_adf91ae0e6fbb9f42b840d1797c8349fb}{}\label{minimal_8h_adf91ae0e6fbb9f42b840d1797c8349fb} 
+typedef enum M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+OT {\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+OT}
+\item 
+\hypertarget{minimal_8h_a54d85f25a2b1d0eaa26a669dd72fd1ea}{}\label{minimal_8h_a54d85f25a2b1d0eaa26a669dd72fd1ea} 
+typedef enum M\+A\+V\+\_\+\+T\+Y\+PE {\bfseries M\+A\+V\+\_\+\+T\+Y\+PE}
+\item 
+\hypertarget{minimal_8h_a37fda57208440d06fc68ff4087859622}{}\label{minimal_8h_a37fda57208440d06fc68ff4087859622} 
+typedef enum M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+AG {\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+AG}
+\item 
+\hypertarget{minimal_8h_a9d70efabb70ee1486c0b88b9d90373db}{}\label{minimal_8h_a9d70efabb70ee1486c0b88b9d90373db} 
+typedef enum M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+ON {\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+ON}
+\item 
+\hypertarget{minimal_8h_a8d8331668b3f9f74c75703d953bf131f}{}\label{minimal_8h_a8d8331668b3f9f74c75703d953bf131f} 
+typedef enum M\+A\+V\+\_\+\+S\+T\+A\+TE {\bfseries M\+A\+V\+\_\+\+S\+T\+A\+TE}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{minimal_8h_add415966c25b466767c08bf3b8c00baa}{}\label{minimal_8h_add415966c25b466767c08bf3b8c00baa} 
+enum {\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+OT} \{ \newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+IC} =0, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+R\+E\+S\+E\+R\+V\+ED} =1, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+S\+L\+U\+GS} =2, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+R\+D\+U\+P\+I\+L\+O\+T\+M\+E\+GA} =3, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+O\+P\+E\+N\+P\+I\+L\+OT} =4, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+W\+A\+Y\+P\+O\+I\+N\+T\+S\+\_\+\+O\+N\+LY} =5, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+W\+A\+Y\+P\+O\+I\+N\+T\+S\+\_\+\+A\+N\+D\+\_\+\+S\+I\+M\+P\+L\+E\+\_\+\+N\+A\+V\+I\+G\+A\+T\+I\+O\+N\+\_\+\+O\+N\+LY} =6, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+M\+I\+S\+S\+I\+O\+N\+\_\+\+F\+U\+LL} =7, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+I\+N\+V\+A\+L\+ID} =8, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+P\+PZ} =9, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+U\+DB} =10, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+FP} =11, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+P\+X4} =12, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+S\+M\+A\+C\+C\+M\+P\+I\+L\+OT} =13, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+U\+T\+O\+Q\+U\+AD} =14, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+R\+M\+A\+Z\+I\+LA} =15, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+E\+R\+OB} =16, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+S\+L\+U\+AV} =17, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =18, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+IC} =0, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+P\+I\+X\+H\+A\+WK} =1, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+S\+L\+U\+GS} =2, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+A\+R\+D\+U\+P\+I\+L\+O\+T\+M\+E\+GA} =3, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+O\+P\+E\+N\+P\+I\+L\+OT} =4, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+W\+A\+Y\+P\+O\+I\+N\+T\+S\+\_\+\+O\+N\+LY} =5, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+W\+A\+Y\+P\+O\+I\+N\+T\+S\+\_\+\+A\+N\+D\+\_\+\+S\+I\+M\+P\+L\+E\+\_\+\+N\+A\+V\+I\+G\+A\+T\+I\+O\+N\+\_\+\+O\+N\+LY} =6, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+G\+E\+N\+E\+R\+I\+C\+\_\+\+M\+I\+S\+S\+I\+O\+N\+\_\+\+F\+U\+LL} =7, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+I\+N\+V\+A\+L\+ID} =8, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+P\+PZ} =9, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+U\+DB} =10, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+FP} =11, 
+{\bfseries M\+A\+V\+\_\+\+A\+U\+T\+O\+P\+I\+L\+O\+T\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =12
+ \}
+\item 
+\hypertarget{minimal_8h_aaf404a9fdbd4c9a05d6cab18790dbb28}{}\label{minimal_8h_aaf404a9fdbd4c9a05d6cab18790dbb28} 
+enum {\bfseries M\+A\+V\+\_\+\+T\+Y\+PE} \{ \newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+E\+N\+E\+R\+IC} =0, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+I\+X\+E\+D\+\_\+\+W\+I\+NG} =1, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+Q\+U\+A\+D\+R\+O\+T\+OR} =2, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+C\+O\+A\+X\+I\+AL} =3, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+H\+E\+L\+I\+C\+O\+P\+T\+ER} =4, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+N\+T\+E\+N\+N\+A\+\_\+\+T\+R\+A\+C\+K\+ER} =5, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+CS} =6, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+I\+R\+S\+H\+IP} =7, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+R\+E\+E\+\_\+\+B\+A\+L\+L\+O\+ON} =8, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+O\+C\+K\+ET} =9, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+R\+O\+U\+N\+D\+\_\+\+R\+O\+V\+ER} =10, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+U\+R\+F\+A\+C\+E\+\_\+\+B\+O\+AT} =11, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+U\+B\+M\+A\+R\+I\+NE} =12, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+H\+E\+X\+A\+R\+O\+T\+OR} =13, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+O\+C\+T\+O\+R\+O\+T\+OR} =14, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+T\+R\+I\+C\+O\+P\+T\+ER} =15, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+L\+A\+P\+P\+I\+N\+G\+\_\+\+W\+I\+NG} =16, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+K\+I\+TE} =17, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+O\+N\+B\+O\+A\+R\+D\+\_\+\+C\+O\+N\+T\+R\+O\+L\+L\+ER} =18, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+D\+U\+O\+R\+O\+T\+OR} =19, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+Q\+U\+A\+D\+R\+O\+T\+OR} =20, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+T\+I\+L\+T\+R\+O\+T\+OR} =21, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+R\+E\+S\+E\+R\+V\+E\+D2} =22, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+R\+E\+S\+E\+R\+V\+E\+D3} =23, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+R\+E\+S\+E\+R\+V\+E\+D4} =24, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+V\+T\+O\+L\+\_\+\+R\+E\+S\+E\+R\+V\+E\+D5} =25, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+I\+M\+B\+AL} =26, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+D\+SB} =27, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =28, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+E\+N\+E\+R\+IC} =0, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+I\+X\+E\+D\+\_\+\+W\+I\+NG} =1, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+Q\+U\+A\+D\+R\+O\+T\+OR} =2, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+C\+O\+A\+X\+I\+AL} =3, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+H\+E\+L\+I\+C\+O\+P\+T\+ER} =4, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+N\+T\+E\+N\+N\+A\+\_\+\+T\+R\+A\+C\+K\+ER} =5, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+CS} =6, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+A\+I\+R\+S\+H\+IP} =7, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+R\+E\+E\+\_\+\+B\+A\+L\+L\+O\+ON} =8, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+R\+O\+C\+K\+ET} =9, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+G\+R\+O\+U\+N\+D\+\_\+\+R\+O\+V\+ER} =10, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+U\+R\+F\+A\+C\+E\+\_\+\+B\+O\+AT} =11, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+S\+U\+B\+M\+A\+R\+I\+NE} =12, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+H\+E\+X\+A\+R\+O\+T\+OR} =13, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+O\+C\+T\+O\+R\+O\+T\+OR} =14, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+T\+R\+I\+C\+O\+P\+T\+ER} =15, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+F\+L\+A\+P\+P\+I\+N\+G\+\_\+\+W\+I\+NG} =16, 
+{\bfseries M\+A\+V\+\_\+\+T\+Y\+P\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =17
+ \}
+\item 
+\hypertarget{minimal_8h_ae603f5021d4667cfcb111ccb235cdd85}{}\label{minimal_8h_ae603f5021d4667cfcb111ccb235cdd85} 
+enum {\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+AG} \{ \newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+C\+U\+S\+T\+O\+M\+\_\+\+M\+O\+D\+E\+\_\+\+E\+N\+A\+B\+L\+ED} =1, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+T\+E\+S\+T\+\_\+\+E\+N\+A\+B\+L\+ED} =2, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+A\+U\+T\+O\+\_\+\+E\+N\+A\+B\+L\+ED} =4, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+G\+U\+I\+D\+E\+D\+\_\+\+E\+N\+A\+B\+L\+ED} =8, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+S\+T\+A\+B\+I\+L\+I\+Z\+E\+\_\+\+E\+N\+A\+B\+L\+ED} =16, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+H\+I\+L\+\_\+\+E\+N\+A\+B\+L\+ED} =32, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+M\+A\+N\+U\+A\+L\+\_\+\+I\+N\+P\+U\+T\+\_\+\+E\+N\+A\+B\+L\+ED} =64, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+S\+A\+F\+E\+T\+Y\+\_\+\+A\+R\+M\+ED} =128, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =129, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+C\+U\+S\+T\+O\+M\+\_\+\+M\+O\+D\+E\+\_\+\+E\+N\+A\+B\+L\+ED} =1, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+T\+E\+S\+T\+\_\+\+E\+N\+A\+B\+L\+ED} =2, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+A\+U\+T\+O\+\_\+\+E\+N\+A\+B\+L\+ED} =4, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+G\+U\+I\+D\+E\+D\+\_\+\+E\+N\+A\+B\+L\+ED} =8, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+S\+T\+A\+B\+I\+L\+I\+Z\+E\+\_\+\+E\+N\+A\+B\+L\+ED} =16, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+H\+I\+L\+\_\+\+E\+N\+A\+B\+L\+ED} =32, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+M\+A\+N\+U\+A\+L\+\_\+\+I\+N\+P\+U\+T\+\_\+\+E\+N\+A\+B\+L\+ED} =64, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+S\+A\+F\+E\+T\+Y\+\_\+\+A\+R\+M\+ED} =128, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =129
+ \}
+\item 
+\hypertarget{minimal_8h_aa2237338e86bf81f4a42fd236080518e}{}\label{minimal_8h_aa2237338e86bf81f4a42fd236080518e} 
+enum {\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+ON} \{ \newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+C\+U\+S\+T\+O\+M\+\_\+\+M\+O\+DE} =1, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+T\+E\+ST} =2, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+A\+U\+TO} =4, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+G\+U\+I\+D\+ED} =8, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+S\+T\+A\+B\+I\+L\+I\+ZE} =16, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+H\+IL} =32, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+M\+A\+N\+U\+AL} =64, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+S\+A\+F\+E\+TY} =128, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =129, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+C\+U\+S\+T\+O\+M\+\_\+\+M\+O\+DE} =1, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+T\+E\+ST} =2, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+A\+U\+TO} =4, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+G\+U\+I\+D\+ED} =8, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+S\+T\+A\+B\+I\+L\+I\+ZE} =16, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+H\+IL} =32, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+M\+A\+N\+U\+AL} =64, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+S\+A\+F\+E\+TY} =128, 
+{\bfseries M\+A\+V\+\_\+\+M\+O\+D\+E\+\_\+\+F\+L\+A\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =129
+ \}
+\item 
+\hypertarget{minimal_8h_a3ca5e79cdc1f95d953a6d1d7ab1e90bb}{}\label{minimal_8h_a3ca5e79cdc1f95d953a6d1d7ab1e90bb} 
+enum {\bfseries M\+A\+V\+\_\+\+S\+T\+A\+TE} \{ \newline
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+I\+N\+IT} =0, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+B\+O\+OT} =1, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+NG} =2, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+T\+A\+N\+D\+BY} =3, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+A\+C\+T\+I\+VE} =4, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+C\+R\+I\+T\+I\+C\+AL} =5, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =6, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+P\+O\+W\+E\+R\+O\+FF} =7, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =8, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+I\+N\+IT} =0, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+B\+O\+OT} =1, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+NG} =2, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+T\+A\+N\+D\+BY} =3, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+A\+C\+T\+I\+VE} =4, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+C\+R\+I\+T\+I\+C\+AL} =5, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+E\+M\+E\+R\+G\+E\+N\+CY} =6, 
+\newline
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+P\+O\+W\+E\+R\+O\+FF} =7, 
+{\bfseries M\+A\+V\+\_\+\+S\+T\+A\+T\+E\+\_\+\+E\+N\+U\+M\+\_\+\+E\+ND} =8
+ \}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+M\+A\+V\+Link comm protocol generated from minimal.\+xml. 
+
+\begin{DoxySeeAlso}{See also}
+\href{http://mavlink.org}{\tt http\+://mavlink.\+org} 
+\end{DoxySeeAlso}
