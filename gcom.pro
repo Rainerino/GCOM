@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         gcomcontroller.cpp
 
-HEADERS  += gcomcontroller.hpp
+HEADERS  += gcomcontroller.hpp \
+    modules/uas_message/uas_message.hpp
 
 FORMS    += gcomcontroller.ui
 
