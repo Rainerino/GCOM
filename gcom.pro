@@ -13,7 +13,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        gcomcontroller.cpp
+        gcomcontroller.cpp \
+    dcnc.cpp
 
 HEADERS  += gcomcontroller.hpp \
     dcnc.h
