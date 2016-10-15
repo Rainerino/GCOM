@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     dcnc.cpp
 
 HEADERS  += gcomcontroller.hpp \
-    dcnc.h
+    modules/uas_message/uas_message.hpp \
+    dcnc.hpp
 
 FORMS    += gcomcontroller.ui
 

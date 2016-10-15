@@ -1,10 +1,13 @@
-#ifndef DCNC_H
-#define DCNC_H
+#ifndef DCNC_HPP
+#define DCNC_HPP
+
 
 #include <string>
 #include <QObject>
 #include <QtNetwork>
 #include <atomic>
+
+#include "modules/uas_message/uas_message.hpp"
 
 class DCNC : public QTcpServer
 {
@@ -25,7 +28,8 @@ public:
 private:
     std::string address;
     int port;
-    QTcpSocket socketbro;
+    QTcpServer *server;
+    QTcpSocket client_connection;
     std::atomic<bool> isConnected;
 
     bool requestCapabilities();
@@ -44,4 +48,4 @@ public slots:
 
 };
 
-#endif // DCNC_H
+#endif // DCNC_HPP
