@@ -13,10 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        gcomcontroller.cpp
+        gcomcontroller.cpp \
+    modules/uas_message/uas_message_tcp_framer.cpp
 
 HEADERS  += gcomcontroller.hpp \
-    modules/uas_message/uas_message.hpp
+    modules/uas_message/uas_message.hpp \
+    modules/uas_message/uas_message_tcp_framer.hpp
 
 FORMS    += gcomcontroller.ui
 
