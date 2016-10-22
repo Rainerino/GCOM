@@ -30,6 +30,8 @@ private:
     int port;
     QTcpServer *server;
     QTcpSocket client_connection;
+    //start, stop abort transaction -> read on
+    QDataStream data_in;
     std::atomic<bool> isConnected;
 
     bool requestCapabilities();
