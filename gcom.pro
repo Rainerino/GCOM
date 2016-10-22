@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,11 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         gcomcontroller.cpp \
-    dcnc.cpp
+    modules/uas_message/uas_message_tcp_framer.cpp \
+    modules/uas_dcnc/dcnc.cpp \
 
 HEADERS  += gcomcontroller.hpp \
     modules/uas_message/uas_message.hpp \
-    dcnc.hpp
+    modules/uas_message/uas_message_tcp_framer.hpp \
+    modules/uas_dcnc/dcnc.hpp \
 
 FORMS    += gcomcontroller.ui
 
