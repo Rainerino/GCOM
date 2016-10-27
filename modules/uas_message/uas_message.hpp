@@ -1,16 +1,15 @@
 #ifndef UASMESSAGE_HPP
 #define UASMESSAGE_HPP
 
-//===============================================
+//===================================================================
 // Includes
-//===============================================
+//===================================================================
 // System Includes
 #include <vector>
 
-
-//===============================================
-// Public Class Definitions
-//===============================================
+//===================================================================
+// Public Class Declarations
+//===================================================================
 /*!
  * \brief UASMessage is an interface that any UAS message must inherit inorder to be handled by G-COM or Gremlin
  * \details The UASMessage interface should be subclassed by all message objects regardless of the way they will be transported
@@ -32,6 +31,7 @@ class UASMessage
             name            = 0x0C,
             capabilities    = 0x0D,
             image           = 0x0E,
+            debug           = 0xFF,
             unspecified     = 0xFF
         };
 
