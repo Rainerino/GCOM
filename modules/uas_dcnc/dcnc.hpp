@@ -1,17 +1,15 @@
 #ifndef DCNC_HPP
 #define DCNC_HPP
 
-
 #include <string>
 #include <QObject>
-#include <QtNetwork>
 #include <atomic>
 #include <memory>
 
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
 
-class DCNC : public QTcpServer
+class DCNC : QObject
 {
     Q_OBJECT
 
@@ -52,25 +50,24 @@ public:
 private:
     std::string address;
     int port;
-    QTcpServer server;
-    QTcpSocket *client_connection;
-    QDataStream data_in;
-    std::atomic<bool> is_connected;
-    unique_ptr<UASMessage> message;
+    QTcpServer* server;
+    QTcpSocket* clientConnection;
+    QDataStream dataIn;
+    std::atomic<bool> isConnected;
+
+    /*!
+     * \brief handleMessage parses the message it recieves and carries out tasks accordingly
+     * \param message to be parsed
+     */
+    handleData(QTCPSocket* socket);
 
     //further commands to be added later on - will document in full later
     bool requestCapabilities();
     bool requestID();
     bool requestVerNumber();
 
-signals:
-    /*!
-     * \brief receivedCompleteMessage is a signal that notifies connected slots and carries the
-     *          message object to be handled
-     * \param new_message is the message object carried by the signal
-     */
-    void receivedCompleteMessage(UASMessage* new_message);
 
+signals:
     /*!
      * \brief receivedImageData is a signal that notifies listeners when image data has been recieved
      *          from the gremlin
@@ -78,12 +75,6 @@ signals:
     void receivedImageData();
 
 public slots:
-    /*!
-     * \brief handleMessage parses the message it recieves and carries out tasks accordingly
-     * \param message to be parsed
-     */
-    handleMessage(UASMessage* message);
-
     /*!
      * \brief handleConection is a slot that gets notified whenever a new connection is recieved.
      */
