@@ -1,5 +1,5 @@
 #include "gcomcontroller.hpp"
-#include "missionplannertcp.h"
+#include "missionplannertcp.hpp"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -7,8 +7,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     GcomController w;
     MissionPlannerSocket mTest;
-    mTest.Test();
+    mTest.run();
     w.show();
+
 
     return a.exec();
 }

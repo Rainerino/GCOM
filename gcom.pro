@@ -19,7 +19,7 @@ SOURCES += main.cpp\
 
 HEADERS  += gcomcontroller.hpp \
     modules/uas_message/uas_message.hpp \
-    missionplannertcp.h
+    missionplannertcp.hpp
 
 FORMS    += gcomcontroller.ui
 

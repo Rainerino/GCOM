@@ -1,19 +1,19 @@
-#ifndef MISSIONPLANNERTCP_H
-#define MISSIONPLANNERTCP_H
+#ifndef MISSIONPLANNERTCP_HPP
+#define MISSIONPLANNERTCP_HPP
 
 #include <QObject>
 #include <QDebug>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QtCore>
 
 
-class MissionPlannerSocket : public QObject
+class MissionPlannerSocket : public QThread
 {
     Q_OBJECT
 public:
-    explicit MissionPlannerSocket(QObject *parent = 0);
-    void Test();
-
+    void run();
+    MissionPlannerSocket();
 signals:
 
 
@@ -25,4 +25,4 @@ public slots:
 private:
     QTcpSocket *socket;
 };
-#endif // MISSIONPLANNERTCP_H
+#endif // MISSIONPLANNERTCP_HPP

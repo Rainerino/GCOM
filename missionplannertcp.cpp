@@ -1,13 +1,14 @@
 #include <QNetworkSession>
-#include "missionplannertcp.h"
+#include "missionplannertcp.hpp"
 #include "Mavlink/common/mavlink.h"
+#include <QtCore>
 
-MissionPlannerSocket::MissionPlannerSocket(QObject *parent) : QObject(parent)
+MissionPlannerSocket::MissionPlannerSocket()
 {
 
 }
 
-void MissionPlannerSocket::Test()
+void MissionPlannerSocket::run()
 {
     socket = new QTcpSocket(this);
 
@@ -39,7 +40,7 @@ void MissionPlannerSocket::disconnected()
 
 void MissionPlannerSocket::bytesWritten(qint64 bytes)
 {
-    qDebug() << "We wrote: " << bytes;
+    qDebug() << "Wrote: " << bytes;
 }
 
 void MissionPlannerSocket::readBytes()
@@ -66,11 +67,21 @@ void MissionPlannerSocket::readBytes()
     case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
         mavlink_global_position_int_t packet;
         mavlink_msg_global_position_int_decode(&message, &packet);
-        qDebug() << packet.time_boot_ms << packet.lat << packet.lon << packet.hdg;
+        //qDebug() << packet.time_boot_ms << packet.lat << packet.lon << packet.hdg;
         break;
     case MAVLINK_MSG_ID_HIGHRES_IMU:
         qDebug() << "Hi";
         break;
+    case MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC:
+        mavlink_camera_trigger_t camerapacket;
+        mavlink_msg_camera_trigger_decode(&message, &camerapacket);
+
+        qDebug() << "Camera Triggered  " << camerapacket.time_usec << "   " << camerapacket.seq;
+        break;
+    case MAVLINK_MSG_ID_CAMERA_TRIGGER:
+        mavlink_camera_trigger_t camerapacket2;
+        mavlink_msg_camera_trigger_decode(&message, &camerapacket2);
+        qDebug() << "Camera Triggered  " << camerapacket2.time_usec << "   " << camerapacket2.seq;
     default:
         break;
     }
