@@ -16,8 +16,9 @@ DCNC::~DCNC()
 void DCNC::startServer(int port, std::string addr)
 {
     this->port = port;
-    this->address = addr;
-    server->listen(addr,port);
+    this->address = QString::fromStdString(addr);
+    QHostAddress hostAddress = QHostAddress(address);
+    server->listen(hostAddress,port);
 }
 
 void DCNC::handleConection()
@@ -29,39 +30,36 @@ void DCNC::handleConection()
     //otherwise let's accept a new connection
     isConnected = true;
     clientConnection = server->nextPendingConnection();
-    if (clientConnection->bytesAvailable != 0){
-        handleData(clientConnection);
-    }
-
-    clientConnection.close();
+    while(clientConnection->bytesAvailable() <= 0){}
+    //do appropriate opperations with message
+    handleData(clientConnection);
+    clientConnection->close();
 }
 
-void DCNC::handleData(QTCPSocket* socket)
+void DCNC::handleData(QTcpSocket* socket)
 {
     //initialize new gremlin connection and prepare message
-    dataIn = new QDataStream(*socket);
-    unique_ptr<UASMessage> message;
-    UASMessageTCPFramer message_framer;
-    message_framer.mStatus = false;
+    dataIn.setDevice(socket);
+    std::unique_ptr<UASMessage> message;
+    UASMessageTCPFramer messageFramer;
 
     //attempts to generate the message
-    while(!message_framer.status()){
-        message_framer >> data_in.startTransaction();
-        message = message_framer.generateMessage();
-        message_framer.frameMessage(message);
-        if(!message_framer.status()){
-            data_in.rollbackTransaction();
-            message_framer.clearMessage();
+    while(!messageFramer.status()){
+        dataIn.startTransaction();
+        dataIn >> messageFramer;
+        message = messageFramer.generateMessage();
+        messageFramer.frameMessage(*message.get());
+        if(!messageFramer.status()){
+            dataIn.rollbackTransaction();
+            messageFramer.clearMessage();
         }
     }
+    dataIn.commitTransaction();
 
-    //we gucci with the transaction now
-    data_in.commitTransaction();
-
-    //lets send the message to the listening slots now
+    /*lets send the message to the listening slots now
     switch(message.MessageID){
         case //enumerate and emit right signals
-    }
+    }*/
 
 }
 

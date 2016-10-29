@@ -1,16 +1,15 @@
 #ifndef UASMESSAGE_HPP
 #define UASMESSAGE_HPP
 
-//===============================================
+//===================================================================
 // Includes
-//===============================================
+//===================================================================
 // System Includes
 #include <vector>
 
-
-//===============================================
-// Public Class Definitions
-//===============================================
+//===================================================================
+// Public Class Declarations
+//===================================================================
 /*!
  * \brief UASMessage is an interface that any UAS message must inherit inorder to be handled by G-COM or Gremlin
  * \details The UASMessage interface should be subclassed by all message objects regardless of the way they will be transported
@@ -25,13 +24,14 @@ class UASMessage
         /*!
          * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
-        enum MessageID : unsigned char
+        enum MeesageId : unsigned char
         {
             request         = 0x0A,
             version         = 0x0B,
             name            = 0x0C,
             capabilities    = 0x0D,
             image           = 0x0E,
+            debug           = 0xFF,
             unspecified     = 0xFF
         };
 
@@ -56,7 +56,7 @@ class UASMessage
          * \brief Pure virtual function that returns the type of the message as a MeesageId
          * \return The type of the enclosed message as a MeeageId enum value
          */
-        virtual MessageID type()=0;
+        virtual MeesageId type()=0;
 
         /*!
          * \brief Pure virtual function that serializes the message into a unsigned char vector

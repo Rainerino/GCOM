@@ -2,7 +2,10 @@
 #define DCNC_HPP
 
 #include <string>
+#include <iostream>
 #include <QObject>
+#include <QTcpSocket>
+#include <QTcpServer>
 #include <atomic>
 #include <memory>
 
@@ -48,10 +51,10 @@ public:
     bool stopImageTransfer();
 
 private:
-    std::string address;
+    QString address;
     int port;
-    QTcpServer* server;
-    QTcpSocket* clientConnection;
+    QTcpServer *server;
+    QTcpSocket *clientConnection;
     QDataStream dataIn;
     std::atomic<bool> isConnected;
 
@@ -59,7 +62,7 @@ private:
      * \brief handleMessage parses the message it recieves and carries out tasks accordingly
      * \param message to be parsed
      */
-    handleData(QTCPSocket* socket);
+    void handleData(QTcpSocket* socket);
 
     //further commands to be added later on - will document in full later
     bool requestCapabilities();
@@ -78,7 +81,7 @@ public slots:
     /*!
      * \brief handleConection is a slot that gets notified whenever a new connection is recieved.
      */
-    handleConection();
+    void handleConection();
 
 };
 

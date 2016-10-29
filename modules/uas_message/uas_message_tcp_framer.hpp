@@ -1,9 +1,9 @@
-#ifndef UASMESSAGETCPFRAMER_H
-#define UASMESSAGETCPFRAMER_H
+#ifndef UASMESSAGETCPFRAMER_HPP
+#define UASMESSAGETCPFRAMER_HPP
 
-//===============================================
+//===================================================================
 // Includes
-//===============================================
+//===================================================================
 // UAS Includes
 #include "uas_message.hpp"
 // Qt Includes
@@ -13,9 +13,9 @@
 #include <memory>
 #include <QByteArray>
 
-//===============================================
-// Public Class Definitions
-//===============================================
+//===================================================================
+// Public Class Declaration
+//===================================================================
 /*!
  * \brief The UASMessageTCPFramer class acts as a wrapper around a UAS Message.
  *        It is responsible for packing (framing) and unpacking the message through a
@@ -61,9 +61,10 @@ class UASMessageTCPFramer
          */
         bool frameMessage(UASMessage &uasMessage);
 
+
         /*!
          * \brief generateMessage given the contents of a framed serialized UAS message this function generates the message object
-         * \return A smart unique pointer to a dynamically allocated UASMessage
+         * \return A smart unique pointer to a dynamically allocated UASMessage, if status is false nullptr is returned
          */
         std::unique_ptr<UASMessage> generateMessage();
 
@@ -74,7 +75,7 @@ class UASMessageTCPFramer
          * \param uasMessageTCPFramer, the framed message to be sent though the stream
          * \return A pointer to the QDataStream to allow for linking << statements
          */
-        friend QDataStream& operator<<(QDataStream& out, const UASMessageTCPFramer& uasMessageTCPFramer);
+        friend QDataStream& operator<<(QDataStream& out, UASMessageTCPFramer& uasMessageTCPFramer);
 
         /*!
          * \brief operator >>
@@ -87,8 +88,10 @@ class UASMessageTCPFramer
 
     private:
         // Private Member Variables
-        bool mStatus;
-        std::vector<uchar> mMessageData;
+        bool framerStatus;
+        std::vector<unsigned char> messageData;
+        // Private Member Functions
+        void initializeDefaults();
 };
 
-#endif // UASMESSAGETCPFRAMER_H
+#endif // UASMESSAGETCPFRAMER_HPP
