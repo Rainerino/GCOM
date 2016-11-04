@@ -5,6 +5,9 @@ DCNC::DCNC()
     server = new QTcpServer();
     connect(server, SIGNAL(newConnection()),
             this, SLOT(handleConection()));
+    isConnected = false;
+    port = 6969;
+    clientConnection = nullptr;
 }
 
 DCNC::~DCNC()
