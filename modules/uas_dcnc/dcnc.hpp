@@ -33,8 +33,9 @@ public:
      * \param addr the address of the server
      */
     void startServer(int port, std::string addr);
-
-    /*!
+    //overload so i can do this with either port or addr
+   
+   /*!
      * \brief cancels the current connection to the client
      * \returns the status of the cancellation
      */
@@ -49,7 +50,7 @@ public:
     //im unsure about this rn
     bool startImageTransfer();
     bool stopImageTransfer();
-
+   
 private:
     QString address;
     int port;
