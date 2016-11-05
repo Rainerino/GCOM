@@ -15,11 +15,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         gcomcontroller.cpp \
-    missionplannertcp.cpp
+    mavlink_relay/missionplannertcp.cpp
 
 HEADERS  += gcomcontroller.hpp \
     modules/uas_message/uas_message.hpp \
-    missionplannertcp.hpp
+    mavlink_relay/missionplannertcp.hpp
 
 FORMS    += gcomcontroller.ui
 
