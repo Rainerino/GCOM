@@ -24,39 +24,41 @@ class UASMessage
         /*!
          * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
-        enum MeesageId : unsigned char
+        enum MessageId : unsigned char
         {
-            request         = 0x0A,
-            version         = 0x0B,
-            name            = 0x0C,
-            capabilities    = 0x0D,
-            image           = 0x0E,
-            debug           = 0xFF,
-            unspecified     = 0xFF
+            REQUEST                 = 0x0A,
+            ID                      = 0x0B,
+            IMAGE_DATA              = 0x0C,
+            IMAGE_TRANSFER_CONTROL  = 0x0D,
+            CLAW_CONTROL_MESSAGE    = 0x0E,
+            CLAW_IMAGE_DATA         = 0x0F,
+            RESET_SYSTEM            = 0x10,
+            DEBUG                   = 0xFF,
+            UNSPECIFIED             = 0xFF
         };
 
         //Public Methods
         /*!
          * \brief Constructor that creates a blank message so that it can be programmatically built up.
          */
-        UASMessage();
+        UASMessage(){}
 
         /*!
          * \brief Constructor designed to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        UASMessage(std::vector<unsigned char> serializedMessage);
+        UASMessage(const std::vector<unsigned char>& serializedMessage){}
 
         /*!
          * \brief ~UASMessage a virtual destructor that must be implemented in order for proper polymorphic behavior
          */
-        virtual ~UASMessage()=0;
+        virtual ~UASMessage(){}
 
         /*!
          * \brief Pure virtual function that returns the type of the message as a MeesageId
          * \return The type of the enclosed message as a MeeageId enum value
          */
-        virtual MeesageId type()=0;
+        virtual MessageId type()=0;
 
         /*!
          * \brief Pure virtual function that serializes the message into a unsigned char vector
