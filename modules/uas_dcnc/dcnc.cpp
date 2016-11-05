@@ -3,16 +3,21 @@
 DCNC::DCNC()
 {
     server = new QTcpServer();
-    connect(server, SIGNAL(newConnection()),
-            this, SLOT(handleConection()));
     isConnected = false;
+    previouslyDropped = false;
     port = 6969;
     clientConnection = nullptr;
+
+    connect(server, SIGNAL(newConnection()),this, SLOT(handleConection()));
+    connect(clientConnection, SIGNAL(readyRead()), this, SLOT(handleData()));
+    connect(clientConnection, SIGNAL(disconnected()), this, SLOT(droppedConnection()));
 }
 
 DCNC::~DCNC()
 {
     //close the clientSocket if it is open check if the ptr is null
+    if(!clientConnection && clientConnection->isOpen())
+        clientConnection->close();
     server->close();
 }
 
@@ -21,8 +26,21 @@ void DCNC::startServer(int port, std::string addr)
 {
     this->port = port;
     this->address = QString::fromStdString(addr);
-    QHostAddress hostAddress = QHostAddress(address);
+    hostAddress = QHostAddress(address);
     server->listen(hostAddress,port);
+}
+
+void DCNC::startServer(int port)
+{
+    this->port = port;
+    server->listen(hostAddress, port);
+}
+
+void DCNC::cancelConnection()
+{
+    if(!clientConnection && clientConnection->isOpen())
+        clientConnection->close();
+    isConnected = false;
 }
 
 void DCNC::handleConection()
@@ -31,42 +49,42 @@ void DCNC::handleConection()
         QDebug("we are already connected \n");
         return;
     }
+
     //otherwise let's accept a new connection
     isConnected = true;
     clientConnection = server->nextPendingConnection();
-    
-    //replace this garbage with the QTCPSocket signal to trigger handle Data as a socket
-    while(clientConnection->bytesAvailable() <= 0){}
-    //do appropriate opperations with message
-    handleData(clientConnection);
-    clientConnection->close();
+    dataIn.setDevice(clientConnection);
 }
 
-//should be a slot that responds to QTCPSignal
-void DCNC::handleData(QTcpSocket* socket)
+void DCNC::handleData()
 {
-    //initialize new gremlin connection and prepare message
-    dataIn.setDevice(socket);               //should be done at the handle connection level
-    std::unique_ptr<UASMessage> message;
-    UASMessageTCPFramer messageFramer;
-
     //attempts to generate the message
     while(!messageFramer.status()){
         dataIn.startTransaction();
         dataIn >> messageFramer;
         //check the status of dataIn and the framer
-        message = messageFramer.generateMessage();
-        if(!messageFramer.status()){
+        if(!messageFramer.status() || dataIn.status() == QDataStream::ReadPastEnd ||
+                dataIn.status() == QDataStream::ReadCorruptData){
             dataIn.rollbackTransaction();
             messageFramer.clearMessage();
         }
     }
+    message = messageFramer.generateMessage();
     dataIn.commitTransaction();
 
     /*lets send the message to the listening slots now
     switch(message.MessageID){
         case //enumerate and emit right signals
     }*/
+    //call close connection and set isConnected to false when you no longer need the client
+    //emit reconnection or new connection signal
+}
+
+void DCNC::droppedConnection()
+{
+    isConnected = false;
+    previouslyDropped = true;
+    emit droppedClient();
 }
 
 //create a slot to handle dropped connection - set is connected to false

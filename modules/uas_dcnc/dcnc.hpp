@@ -33,37 +33,30 @@ public:
      * \param addr the address of the server
      */
     void startServer(int port, std::string addr);
-    //overload so i can do this with either port or addr
+    void startServer(int port);
    
    /*!
      * \brief cancels the current connection to the client
      * \returns the status of the cancellation
      */
-    bool stopConnection();
-
-    /*!
-     * \brief stops the server
-     * \returns the status of the cancellation
-     */
-    bool stopServer();
+    bool cancelConnection();
 
     //im unsure about this rn
     bool startImageTransfer();
     bool stopImageTransfer();
    
 private:
-    QString address;
     int port;
+    std::atomic<bool> isConnected;
+    std::atomic<bool> previouslyDropped;
+
+    QString address;
+    QHostAddress hostAddress;
     QTcpServer *server;
     QTcpSocket *clientConnection;
     QDataStream dataIn;
-    std::atomic<bool> isConnected;
-
-    /*!
-     * \brief handleMessage parses the message it recieves and carries out tasks accordingly
-     * \param message to be parsed
-     */
-    void handleData(QTcpSocket* socket);
+    std::unique_ptr<UASMessage> message;
+    UASMessageTCPFramer messageFramer;
 
     //further commands to be added later on - will document in full later
     bool requestCapabilities();
@@ -77,6 +70,9 @@ signals:
      *          from the gremlin
      */
     void receivedImageData();
+    void receivedNewConnection();
+    void receivedReconnection();
+    void droppedClient();
 
 public slots:
     /*!
@@ -84,6 +80,30 @@ public slots:
      */
     void handleConection();
 
+private slots:
+    /*!
+     * \brief handleMessage parses the message it recieves and carries out tasks accordingly
+     */
+    void handleData();
+
+    /*!
+     * \brief droppedConnection sets the system variables in the case we lose the client
+     */
+    void droppedConnection();
+
 };
+
+//create a slot to handle dropped connection - set is connected to false
+//check ID message if client is dropped flag
+//1. send a signal if a client is reconnection from dropout
+//2. send client a message to acknowledge that client dropped before
+
+//create new connection signal for UI if you get a new connection after a drop
+//create connection dropped signal
+
+//create method to force drop connection
+//if i get a dirty message tell the gremlin to reset => gaurantees always get an ID message after it
+//otherwise its a new connection and treat normally
+//
 
 #endif // DCNC_HPP
