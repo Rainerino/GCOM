@@ -1,16 +1,18 @@
 #include "gcomcontroller.hpp"
-#include "mavlink_relay/missionplannertcp.hpp"
+#include "modules/mavlink_relay/missionplannertcp.hpp"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     GcomController w;
+
     MissionPlannerSocket mTest;
-    mTest.run(); //add slot for exit
+    mTest.setup("127.0.0.1", 14550, 1000);
+    mTest.run();
 
 
     w.show();
-    //mTest.exit(); //Have a more gracefull exit
+
     return a.exec();
 }
