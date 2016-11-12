@@ -35,8 +35,7 @@ public:
     bool startDevice(MissionPlannerSocket * const relay);
 
 public slots:
-    //change this late
-    void receiveHandler();
+    void receiveHandler(std::shared_ptr<mavlink_global_position_int_t>);
 
 private:
     QString arduino_port;
@@ -44,7 +43,7 @@ private:
     QSerialPort *arduino_serial;
     QSerialPort *zaber_serial;
 
-    //mavlink_msg_global_position_int gpsData;
+    mavlink_global_position_int_t gpsData;
 
     float base_lat;
     float base_lon;
@@ -52,7 +51,8 @@ private:
     QString arduino_port_name = "Arduino";
     QString zaber_port_name = "Zaber";
     std::string arduino_request = "GCOM_ready";
-    //std::string calcMovement();
+
+    std::string calcMovement();
 };
 
 #endif // ANTENNATRACKER_H
