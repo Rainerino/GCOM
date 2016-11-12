@@ -74,8 +74,7 @@ bool AntennaTracker::startDevice(MissionPlannerSocket * const relay)
     this->zaber_serial->open(QIODevice::ReadWrite);
 
     //connect mavlink relay
-    //giving syntax error
-    connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler());
+    connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler()));
 
     if(this->arduino_serial->isOpen() && this->zaber_serial->isOpen())
         return true;
