@@ -16,12 +16,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         gcomcontroller.cpp \
     modules/uas_message/uas_message_tcp_framer.cpp \
-    antennatracker.cpp
+    modules/uas_antenna_tracker/antennatracker.cpp
 
 HEADERS  += gcomcontroller.hpp \
     modules/uas_message/uas_message.hpp \
     modules/uas_message/uas_message_tcp_framer.hpp \
-    antennatracker.hpp
+    modules/uas_antenna_tracker/antennatracker.hpp
 
 FORMS    += gcomcontroller.ui
 
