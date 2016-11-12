@@ -17,7 +17,7 @@
 
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
-//#include "Mavlink/common/mavlink.h"
+#include "Mavlink/common/mavlink.h"
 
 class AntennaTracker : QObject
 {
