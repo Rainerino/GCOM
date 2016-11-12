@@ -18,6 +18,7 @@
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
 #include "Mavlink/common/mavlink.h"
+#include "modules/mavlink_relay/missionplannertcp.hpp"
 
 class AntennaTracker : QObject
 {
@@ -31,7 +32,7 @@ public:
     QList<QString> getZaberList();
 
     void setupDevice(std::string arduino_port, std::string zaber_port);
-    bool startDevice();
+    bool startDevice(MissionPlannerSocket * const relay);
 
 public slots:
     //change this late

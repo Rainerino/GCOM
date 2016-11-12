@@ -65,7 +65,7 @@ void AntennaTracker::setupDevice(std::string arduino_port="COM5", std::string za
     this->zaber_serial->setFlowControl(QSerialPort::NoFlowControl);
 }
 
-bool AntennaTracker::startDevice()
+bool AntennaTracker::startDevice(MissionPlannerSocket * const relay)
 {
     if(this->arduino_serial == NULL || this->zaber_serial == NULL)
         return false;
@@ -74,7 +74,8 @@ bool AntennaTracker::startDevice()
     this->zaber_serial->open(QIODevice::ReadWrite);
 
     //connect mavlink relay
-    //connect(, SIGNAL(mavlinkgpsinfo(std::)), this, SLOT(receiveHandler());
+    //giving syntax error
+    connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler());
 
     if(this->arduino_serial->isOpen() && this->zaber_serial->isOpen())
         return true;
