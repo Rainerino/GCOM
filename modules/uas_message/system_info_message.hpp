@@ -1,7 +1,17 @@
 #ifndef SYSTEMINFOMESSAGE_H
 #define SYSTEMINFOMESSAGE_H
 
+//===================================================================
+// Includes
+//===================================================================
+// System Includes
+#include <vector>
+// GCOM Includes
+#include "uas_message.hpp"
 
+//===================================================================
+// Public Class Declarations
+//===================================================================
 class SystemInfoMessage : public UASMessage
 {
     public:
@@ -43,9 +53,6 @@ class SystemInfoMessage : public UASMessage
         unsigned char  systemId;
         unsigned char  versionNumber;
         bool cameraRelay;
-
-    private:
-        MessageId messageType;
 };
 
 #endif // SYSTEMINFOMESSAGE_H

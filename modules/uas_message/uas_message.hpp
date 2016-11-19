@@ -27,12 +27,11 @@ class UASMessage
         enum MessageId : unsigned char
         {
             REQUEST                 = 0x0A,
-            SYSTEM_INFO             = 0x0B,
-            IMAGE_DATA              = 0x0C,
-            IMAGE_TRANSFER_CONTROL  = 0x0D,
-            CLAW_CONTROL_MESSAGE    = 0x0E,
+            RESPONSE                = 0x0B,
+            SYSTEM_INFO             = 0x0C,
+            SYSTEM_CONTROL          = 0x0D,
+            IMAGE_DATA              = 0x0E,
             CLAW_IMAGE_DATA         = 0x0F,
-            RESET_SYSTEM            = 0x10,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };

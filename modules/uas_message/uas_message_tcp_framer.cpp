@@ -4,6 +4,8 @@
 // UAS Includes
 #include "uas_message_tcp_framer.hpp"
 #include "uas_message.hpp"
+#include "request_message.hpp"
+#include "system_info_message.hpp"
 // Qt Includes
 #include <QDataStream>
 #include <array>
@@ -59,6 +61,16 @@ std::unique_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
     // Next we switch on the type of the message so that we can construct the appropriate object and return it
     switch (messageData.front())
     {
+        case UASMessage::MessageId::REQUEST:
+        {
+            std::unique_ptr<UASMessage> message(new RequestMessage(serialMessagePayload));
+            return message;
+        }
+        case UASMessage::MessageId::SYSTEM_INFO:
+        {
+            std::unique_ptr<UASMessage> message(new SystemInfoMessage(serialMessagePayload));
+            return message;
+        }
         default:
             return nullptr;
     }

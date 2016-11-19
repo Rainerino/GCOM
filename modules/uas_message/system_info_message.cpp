@@ -15,14 +15,13 @@ SystemInfoMessage::SystemInfoMessage(unsigned char systemId, unsigned char versi
     this->systemId = systemId;
     this->versionNumber = versionNumber;
     cameraRelay = false;
-    messageType = MessageId::REQUEST;
 }
 
 SystemInfoMessage::SystemInfoMessage(const std::vector<unsigned char> &serializedMessage)
 {
-    cameraRelay = serializedMessage.pop_back();
-    versionNumber = serializedMessage.pop_back();
-    systemId = serializedMessage.pop_back();
+    systemId = serializedMessage[0];
+    versionNumber = serializedMessage[1];
+    cameraRelay = serializedMessage[2];
 }
 
 SystemInfoMessage::~SystemInfoMessage()
@@ -32,7 +31,7 @@ SystemInfoMessage::~SystemInfoMessage()
 
 UASMessage::MessageId SystemInfoMessage::type()
 {
-    return messageType;
+    return MessageId::REQUEST;;
 }
 
 std::vector<unsigned char> SystemInfoMessage::serialize()
@@ -41,6 +40,7 @@ std::vector<unsigned char> SystemInfoMessage::serialize()
     serializedMessage.push_back(systemId);
     serializedMessage.push_back(versionNumber);
     serializedMessage.push_back(cameraRelay);
+    return serializedMessage;
 }
 
 
