@@ -7,7 +7,9 @@
 #include "request_message.hpp"
 #include "uas_message.hpp"
 
-
+//===================================================================
+// Class Definitions
+//===================================================================
 RequestMessage::RequestMessage(MessageId requestedMessage)
 {
     messageType = MessageId::REQUEST;

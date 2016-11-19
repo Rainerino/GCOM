@@ -27,7 +27,7 @@ class UASMessage
         enum MessageId : unsigned char
         {
             REQUEST                 = 0x0A,
-            ID                      = 0x0B,
+            SYSTEM_INFO             = 0x0B,
             IMAGE_DATA              = 0x0C,
             IMAGE_TRANSFER_CONTROL  = 0x0D,
             CLAW_CONTROL_MESSAGE    = 0x0E,
