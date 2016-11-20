@@ -7,6 +7,7 @@
 #include <QAbstractSocket>
 #include <QtCore>
 #include "Mavlink/common/mavlink.h"
+#include "../Mavlink/ardupilotmega/ardupilotmega.h"
 #include <string>
 #include <memory>
 
@@ -16,22 +17,25 @@ class MissionPlannerSocket : public QThread
     Q_OBJECT
 public:
     void run();
-    void exit();
+    void end();
     void setup(QString ipaddress, qint16 port, int timeout = 1000);
     MissionPlannerSocket();
 signals:
     void connectedtomavlink();
     void disconnectedfrommavlink();
-    void mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>);
-    void mavlinkcamerainfo(std::shared_ptr<mavlink_camera_trigger_t>);
+    void mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t> gpsSignal);
+    void mavlinkcamerainfo(std::shared_ptr<mavlink_camera_feedback_t> cameraSignal);
 public slots:
     void connected();
     void disconnected();
     void readBytes();
+
 private:
     QTcpSocket *socket;
     QString ipaddress;
     qint16 port;
     int timeout;
+    mavlink_status_t lastStatus;
+    void exit();
 };
 #endif // MISSIONPLANNERTCP_HPP

@@ -1,9 +1,10 @@
 #include <QNetworkSession>
 #include "missionplannertcp.hpp"
-#include "../Mavlink/common/mavlink.h"
+#include "../Mavlink/ardupilotmega/ardupilotmega.h"
 #include <QtCore>
 #include <QString>
 #include <memory>
+
 
 MissionPlannerSocket::MissionPlannerSocket()
 {
@@ -21,9 +22,15 @@ void MissionPlannerSocket::exit(){
     disconnect(socket,SIGNAL(connected()), this, SLOT(connected()));
     disconnect(socket,SIGNAL(disconnected()), this, SLOT(disconnected()));
     disconnect(socket,SIGNAL(readyRead()), this, SLOT(readBytes()));
+
+}
+
+void MissionPlannerSocket::end(){
+    exit();
 }
 
 void MissionPlannerSocket::setup(QString s_ipaddress, qint16 s_port, int s_timeout){
+    //todo: atomic boolean(thread safe) keep track of connection or thread.isalive
     ipaddress = s_ipaddress;
     port = s_port;
     timeout = s_timeout;
@@ -48,6 +55,7 @@ void MissionPlannerSocket::connected()
 void MissionPlannerSocket::disconnected()
 {
     emit disconnectedfrommavlink();
+    exit();
 }
 
 void MissionPlannerSocket::readBytes()
@@ -56,42 +64,48 @@ void MissionPlannerSocket::readBytes()
     mavlink_status_t status;
     uint8_t msgReceived = false;
     QByteArray bufferByteArray;
-    // Shared pointers don't like being constructed in case statements?
-    std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(new mavlink_global_position_int_t);
-    std::shared_ptr<mavlink_camera_trigger_t> cameraPacketPointer(new mavlink_camera_trigger_t);
 
     bufferByteArray = socket->readAll(); // Read a QByteArray from TCP Socket
+    //char readChar = 'a';
+    //socket->read(&readChar, sizeof(char));
     std::vector<unsigned char> bufferVector(bufferByteArray.begin(),
                                             bufferByteArray.end());// Convert QByteArray to a vector of uint_8
 
     // Decode the vector into a message
     for(int i = 0; i < bufferVector.size(); i++){
         msgReceived = mavlink_parse_char(MAVLINK_COMM_1, bufferVector[i], &message, &status);
-
-        if(msgReceived){
+        }
+        //if(msgReceived)
+        // msgRecievied boolean blocks the MAVLINK_MSG_ID_CAMERA_FEEDBACK
+        // so it has been temporaily disabled.
+        // this will be investigated
+        //{
             switch (message.msgid) {
 
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+            {
+                std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(new mavlink_global_position_int_t);
+
                 mavlink_msg_global_position_int_decode(&message, gpsPacketPointer.get());
                 emit mavlinkgpsinfo(gpsPacketPointer);
-                //qDebug() << gpsPacketPointer->time_boot_ms << gpsPacketPointer->lat << gpsPacketPointer->lon;
                 break;
+            }
 
-            case MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC:
-                mavlink_msg_camera_trigger_decode(&message, cameraPacketPointer.get());
+            case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
+            {
+                std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(new mavlink_camera_feedback_t);
+                mavlink_msg_camera_feedback_decode(&message, cameraPacketPointer.get());
                 emit mavlinkcamerainfo(cameraPacketPointer);
-                //qDebug() << "Camera Triggered  " << cameraPacketPointer->time_usec << "   " << cameraPacketPointer->seq;
                 break;
+            }
+
+
 
             default:
                 break;
             }
-        }
-    }
-    //qDebug() << msgReceived;
-    // Todo: impletemt testing for message errors and incomplete messages
-    //if(msgReceived){
-
+        //}
     //}
+
 }
 
