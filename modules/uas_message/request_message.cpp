@@ -10,16 +10,14 @@
 //===================================================================
 // Class Definitions
 //===================================================================
-RequestMessage::RequestMessage(MessageId requestedMessage)
+RequestMessage::RequestMessage(MessageID requestedMessage)
 {
-    messageType = MessageId::REQUEST;
     this->requestedMessage = requestedMessage;
 }
 
 RequestMessage::RequestMessage(const std::vector<unsigned char>& serializedMessage)
 {
-    messageType = MessageId::REQUEST;
-    this->requestedMessage = static_cast<MessageId>(serializedMessage.front());
+    this->requestedMessage = static_cast<MessageID>(serializedMessage.front());
 }
 
 RequestMessage::~RequestMessage()
@@ -27,14 +25,14 @@ RequestMessage::~RequestMessage()
 
 }
 
-UASMessage::MessageId RequestMessage::type()
+UASMessage::MessageID RequestMessage::type()
 {
-    return messageType;
+    return MessageID::REQUEST;
 }
 
 std::vector<unsigned char> RequestMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;
-    serializedMessage.push_back(requestedMessage);
+    serializedMessage.push_back(static_cast<unsigned char>(requestedMessage));
     return serializedMessage;
 }

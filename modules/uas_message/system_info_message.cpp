@@ -29,9 +29,9 @@ SystemInfoMessage::~SystemInfoMessage()
 
 }
 
-UASMessage::MessageId SystemInfoMessage::type()
+UASMessage::MessageID SystemInfoMessage::type()
 {
-    return MessageId::REQUEST;;
+    return MessageID::REQUEST;;
 }
 
 std::vector<unsigned char> SystemInfoMessage::serialize()

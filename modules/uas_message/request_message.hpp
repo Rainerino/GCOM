@@ -21,7 +21,7 @@ class RequestMessage : public UASMessage
          * \brief RequestMessage constructor that requests a specific message
          * \param [in] requestedMessage the message ID to request
          */
-        RequestMessage(UASMessage::MessageId requestedMessage);
+        RequestMessage(UASMessage::MessageID requestedMessage);
 
         /*!
          * \brief RequestMessage constructor designed to initialize a message using a serialized payload
@@ -38,13 +38,13 @@ class RequestMessage : public UASMessage
          * \brief request returns the message ID that that this message is requesting
          * \return The MeesageId of the message ID we are requesting
          */
-        MessageId request();
+        MessageID request();
 
         /*!
          * \brief type returns the type of the message as a MeesageId
          * \return The type of the enclosed message as a MeeageId enum value
          */
-        MessageId type();
+        MessageID type();
 
         /*!
          * \brief serialize serializes the message into a unsigned char vector
@@ -54,8 +54,7 @@ class RequestMessage : public UASMessage
 
     private:
         // Private Member Vriable
-        MessageId messageType;
-        MessageId requestedMessage;
+        MessageID requestedMessage;
 };
 
 #endif // REQUEST_MESSAGE_H

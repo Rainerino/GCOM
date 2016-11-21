@@ -19,7 +19,6 @@
 const int FRAMED_MESG_SIZE_FIELD_SIZE = 4;
 const int FRAMED_MESG_ID_FIELD_SIZE = 1;
 
-
 //===================================================================
 // Class Definitions
 //===================================================================
@@ -46,7 +45,7 @@ bool UASMessageTCPFramer::frameMessage(UASMessage &uasMessage)
     for (int sizeFieldByte = 0; sizeFieldByte < FRAMED_MESG_SIZE_FIELD_SIZE; sizeFieldByte++)
          messageData.insert(messageData.begin(), (serializedMessageSize >> (8 * sizeFieldByte ))& 0xFF);
     // Finally append the message ID to the very front of the message
-    messageData.insert(messageData.begin(), uasMessage.type());
+    messageData.insert(messageData.begin(), static_cast<unsigned char>(uasMessage.type()));
     return true;
 }
 
@@ -61,12 +60,12 @@ std::unique_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
     // Next we switch on the type of the message so that we can construct the appropriate object and return it
     switch (messageData.front())
     {
-        case UASMessage::MessageId::REQUEST:
+        case UASMessage::MessageID::REQUEST:
         {
             std::unique_ptr<UASMessage> message(new RequestMessage(serialMessagePayload));
             return message;
         }
-        case UASMessage::MessageId::SYSTEM_INFO:
+        case UASMessage::MessageID::SYSTEM_INFO:
         {
             std::unique_ptr<UASMessage> message(new SystemInfoMessage(serialMessagePayload));
             return message;

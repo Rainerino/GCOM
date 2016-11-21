@@ -41,7 +41,7 @@ class SystemInfoMessage : public UASMessage
          * \brief type returns the type of the message as a MeesageId
          * \return The type of the enclosed message as a MeeageId enum value
          */
-        MessageId type();
+        MessageID type();
 
         /*!
          * \brief serialize serializes the message into a unsigned char vector
