@@ -5,6 +5,7 @@
 #include <QtCore>
 #include <memory>
 #include <QDebug>
+#include <windows.h>
 
 #include "modules/mavlink_relay/testslotthread.hpp"
 
@@ -30,17 +31,12 @@ int main(int argc, char *argv[])
     QObject::connect(&relayTest,SIGNAL(mavlinkcamerainfo(std::shared_ptr<mavlink_camera_feedback_t>)),    // Camera signal emitted from mavlink relay
                      &testSlotsThread,SLOT(mavlinkcamerainfo(std::shared_ptr<mavlink_camera_feedback_t>))); // Camera example slot which recieves the data
     relayTest.run();
-    //if (relayTest.isRunning())
-    testSlotsThread.start();
+    qDebug() << "This message doesn't exist when exec() is called within the run() function";
 
-    relayTest.end();
-
-
-
-    //mTest.exit();//Look into this
+    QObject::connect(&w,SIGNAL(testclick()), &relayTest,SLOT(end()));
 
 
     w.show();
-
     return a.exec();
+
 }

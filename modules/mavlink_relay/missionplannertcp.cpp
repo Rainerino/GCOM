@@ -18,15 +18,14 @@ MissionPlannerSocket::MissionPlannerSocket()
     connect(socket,SIGNAL(readyRead()), this, SLOT(readBytes())); // Reads bytes when there are bytes availible to read
 }
 
-void MissionPlannerSocket::exit(){
+
+
+void MissionPlannerSocket::end(){
+    qDebug() << "Thread Ended";
     disconnect(socket,SIGNAL(connected()), this, SLOT(connected()));
     disconnect(socket,SIGNAL(disconnected()), this, SLOT(disconnected()));
     disconnect(socket,SIGNAL(readyRead()), this, SLOT(readBytes()));
-
-}
-
-void MissionPlannerSocket::end(){
-    exit();
+    quit();
 }
 
 void MissionPlannerSocket::setup(QString s_ipaddress, qint16 s_port, int s_timeout){
@@ -44,7 +43,7 @@ void MissionPlannerSocket::run()
         qDebug() << "Error: " << socket->errorString();
     }
 
-    exec();
+    //exec();
 }
 
 void MissionPlannerSocket::connected()

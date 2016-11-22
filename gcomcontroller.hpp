@@ -14,6 +14,10 @@ class GcomController : public QMainWindow
 public:
     explicit GcomController(QWidget *parent = 0);
     ~GcomController();
+signals:
+    void testclick();
+public slots:
+    void clicked();
 
 private:
     Ui::GcomController *ui;

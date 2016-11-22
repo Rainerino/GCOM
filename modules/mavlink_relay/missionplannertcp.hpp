@@ -17,7 +17,7 @@ class MissionPlannerSocket : public QThread
     Q_OBJECT
 public:
     void run();
-    void end();
+
     void setup(QString ipaddress, qint16 port, int timeout = 1000);
     MissionPlannerSocket();
 signals:
@@ -29,6 +29,8 @@ public slots:
     void connected();
     void disconnected();
     void readBytes();
+    void end();
+
 
 private:
     QTcpSocket *socket;
@@ -36,6 +38,6 @@ private:
     qint16 port;
     int timeout;
     mavlink_status_t lastStatus;
-    void exit();
+
 };
 #endif // MISSIONPLANNERTCP_HPP

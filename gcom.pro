@@ -28,3 +28,4 @@ FORMS    += gcomcontroller.ui
 INCLUDEPATH += Mavlink
 
 CONFIG += c++14
+
