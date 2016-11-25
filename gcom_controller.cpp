@@ -1,4 +1,4 @@
-#include "gcomcontroller.hpp"
+#include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
 
 GcomController::GcomController(QWidget *parent) :

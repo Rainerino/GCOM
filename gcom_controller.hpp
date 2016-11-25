@@ -15,7 +15,7 @@ public:
     explicit GcomController(QWidget *parent = 0);
     ~GcomController();
 
-private:
+    private:
     Ui::GcomController *ui;
 };
 
