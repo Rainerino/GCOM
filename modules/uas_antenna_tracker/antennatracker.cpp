@@ -72,11 +72,14 @@ void AntennaTracker::setupDevice(std::string arduino_port, std::string zaber_por
     this->zaber_serial->setFlowControl(QSerialPort::NoFlowControl);
 }
 
-bool AntennaTracker::startDevice(MissionPlannerSocket * const relay)
+AntennaTracker::DEVICE_STAT AntennaTracker::startDevice(MissionPlannerSocket * const relay)
 {
     //failed if either arduino_serial or zaber_serial is uninitialized
-    if(this->arduino_serial == NULL || this->zaber_serial == NULL)
-        return false;
+    if(this->arduino_serial == NULL)
+        return DEVICE_STAT::arduino_uninitialized;
+
+    if(this->zaber_serial == NULL)
+        return DEVICE_STAT::zaber_uninitialized;
 
     //open arduino_serial and zaber_serial
     bool zaberOpen = this->arduino_serial->open(QIODevice::ReadWrite);
@@ -86,10 +89,12 @@ bool AntennaTracker::startDevice(MissionPlannerSocket * const relay)
     connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
 
     //return true if both arduino and zaber are open, and false otherwise
-    if(zaberOpen && arduinoOpen)
-        return true;
+    if(!arduinoOpen)
+        return DEVICE_STAT::arduino_not_open;
+    else if(!zaberOpen)
+        return DEVICE_STAT::zaber_not_open;
     else
-        return false;
+        return DEVICE_STAT::success;
 }
 
 //incomplete
@@ -117,5 +122,5 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
 
 //NEEDS TO BE IMPLEMENTED
 std::string AntennaTracker::calcMovement(){
-    return null;
+    return "";
 }

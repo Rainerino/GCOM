@@ -28,11 +28,19 @@ public:
     explicit AntennaTracker();
     ~AntennaTracker();
 
+    enum DEVICE_STAT {
+        success,
+        arduino_uninitialized,
+        zaber_uninitialized,
+        arduino_not_open,
+        zaber_not_open
+    };
+
     QList<QString> getArduinoList();
     QList<QString> getZaberList();
 
     void setupDevice(std::string arduino_port, std::string zaber_port);
-    bool startDevice(MissionPlannerSocket * const relay);
+    AntennaTracker::DEVICE_STAT startDevice(MissionPlannerSocket * const relay);
 
 public slots:
     void receiveHandler(std::shared_ptr<mavlink_global_position_int_t>);
