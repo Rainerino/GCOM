@@ -3,11 +3,7 @@
 # Project created by QtCreator 2016-10-01T08:23:59
 #
 #-------------------------------------------------
-
-QT       += core gui
-QT       += network
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 TARGET = gcom
 TEMPLATE = app
@@ -15,13 +11,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         gcomcontroller.cpp \
-    modules/mavlink_relay/missionplannertcp.cpp \
-    modules/mavlink_relay/testslotthread.cpp
+    modules/mavlink_relay/mavlink_relay_tcp.cpp
 
 HEADERS  += gcomcontroller.hpp \
     modules/uas_message/uas_message.hpp \
-    modules/mavlink_relay/missionplannertcp.hpp \
-    modules/mavlink_relay/testslotthread.hpp
+    modules/mavlink_relay/mavlink_relay_tcp.hpp
 
 FORMS    += gcomcontroller.ui
 
