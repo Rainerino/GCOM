@@ -16,16 +16,20 @@ MAVLinkRelay::MAVLinkRelay()
     missionplannerSocket = nullptr;
 }
 
-void MAVLinkRelay::stop()
+bool MAVLinkRelay::stop()
 {
-    if (missionplannerSocket == nullptr)
+    if (missionplannerSocket != nullptr)
     {
 
         disconnect(missionplannerSocket,SIGNAL(connected()), this, SLOT(connected()));
         disconnect(missionplannerSocket,SIGNAL(disconnected()), this, SLOT(disconnected()));
         disconnect(missionplannerSocket,SIGNAL(readyRead()), this, SLOT(readBytes()));
         delete missionplannerSocket;
+
+        return true;
     }
+
+    return false;
 
 }
 
@@ -44,6 +48,11 @@ void MAVLinkRelay::setup(QString ipaddress, qint16 port, int timeout)
 
 bool MAVLinkRelay::start()
 {
+    if(missionplannerSocket == nullptr)
+    {
+        return false;
+    }
+
     missionplannerSocket->connectToHost(ipaddress, port);
     if(!missionplannerSocket->waitForConnected(timeout))
     {
@@ -55,12 +64,12 @@ bool MAVLinkRelay::start()
 
 void MAVLinkRelay::connected()
 {
-     emit connectedtomavlink();
+     emit mavrelayConnected();
 }
 
 void MAVLinkRelay::disconnected()
 {
-    emit disconnectedfrommavlink();
+    emit mavrelayDisconnected();
 }
 
 void MAVLinkRelay::readBytes()
@@ -70,40 +79,39 @@ void MAVLinkRelay::readBytes()
     uint8_t msgReceived = false;
     QByteArray bufferByteArray;
 
-    // Read a QByteArray from TCP Socket
+    // Read from TCP Socket
     bufferByteArray = missionplannerSocket->readAll();
-    // Convert QByteArray to a vector of uint_8
-    std::vector<unsigned char> bufferVector(bufferByteArray.begin(),
-                                            bufferByteArray.end());
-    // Decode the vector into a message
-    for(int i = 0; i < bufferVector.size(); i++)
-        msgReceived = mavlink_parse_char(MAVLINK_COMM_1, bufferVector[i], &message, &status);
-        //if(msgReceived)
-        //{
-            switch (message.msgid) {
-
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+    // Decode and emit the mavlink message
+    for(auto messageCurrentByte = bufferByteArray.begin(); messageCurrentByte != bufferByteArray.end(); ++messageCurrentByte)
+    {
+        msgReceived = mavlink_parse_char(MAVLINK_COMM_1, static_cast<uint8_t>(*messageCurrentByte), &message, &status);
+        if(msgReceived)
+        {
+            switch (message.msgid)
             {
-                std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(new mavlink_global_position_int_t);
-                qDebug() << "GOT IT";
-                mavlink_msg_global_position_int_decode(&message, gpsPacketPointer.get());
-                emit mavlinkgpsinfo(gpsPacketPointer);
-                break;
-            }
 
-            case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
-            {
-                qDebug() << "GOT CAM WITH MESSAGE: " << msgReceived;
-                std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(new mavlink_camera_feedback_t);
-                mavlink_msg_camera_feedback_decode(&message, cameraPacketPointer.get());
-                emit mavlinkcamerainfo(cameraPacketPointer);
-                break;
-            }
+                case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+                {
+                    std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(new mavlink_global_position_int_t);
+                    qDebug() << "GOT IT";
+                    mavlink_msg_global_position_int_decode(&message, gpsPacketPointer.get());
+                    emit mavrelayGPSInfo(gpsPacketPointer);
+                    break;
+                }
 
-            default:
-                break;
+                case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
+                {
+                    qDebug() << "GOT CAM WITH MESSAGE: " << msgReceived;
+                    std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(new mavlink_camera_feedback_t);
+                    mavlink_msg_camera_feedback_decode(&message, cameraPacketPointer.get());
+                    emit mavrelayCameraInfo(cameraPacketPointer);
+                    break;
+                }
+
+                default:
+                    break;
             }
-        //}
-    //}
+        }
+    }
 }
 

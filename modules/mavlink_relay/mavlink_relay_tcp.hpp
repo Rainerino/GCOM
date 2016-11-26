@@ -27,12 +27,12 @@ public:
 
     bool start();
     void setup(QString ipaddress, qint16 port, int timeout = 1000);
-    void stop();
+    bool stop();
 signals:
-    void connectedtomavlink();
-    void disconnectedfrommavlink();
-    void mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t> gpsSignal);
-    void mavlinkcamerainfo(std::shared_ptr<mavlink_camera_feedback_t> cameraSignal);
+    void mavrelayConnected();
+    void mavrelayDisconnected();
+    void mavrelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t> gpsSignal);
+    void mavrelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t> cameraSignal);
 
 public slots:
     void connected();
