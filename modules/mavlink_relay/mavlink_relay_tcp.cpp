@@ -20,7 +20,7 @@ bool MAVLinkRelay::stop()
 {
     if (missionplannerSocket != nullptr)
     {
-
+        missionplannerSocket->disconnectFromHost();
         disconnect(missionplannerSocket,SIGNAL(connected()), this, SLOT(connected()));
         disconnect(missionplannerSocket,SIGNAL(disconnected()), this, SLOT(disconnected()));
         disconnect(missionplannerSocket,SIGNAL(readyRead()), this, SLOT(readBytes()));
@@ -93,7 +93,6 @@ void MAVLinkRelay::readBytes()
                 case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
                 {
                     std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(new mavlink_global_position_int_t);
-                    qDebug() << "GOT IT";
                     mavlink_msg_global_position_int_decode(&message, gpsPacketPointer.get());
                     emit mavrelayGPSInfo(gpsPacketPointer);
                     break;
@@ -101,7 +100,6 @@ void MAVLinkRelay::readBytes()
 
                 case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
                 {
-                    qDebug() << "GOT CAM WITH MESSAGE: " << msgReceived;
                     std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(new mavlink_camera_feedback_t);
                     mavlink_msg_camera_feedback_decode(&message, cameraPacketPointer.get());
                     emit mavrelayCameraInfo(cameraPacketPointer);
