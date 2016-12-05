@@ -2,10 +2,9 @@
 // Includes
 //===================================================================
 // System Includes
-#include <QtCore>
 #include <QString>
 #include <memory>
-#include <qdebug>
+#include <QDebug>
 // GCOM Includes
 #include "mavlink_relay_tcp.hpp"
 #include "../Mavlink/ardupilotmega/mavlink.h"
@@ -15,66 +14,77 @@
 //===================================================================
 MAVLinkRelay::MAVLinkRelay()
 {
+    // Set defualt values
     ipaddress = "127.0.0.1";
     port = 14550;
-    missionplannerSocket = nullptr;
+    relayStatus = MAVLinkRelayStatus::DISCCONNECTED;
+    // Build the sockets and connect the signals/slots
+    missionplannerSocket = new QTcpSocket(this);
+    connect(missionplannerSocket, SIGNAL(connected()),
+            this, SLOT(connected()));
+    connect(missionplannerSocket, SIGNAL(disconnected()),
+            this, SLOT(disconnected()));
+    connect(missionplannerSocket, SIGNAL(readyRead()),
+            this, SLOT(readBytes()));
+    connect(missionplannerSocket, &QTcpSocket::stateChanged,
+            this, &MAVLinkRelay::statusChanged);
 }
 
-bool MAVLinkRelay::stop()
+void MAVLinkRelay::stop()
 {
-    if (missionplannerSocket != nullptr)
-    {
-        missionplannerSocket->disconnectFromHost();
-        disconnect(missionplannerSocket,SIGNAL(connected()), this, SLOT(connected()));
-        disconnect(missionplannerSocket,SIGNAL(disconnected()), this, SLOT(disconnected()));
-        disconnect(missionplannerSocket,SIGNAL(readyRead()), this, SLOT(readBytes()));
-        delete missionplannerSocket;
-        missionplannerSocket = nullptr;
-
-        return true;
-    }
-
-    return false;
+    missionplannerSocket->disconnectFromHost();
 }
 
 void MAVLinkRelay::setup(QString ipAddress, qint16 port)
 {
-    // If setup was called twice  withougt calling stop in between then we call
-    // stop
-    if (missionplannerSocket != nullptr)
+    // If the socket is unconnected or is not in the process of closing then we
+    // close it
+    if (missionplannerSocket->state() != QAbstractSocket::UnconnectedState)
         stop();
-
     // Save connection Parameters
     this->ipaddress = ipAddress;
     this->port = port;
-
-    // Build the sockets and connect the signals/slots
-    missionplannerSocket = new QTcpSocket(this);
-    connect(missionplannerSocket,SIGNAL(connected()), this, SLOT(connected()));
-    connect(missionplannerSocket,SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(missionplannerSocket,SIGNAL(readyRead()), this, SLOT(readBytes()));
 }
 
-bool MAVLinkRelay::start(int timeout)
+MAVLinkRelay::MAVLinkRelayStatus MAVLinkRelay::status()
 {
-    if(missionplannerSocket == nullptr)
-        return false;
+    return relayStatus;
+}
 
-    missionplannerSocket->connectToHost(ipaddress, port);
-    if(!missionplannerSocket->waitForConnected(timeout))
+bool MAVLinkRelay::start()
+{
+    // If the socket if is not unconnected then return false
+    if (missionplannerSocket->state() != QAbstractSocket::UnconnectedState)
         return false;
+    // Attempt to connect to the specified host
+    missionplannerSocket->connectToHost(ipaddress, port);
 
     return true;
 }
 
 void MAVLinkRelay::connected()
 {
-     emit mavrelayConnected();
+     relayStatus = MAVLinkRelayStatus::CONNECTED;
+     emit mavlinkRelayConnected();
 }
 
 void MAVLinkRelay::disconnected()
 {
-    emit mavrelayDisconnected();
+    relayStatus = MAVLinkRelayStatus::DISCCONNECTED;
+    emit mavlinkRelayDisconnected();
+}
+
+void MAVLinkRelay::statusChanged(QAbstractSocket::SocketState socketState)
+{
+    // Handle the connecting case
+    if ((socketState == QAbstractSocket::SocketState::HostLookupState)
+            || socketState == QAbstractSocket::SocketState::ConnectingState)
+    {
+        relayStatus = MAVLinkRelayStatus::CONNECTING;
+    }
+    else if ((relayStatus == MAVLinkRelayStatus::CONNECTING)
+             && (socketState == QAbstractSocket::SocketState::UnconnectedState))
+        disconnected();
 }
 
 void MAVLinkRelay::readBytes()
@@ -110,7 +120,7 @@ void MAVLinkRelay::readBytes()
                     std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(
                                 new mavlink_global_position_int_t);
                     mavlink_msg_global_position_int_decode(&message,gpsPacketPointer.get());
-                    emit mavrelayGPSInfo(gpsPacketPointer);
+                    emit mavlinkRelayGPSInfo(gpsPacketPointer);
                     break;
                 }
 
@@ -119,7 +129,7 @@ void MAVLinkRelay::readBytes()
                     std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(
                                 new mavlink_camera_feedback_t);
                     mavlink_msg_camera_feedback_decode(&message, cameraPacketPointer.get());
-                    emit mavrelayCameraInfo(cameraPacketPointer);
+                    emit mavlinkRelayCameraInfo(cameraPacketPointer);
                     break;
                 }
 
