@@ -24,12 +24,18 @@
  * \author Grant Nicol
  * \author Zeyad Tamimi
  */
-class MAVLinkRelay : QObject
+class MAVLinkRelay : public QObject
 {
     Q_OBJECT
 
 public:
 
+    enum class MAVLinkRelayStatus : int
+    {
+        CONNECTED           = 0,
+        DISCCONNECTED       = 1,
+        CONNECTING          = 2,
+    };
     // Public Methods
     MAVLinkRelay();
 
@@ -45,34 +51,38 @@ public:
     /*!
      * \brief start, attempts to open the TCP socket and connect to the MAVLink
      *        stream
-     * \return True if the connection was successful. False if the operation
-     *         timed out or setup was never called
+     * \return True if the connection was successful. False if setup was never
+     *         called
      */
-    bool start(int timeout);
+    bool start();
 
     /*!
-     * \brief stop, tearsdown the TCP socket and disconnects the slots and
-     *        signals
-     * \return True if the TCP socket was torn down and False if stop was called
-     *         before start
+     * \brief stop, tearsdown the TCP socket
      */
-    bool stop();
+    void stop();
+
+    /*!
+     * \brief status
+     * \return the status of the MAVLinkRelay as a MAVLinkRelayStatus
+     */
+    MAVLinkRelayStatus status();
 
 signals:
-    void mavrelayConnected();
-    void mavrelayDisconnected();
-    void mavrelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t> gpsSignal);
-    void mavrelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t> cameraSignal);
+    void mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t> gpsSignal);
+    void mavlinkRelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t> cameraSignal);
+    void mavlinkRelayConnected();
+    void mavlinkRelayDisconnected();
 
 private slots:
     void connected();
     void disconnected();
+    void statusChanged(QAbstractSocket::SocketState socketState);
     void readBytes();
-
 
 private:
     // Private Member Variables
     QTcpSocket *missionplannerSocket;
+    MAVLinkRelayStatus relayStatus;
     QString ipaddress;
     qint16 port;
     mavlink_status_t lastStatus;
