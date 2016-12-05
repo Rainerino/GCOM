@@ -18,12 +18,12 @@ SOURCES += main.cpp\
     modules/uas_message/system_info_message.cpp \
     modules/uas_message/command_message.cpp \
     modules/uas_message/response_message.cpp \
-        gcomcontroller.cpp \
+    gcom_controller.cpp \
     modules/mavlink_relay/mavlink_relay_tcp.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
-    modules/mavlink_relay/mavlink_relay_tcp.hpp
+    modules/mavlink_relay/mavlink_relay_tcp.hpp \
     modules/uas_message/request_message.hpp \
     modules/uas_message/system_info_message.hpp \
     modules/uas_message/command_message.hpp \
@@ -35,3 +35,5 @@ FORMS    += gcomcontroller.ui
 INCLUDEPATH += Mavlink
 
 CONFIG += c++14
+
+RESOURCES = resources.qrc

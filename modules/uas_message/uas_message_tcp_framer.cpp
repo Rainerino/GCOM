@@ -58,7 +58,7 @@ std::unique_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
     std::vector<unsigned char> serialMessagePayload(messageData.begin() + FRAMED_MESG_ID_FIELD_SIZE
                                                     + FRAMED_MESG_SIZE_FIELD_SIZE, messageData.end());
     // Next we switch on the type of the message so that we can construct the appropriate object and return it
-    switch (messageData.front())
+    switch (static_cast<UASMessage::MessageID>(messageData.front()))
     {
         case UASMessage::MessageID::REQUEST:
         {
