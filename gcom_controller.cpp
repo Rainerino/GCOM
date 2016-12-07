@@ -8,6 +8,7 @@
 #include <QRegExpValidator>
 #include <QRegExp>
 #include <QTimer>
+#include <QDebug>
 // GCOM Includes
 #include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
@@ -16,11 +17,11 @@
 //===================================================================
 // Constants
 //===================================================================
-const QString DISCONNECT_LABEL("<font color='red'> DISCONNECTED </font>"
+const QString DISCONNECT_LABEL("<font color='#D52D2D'> DISCONNECTED </font>"
                                "<img src=':/connection/disconnected.png'>");
 const QString CONNECTING_LABEL("<font color='#EED202'> CONNECTING </font>"
                                "<img src=':/connection/connecting.png'>");
-const QString CONNECTED_LABEL("<font color='green'> CONNECTED </font>"
+const QString CONNECTED_LABEL("<font color='#05c400'> CONNECTED </font>"
                                "<img src=':/connection/connected.png'>");
 
 const QRegExp IP_REGEX("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
@@ -28,7 +29,6 @@ const QRegExp IP_REGEX("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 const QString CONNECT_BUTTON_TEXT("Connect");
 const QString CONNECTING_BUTTON_TEXT("Cancel Connecting");
 const QString DISCONNECT_BUTTON_TEXT("Disconnect");
-
 
 //===================================================================
 // Class Declarations
@@ -52,7 +52,9 @@ GcomController::GcomController(QWidget *parent) :
             this, SLOT(mavlinkRelayConnected()));
     connect(mavlinkRelay, SIGNAL(mavlinkRelayDisconnected()),
             this, SLOT(mavlinkRelayDisconnected()));
+    mavlinkButtonDisconnect = false;
     mavlinkConnectingMovie = new QMovie (":/connection/mavlink_connecting.gif");
+    mavlinkConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
 }
 
 GcomController::~GcomController()
@@ -98,6 +100,7 @@ void GcomController::on_mavlinkConnectionButton_clicked()
         ui->mavlinkConnectionButton->setText(CONNECTING_BUTTON_TEXT);
         ui->mavlinkStatusField->setText(CONNECTING_LABEL);
         ui->mavlinkConnectionStatusField->setText(CONNECTING_LABEL);
+        mavlinkConnectedMovie->stop();
         ui->mavlinkStatusMovie->setMovie(mavlinkConnectingMovie);
         mavlinkConnectingMovie->start();
         // Start the MAVLinkRelay
@@ -108,6 +111,7 @@ void GcomController::on_mavlinkConnectionButton_clicked()
     // stopped
     else
     {
+        mavlinkButtonDisconnect = true;
         mavlinkRelay->stop();
     }
 }
@@ -118,16 +122,17 @@ void GcomController::mavlinkRelayConnected()
     ui->mavlinkStatusField->setText(CONNECTED_LABEL);
     ui->mavlinkConnectionStatusField->setText(CONNECTED_LABEL);
     ui->mavlinkConnectionButton->setText(DISCONNECT_BUTTON_TEXT);
-    // Stop the connection movie
-    ui->mavlinkStatusMovie->setText(" ");
+    // Stop the connection movie and start the connected movie
     mavlinkConnectingMovie->stop();
+    ui->mavlinkStatusMovie->setMovie(mavlinkConnectedMovie);
+    mavlinkConnectedMovie->start();
     // Start the timer
     mavlinkConnectionTimer->start(1000);
 }
 
 void GcomController::mavlinkRelayDisconnected()
 {
-    if (ui->mavlinkAutoReconnect->isChecked())
+    if (ui->mavlinkAutoReconnect->isChecked() && mavlinkButtonDisconnect != true)
     {
         on_mavlinkConnectionButton_clicked();
         return;
@@ -135,11 +140,14 @@ void GcomController::mavlinkRelayDisconnected()
     // When a disconnection is detected then the GUI is reset to the unconnected
     // state
     restMavlinkGUI();
-    // Stop the connection movie
+    // Stop any movies
     ui->mavlinkStatusMovie->setText(" ");
+    mavlinkConnectedMovie->stop();
     mavlinkConnectingMovie->stop();
     // Stop the timer
     mavlinkConnectionTimer->stop();
+    // Reset the button method
+    mavlinkButtonDisconnect = false;
 }
 
 //===================================================================

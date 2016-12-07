@@ -337,8 +337,13 @@
        </item>
        <item>
         <widget class="QLabel" name="mavlinkPlannerStatusLabel">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
-          <string>MAVLink Relay</string>
+          <string>MAVLink Relay:</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -347,6 +352,11 @@
        </item>
        <item>
         <widget class="QLabel" name="mavlinkStatusField">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Disconnected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -357,10 +367,17 @@
          <property name="text">
           <string/>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QLCDNumber" name="mavlinkConnectionTime"/>
+        <widget class="QLCDNumber" name="mavlinkConnectionTime">
+         <property name="digitCount">
+          <number>7</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

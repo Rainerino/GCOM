@@ -48,6 +48,8 @@ private:
     void restMavlinkGUI();
     unsigned long mavlinkConnectionTime;
     QMovie *mavlinkConnectingMovie;
+    QMovie *mavlinkConnectedMovie;
+    bool mavlinkButtonDisconnect;
     // private member methods
     QString formatDuration(unsigned long seconds);
 
