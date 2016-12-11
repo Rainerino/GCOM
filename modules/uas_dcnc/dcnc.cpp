@@ -1,105 +1,146 @@
+//===================================================================
+// Includes
+//===================================================================
+// System Includes
+#include <QString>
+#include <QDebug>
+// GCOM Includes
 #include "dcnc.hpp"
 
+//===================================================================
+// Public Class Declaration
+//===================================================================
 DCNC::DCNC()
 {
+    // Set default values
     server = new QTcpServer();
-    isConnected = false;
-    previouslyDropped = false;
-    port = 6969;
+    server->setMaxPendingConnections(1);
+    port = 42069;
     clientConnection = nullptr;
-
-    connect(server, SIGNAL(newConnection()),this, SLOT(handleConection()));
-    connect(clientConnection, SIGNAL(readyRead()), this, SLOT(handleData()));
-    connect(clientConnection, SIGNAL(disconnected()), this, SLOT(droppedConnection()));
+    serverStatus = DCNCStatus::OFFLINE;
+    // Connect Signals to Slots
+    connect(server, SIGNAL(newConnection()),
+            this, SLOT(handleClientConection()));
 }
 
 DCNC::~DCNC()
 {
-    //close the clientSocket if it is open check if the ptr is null
-    if(!clientConnection && clientConnection->isOpen())
-        clientConnection->close();
-    server->close();
+    stopServer();
+    delete(server);
 }
 
-//make startServer connect slots with signals
-void DCNC::startServer(int port, std::string addr)
+bool DCNC::startServer(QString address, int port)
 {
+    // If the DCNC is currently running then stop it
+    if (serverStatus != DCNCStatus::OFFLINE)
+        stopServer();
+
     this->port = port;
-    this->address = QString::fromStdString(addr);
+    this->address = address;
     hostAddress = QHostAddress(address);
-    server->listen(hostAddress,port);
+    bool startStatus = server->listen(hostAddress, port);
+    if (startStatus == true)
+        serverStatus = DCNCStatus::SEARCHING;
+
+    return startStatus;
 }
 
-void DCNC::startServer(int port)
+bool DCNC::startServer(int port)
 {
-    this->port = port;
-    server->listen(hostAddress, port);
+    if (serverStatus != DCNCStatus::OFFLINE)
+        stopServer();
+
+    bool startStatus = server->listen(QHostAddress::Any, port);
+    if (startStatus == true)
+        serverStatus = DCNCStatus::SEARCHING;
+
+    return startStatus;
+}
+
+void DCNC::stopServer()
+{
+    // If there any client connections
+    if(clientConnection != nullptr)
+    {
+        // Handle teardown of the socket
+        disconnect(clientConnection, SIGNAL(readyRead()),
+                   this, SLOT(handleClientData()));
+        disconnect(clientConnection, SIGNAL(disconnected()),
+                   this, SLOT(handleClientDisconnected()));
+        clientConnection->close();
+        clientConnection->deleteLater();
+        clientConnection = nullptr;
+    }
+    // Stop listning on the selected interfaces and update state
+    server->close();
+    serverStatus = DCNCStatus::OFFLINE;
 }
 
 void DCNC::cancelConnection()
 {
-    if(!clientConnection && clientConnection->isOpen())
+    if(clientConnection != nullptr)
         clientConnection->close();
-    isConnected = false;
 }
 
-void DCNC::handleConection()
+DCNC::DCNCStatus DCNC::status()
 {
-    if(isConnected){
-        QDebug("we are already connected \n");
-        return;
-    }
+    return serverStatus;
+}
 
-    //otherwise let's accept a new connection
-    isConnected = true;
+void DCNC::handleClientConection()
+{
+    // While this connection is established stop accepting more connections
+    server->pauseAccepting();
+    // Setup the connection socket
     clientConnection = server->nextPendingConnection();
-    dataIn.setDevice(clientConnection);
+    connectionData.setDevice(clientConnection);
+    // Connect the connection slot's signals
+    connect(clientConnection, SIGNAL(readyRead()),
+            this, SLOT(handleClientData()));
+    connect(clientConnection, SIGNAL(disconnected()),
+            this, SLOT(handleClientDisconnected()));
+    // Update the DCNC's state and notify listners
+    serverStatus = DCNCStatus::CONNECTED;
+    emit receivedNewConnection();
 }
 
-void DCNC::handleData()
+void DCNC::handleClientDisconnected()
 {
-    //attempts to generate the message
+    // Set the internal state
+    serverStatus = DCNCStatus::SEARCHING;
+    // Handle teardown of the socket
+    disconnect(clientConnection, SIGNAL(readyRead()),
+               this, SLOT(handleClientData()));
+    disconnect(clientConnection, SIGNAL(disconnected()),
+               this, SLOT(handleClientDisconnected()));
+    clientConnection->deleteLater();
+    clientConnection = nullptr;
+    // Set the DCNC back into searching state
+    server->resumeAccepting();
+    // Inform any lisners of the dropped connection
+    emit droppedConnection();
+}
+
+void DCNC::handleClientData()
+{
+    /*//attempts to generate the message
     while(!messageFramer.status()){
-        dataIn.startTransaction();
-        dataIn >> messageFramer;
+        connectionData.startTransaction();
+        connectionData >> messageFramer;
         //check the status of dataIn and the framer
-        if(!messageFramer.status() || dataIn.status() == QDataStream::ReadPastEnd ||
-                dataIn.status() == QDataStream::ReadCorruptData){
-            dataIn.rollbackTransaction();
+        if(!messageFramer.status() || connectionData.status() == QDataStream::ReadPastEnd ||
+                connectionData.status() == QDataStream::ReadCorruptData){
+            connectionData.rollbackTransaction();
             messageFramer.clearMessage();
         }
     }
     message = messageFramer.generateMessage();
-    dataIn.commitTransaction();
+    connectionData.commitTransaction();
 
     /*lets send the message to the listening slots now
     switch(message.MessageID){
         case //enumerate and emit right signals
     }*/
     //call close connection and set isConnected to false when you no longer need the client
-    //emit reconnection or new connection signal
+    //emit reconnection or new connection signal*/
 }
-
-void DCNC::droppedConnection()
-{
-    isConnected = false;
-    previouslyDropped = true;
-    emit droppedClient();
-}
-
-//create a slot to handle dropped connection - set is connected to false
-//check ID message if client is dropped flag
-//1. send a signal if a client is reconnection from dropout
-//2. send client a message to acknowledge that client dropped before
-
-//create new connection signal for UI if you get a new connection after a drop
-//create connection dropped signal
-
-//create method to force drop connection
-//if i get a dirty message tell the gremlin to reset => gaurantees always get an ID message after it
-//otherwise its a new connection and treat normally
-//
-
-
-
-
