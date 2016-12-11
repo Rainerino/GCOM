@@ -101,7 +101,7 @@ void DCNC::handleClientConection()
             this, SLOT(handleClientDisconnected()));
     // Update the DCNC's state and notify listners
     serverStatus = DCNCStatus::CONNECTED;
-    emit receivedNewConnection();
+    emit receivedConnection();
 }
 
 void DCNC::handleClientDisconnected()
