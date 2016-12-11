@@ -37,7 +37,6 @@ class UASMessage
             UNSPECIFIED             = 0xFF
         };
 
-        //Public Methods
         /*!
          * \brief ~UASMessage a virtual destructor that must be implemented in order for proper polymorphic behavior
          */

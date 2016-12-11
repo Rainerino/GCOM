@@ -29,7 +29,7 @@ HEADERS  += \
     modules/uas_message/system_info_message.hpp \
     modules/uas_message/command_message.hpp \
     modules/uas_message/response_message.hpp \
-HEADERS  += gcomcontroller.hpp
+    gcom_controller.hpp \
     modules/uas_message/uas_message.hpp \
     modules/uas_message/uas_message_tcp_framer.hpp \
     modules/uas_dcnc/dcnc.hpp
