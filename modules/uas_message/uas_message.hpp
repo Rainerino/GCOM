@@ -39,6 +39,17 @@ class UASMessage
 
         //Public Methods
         /*!
+         * \brief Constructor that creates a blank message so that it can be programmatically built up.
+         */
+        UASMessage();
+
+        /*!
+         * \brief Constructor designed to initialize a message using a serialized payload
+         * \param [in] serializedMessage a byte vector containing the object's serialized contents
+         */
+        UASMessage(std::vector<unsigned char> serializedMessage);
+
+        /*!
          * \brief ~UASMessage a virtual destructor that must be implemented in order for proper polymorphic behavior
          */
         virtual ~UASMessage(){}
