@@ -27,10 +27,7 @@ ImageTagger::ImageTagger(const std::vector<unsigned char> &serializedMessage)
               back_inserter(imageData));
 }
 
-ImageTagger::~ImageTagger()
-{
-
-}
+ImageTagger::~ImageTagger(){}
 
 UASMessage::MessageID ImageTagger::type()
 {
