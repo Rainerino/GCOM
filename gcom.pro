@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     modules/uas_message/response_message.cpp \
     gcom_controller.cpp \
     modules/mavlink_relay/mavlink_relay_tcp.cpp \
-    modules/uas_dcnc/dcnc.cpp
+    modules/uas_dcnc/dcnc.cpp \
+    modules/uas_message/image_tagger_message.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -30,7 +31,8 @@ HEADERS  += \
     modules/uas_message/command_message.hpp \
     modules/uas_message/response_message.hpp \
     gcom_controller.hpp \
-    modules/uas_dcnc/dcnc.hpp
+    modules/uas_dcnc/dcnc.hpp \
+    modules/uas_message/image_tagger_message.hpp
 
 FORMS    += gcomcontroller.ui
 

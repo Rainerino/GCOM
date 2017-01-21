@@ -1,5 +1,5 @@
-#ifndef __UAS_IMGTAG_IMAGE_TAGGER_HPP
-#define __UAS_IMGTAG_IMAGE_TAGGER_HPP
+#ifndef __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP
+#define __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP
 
 //===================================================================
 // Includes
@@ -20,26 +20,26 @@
  *          serialization method
  *
  */
-class ImageTagger: public UASMessage {
+class ImageTaggerMessage: public UASMessage {
     public:
         // Public Member Methods
         /*!
-         * \brief ImageTagger constructor
+         * \brief ImageTaggerMessage constructor
          * \param [in] sequenceNumber a byte indicating the current image
          * \param [in] imageData[] a byte array holding the data of the current image
          */
-        ImageTagger(unsigned char sequenceNumber, unsigned char imageData[]);
+        ImageTaggerMessage(unsigned char sequenceNumber, unsigned char imageData[]);
 
         /*!
-         * ~ImageTagger deconstructor
+         * ~ImageTaggerMessage deconstructor
          */
-        ~ImageTagger();
+        ~ImageTaggerMessage();
 
         /*!
-         * \brief ImageTagger constructor to initialize a message using a serialized payload
+         * \brief ImageTaggerMessage constructor to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        ImageTagger(const std::vector<unsigned char> &serializedMessage);
+        ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage);
 
         /*!
          * \brief type returns the type of the message as a MeesageId
@@ -58,4 +58,4 @@ class ImageTagger: public UASMessage {
         std::vector<unsigned char> imageData;
 };
 
-#endif // IMAGETAGGER_HPP
+#endif // __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP

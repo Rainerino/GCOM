@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <iterator>
 // GCOM Includes
-#include "image_tagger.hpp"
+#include "image_tagger_message.hpp"
 #include "modules/uas_message/uas_message.hpp"
 
 //===================================================================
 // Class Definitions
 //===================================================================
-ImageTagger::ImageTagger(unsigned char sequenceNumber, unsigned char imageData[])
+ImageTaggerMessage::ImageTaggerMessage(unsigned char sequenceNumber, unsigned char imageData[])
 {
     this->sequenceNumber = sequenceNumber;
 
@@ -20,21 +20,21 @@ ImageTagger::ImageTagger(unsigned char sequenceNumber, unsigned char imageData[]
     std::copy(imageData, imageData + len, this->imageData.begin());
 }
 
-ImageTagger::ImageTagger(const std::vector<unsigned char> &serializedMessage)
+ImageTaggerMessage::ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage)
 {
     this->sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
     std::copy(serializedMessage.begin() + 1, serializedMessage.end(),
               back_inserter(imageData));
 }
 
-ImageTagger::~ImageTagger(){}
+ImageTaggerMessage::~ImageTaggerMessage(){}
 
-UASMessage::MessageID ImageTagger::type()
+UASMessage::MessageID ImageTaggerMessage::type()
 {
     return MessageID::IMAGE_DATA;
 }
 
-std::vector<unsigned char> ImageTagger::serialize()
+std::vector<unsigned char> ImageTaggerMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;
     serializedMessage.push_back(sequenceNumber);
