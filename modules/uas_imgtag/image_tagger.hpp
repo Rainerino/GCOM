@@ -1,5 +1,5 @@
-#ifndef IMAGETAGGER_HPP
-#define IMAGETAGGER_HPP
+#ifndef __UAS_IMGTAG_IMAGE_TAGGER_HPP
+#define __UAS_IMGTAG_IMAGE_TAGGER_HPP
 
 //===================================================================
 // Includes
