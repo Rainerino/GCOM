@@ -12,9 +12,9 @@
 //===================================================================
 // Class Definitions
 //===================================================================
-ImageTagger::ImageTagger(unsigned char seqNum, unsigned char imageData[])
+ImageTagger::ImageTagger(unsigned char sequenceNumber, unsigned char imageData[])
 {
-    this->seqNum = seqNum;
+    this->sequenceNumber = sequenceNumber;
 
     int len = sizeof(imageData) / sizeof(unsigned char);
     std::copy(imageData, imageData + len, this->imageData.begin());
@@ -22,7 +22,7 @@ ImageTagger::ImageTagger(unsigned char seqNum, unsigned char imageData[])
 
 ImageTagger::ImageTagger(const std::vector<unsigned char> &serializedMessage)
 {
-    this->seqNum = static_cast<unsigned char>(serializedMessage.front());
+    this->sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
     std::copy(serializedMessage.begin() + 1, serializedMessage.end(),
               back_inserter(imageData));
 }
@@ -37,7 +37,7 @@ UASMessage::MessageID ImageTagger::type()
 std::vector<unsigned char> ImageTagger::serialize()
 {
     std::vector<unsigned char> serializedMessage;
-    serializedMessage.push_back(seqNum);
+    serializedMessage.push_back(sequenceNumber);
     serializedMessage.insert(std::end(serializedMessage),
                              std::begin(imageData), std::end(imageData));
     return serializedMessage;

@@ -25,10 +25,10 @@ class ImageTagger: public UASMessage {
         // Public Member Methods
         /*!
          * \brief ImageTagger constructor
-         * \param [in] seqNum a byte indicating the current image
+         * \param [in] sequenceNumber a byte indicating the current image
          * \param [in] imageData[] a byte array holding the data of the current image
          */
-        ImageTagger(unsigned char seqNum, unsigned char imageData[]);
+        ImageTagger(unsigned char sequenceNumber, unsigned char imageData[]);
 
         /*!
          * ~ImageTagger deconstructor
@@ -54,7 +54,7 @@ class ImageTagger: public UASMessage {
         std::vector<unsigned char> serialize();
     private:
         // Private Member Variables
-        unsigned char seqNum;
+        unsigned char sequenceNumber;
         std::vector<unsigned char> imageData;
 };
 
