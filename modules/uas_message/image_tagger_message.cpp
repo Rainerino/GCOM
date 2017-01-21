@@ -22,7 +22,7 @@ ImageTaggerMessage::ImageTaggerMessage(unsigned char sequenceNumber, unsigned ch
 
 ImageTaggerMessage::ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage)
 {
-    this->sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
+    sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
     std::copy(serializedMessage.begin() + 1, serializedMessage.end(),
               back_inserter(imageData));
 }
@@ -41,4 +41,14 @@ std::vector<unsigned char> ImageTaggerMessage::serialize()
     serializedMessage.insert(std::end(serializedMessage),
                              std::begin(imageData), std::end(imageData));
     return serializedMessage;
+}
+
+unsigned char ImageTaggerMessage::getSequenceNumber()
+{
+    return sequenceNumber;
+}
+
+std::vector<unsigned char> ImageTaggerMessage::getImageData()
+{
+    return imageData;
 }

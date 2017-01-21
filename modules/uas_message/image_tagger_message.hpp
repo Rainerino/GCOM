@@ -49,9 +49,21 @@ class ImageTaggerMessage: public UASMessage {
 
         /*!
          * \brief serialize serializes the message into a unsigned char vector
-         * \return An standard unsigned vector containing the message's serialized contents
+         * \return A standard unsigned vector containing the message's serialized contents
          */
         std::vector<unsigned char> serialize();
+
+        /*!
+         * \brief getSequenceNumber returns the variable sequenceNumber
+         * \return An unsigned char containing an image's sequence number
+         */
+        unsigned char getSequenceNumber();
+
+        /*!
+         * \brief getImageData returns the variable imageData
+         * \return A standard unsigned vector containing the image's data
+         */
+        std::vector<unsigned char> getImageData();
     private:
         // Private Member Variables
         unsigned char sequenceNumber;
