@@ -20,7 +20,7 @@
  *          serialization method
  *
  */
-class ImgageTagger: public UASMessage {
+class ImageTagger: public UASMessage {
     public:
         // Public Member Methods
         /*!
@@ -55,7 +55,7 @@ class ImgageTagger: public UASMessage {
     private:
         // Private Member Variables
         unsigned char seqNum;
-        unsigned char imageData[];
-}
+        std::vector<unsigned char> imageData;
+};
 
 #endif // IMAGETAGGER_HPP
