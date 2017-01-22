@@ -15,19 +15,16 @@
 ImageTaggerMessage::ImageTaggerMessage(unsigned char sequenceNumber, unsigned char imageData[])
 {
     this->sequenceNumber = sequenceNumber;
-
-    int len = sizeof(imageData) / sizeof(unsigned char);
-    std::copy(imageData, imageData + len, this->imageData.begin());
+    this->imageData.assign(imageData, imageData + sizeof(imageData) / sizeof(*imageData));
 }
 
 ImageTaggerMessage::ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage)
 {
     sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
-    std::copy(serializedMessage.begin() + 1, serializedMessage.end(),
-              back_inserter(imageData));
+    imageData.assign(serializedMessage.begin() + 1, serializedMessage.end());
 }
 
-ImageTaggerMessage::~ImageTaggerMessage(){}
+ImageTaggerMessage::~ImageTaggerMessage() { }
 
 UASMessage::MessageID ImageTaggerMessage::type()
 {
@@ -50,5 +47,5 @@ unsigned char ImageTaggerMessage::getSequenceNumber()
 
 std::vector<unsigned char> ImageTaggerMessage::getImageData()
 {
-    return imageData;
+    return imageData;   // return an array instead???
 }
