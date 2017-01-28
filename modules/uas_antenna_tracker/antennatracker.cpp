@@ -1,20 +1,47 @@
 #include "antennatracker.hpp"
-//#include <QSerialPort>
 
 AntennaTracker::AntennaTracker()
 {
-    //nothing needs to go here
+    arduino_serial = nullptr;
+    zaber_serial = nullptr;
+
+    degToRad = 0.01745329251;
+    radToDeg = 57.2957795131;
+    radiusEarth = 6378137;
+
+    //initialize base coordinates with arbitrary garbage value
+    baseLat = 9999;
+    baseLon = 9999;
+
+    arduinoPortName = "Arduino";
+    zaberPortName = "Zaber";
 }
 
 AntennaTracker::~AntennaTracker()
 {
     //close serial connection to arduino if it's open
-    if(this->arduino_serial && this->arduino_serial->isOpen())
-        this->arduino_serial->close();
+    if(arduinoSerial != nullptr && arduinoSerial->isOpen()) {
+        arduinoSerial->close();
+        delete zaber_serial;
+    }
 
     //close serial connection to zaber if it's open
-    if(this->zaber_serial && this->zaber_serial->isOpen())
-        this->zaber_serial->close();
+    if(zaberSerial != nullptr && zaberSerial->isOpen()) {
+        zaberSerial->close();
+        delete zaberSerial;
+    }
+}
+
+bool AntennaTracker::setStationPos(QString lon, QString lat)
+{
+    baseLon = lon.toDouble();
+    baseLat = lat.toDouble();
+
+    //true if lat/lon changed, false if still garbage value(9999)
+    if(baseLon == 9999 || baseLat == 9999)
+        return false;
+    else
+        return true;
 }
 
 QList<QString> AntennaTracker::getArduinoList()
@@ -47,80 +74,104 @@ QList<QString> AntennaTracker::getZaberList()
     return zaberPorts;   //return list of zaber controllers
 }
 
-void AntennaTracker::setupDevice(std::string arduino_port, std::string zaber_port)
+void AntennaTracker::setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud)
 {
     //convert arduino and zaber port names to qstring
-    this->arduino_port = QString::fromStdString(arduino_port);
-    this->zaber_port = QString::fromStdString(zaber_port);
+    this->arduinoPort = arduinoPort;
+    this->zaberPort = zaberPort;
 
     //intialize arduino serial port
-    this->arduino_serial = new QSerialPort(this->arduino_port);
-    this->arduino_serial->setPortName("arduino");
-    this->arduino_serial->setBaudRate(QSerialPort::Baud57600);
-    this->arduino_serial->setDataBits(QSerialPort::Data8);
-    this->arduino_serial->setParity(QSerialPort::NoParity);
-    this->arduino_serial->setStopBits(QSerialPort::OneStop);
-    this->arduino_serial->setFlowControl(QSerialPort::NoFlowControl);
+    this->arduinoPort = new QSerialPort(this->arduinoPort);
+    this->arduinoPort->setPortName("arduino");
+    this->arduinoPort->setBaudRate(arduinoBaud);
+    this->arduinoPort->setDataBits(QSerialPort::Data8);
+    this->arduinoPort->setParity(QSerialPort::NoParity);
+    this->arduinoPort->setStopBits(QSerialPort::OneStop);
+    this->arduinoPort->setFlowControl(QSerialPort::NoFlowControl);
 
-    //intializae arduino serial port
-    this->zaber_serial = new QSerialPort(this->zaber_port);
-    this->zaber_serial->setPortName("zaber controller");
-    this->zaber_serial->setBaudRate(QSerialPort::Baud9600);
-    this->zaber_serial->setDataBits(QSerialPort::Data8);
-    this->zaber_serial->setParity(QSerialPort::NoParity);
-    this->zaber_serial->setStopBits(QSerialPort::OneStop);
-    this->zaber_serial->setFlowControl(QSerialPort::NoFlowControl);
+    //intializae zaber serial port
+    this->zaberSerial = new QSerialPort(this->zaberPort);
+    this->zaberSerial->setPortName("zaber controller");
+    this->zaberSerial->setBaudRate(zaberBaud);
+    this->zaberSerial->setDataBits(QSerialPort::Data8);
+    this->zaberSerial->setParity(QSerialPort::NoParity);
+    this->zaberSerial->setStopBits(QSerialPort::OneStop);
+    this->zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
 }
 
-AntennaTracker::DEVICE_STAT AntennaTracker::startDevice(MissionPlannerSocket * const relay)
+AntennaTracker::deviceConnectionStat AntennaTracker::startDevice(MissionPlannerSocket * const relay)
 {
-    //failed if either arduino_serial or zaber_serial is uninitialized
-    if(this->arduino_serial == NULL)
-        return DEVICE_STAT::arduino_uninitialized;
+    //if arduino or zaber uninitialized, initialize first item in the list
 
-    if(this->zaber_serial == NULL)
-        return DEVICE_STAT::zaber_uninitialized;
+    //failed if either arduino_serial or zaber_serial is uninitialized
+    if(this->arduino_serial == nullptr)
+        return deviceConnectionStat::ARDUINO_UNINITIALIZED;
+
+    if(this->zaber_serial == nullptr)
+        return deviceConnectionStat::ZABER_UNITIALIZED;
 
     //open arduino_serial and zaber_serial
-    bool zaberOpen = this->arduino_serial->open(QIODevice::ReadWrite);
-    bool arduinoOpen = this->zaber_serial->open(QIODevice::ReadWrite);
-
-    //connect mavlink relay
-    connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+    bool zaberOpen = this->arduinoSerial->open(QIODevice::ReadWrite);
+    bool arduinoOpen = this->zaberSerial->open(QIODevice::ReadWrite);
 
     //return true if both arduino and zaber are open, and false otherwise
     if(!arduinoOpen)
-        return DEVICE_STAT::arduino_not_open;
+        return deviceConnectionStat::ARDUINO_NOT_OPEN;
     else if(!zaberOpen)
-        return DEVICE_STAT::zaber_not_open;
-    else
-        return DEVICE_STAT::success;
+        return deviceConnectionStat::ZABER_NOT_OPEN;
+
+    //connect mavlink relay
+    connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+    return deviceConnectionStat::SUCCESS;
 }
 
 //incomplete
-void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)
+void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t> gps_data)
 {
     qDebug() << "Mavlink signal consumed!!!!!!" << endl;
 
     QByteArray request = QByteArray::fromStdString(this->arduino_request);  //convert request msg to qstring
     this->arduino_serial->write(request);   //write request message to arduino
 
-    int delayMilsec = 200;  //setup time-out delay
+    int delayMilsec = 2000;  //setup time-out delay (2 seconds)
     //read from arduino if ready to read
     //return if readyread has timed out
     if(arduino_serial->waitForReadyRead(delayMilsec)) {
         QByteArray arduinoInByte = this->arduino_serial->readAll();
         QString arduinoInString = QString(arduinoInByte);
         qDebug() << "Received From Arduino: " << arduinoInString << endl;
+
+        //QString moveCommand = calcMovement(gps_data);
     }
     else {
         return;
     }
-
-    //do stuff
 }
 
 //NEEDS TO BE IMPLEMENTED
-std::string AntennaTracker::calcMovement(){
+QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData){
+    //Grabbing individual pieces of data from gpsData
+    float droneLat = gpsData->lat;
+    float droneLon = gpsData->lon;
+
+    int32_t droneAlt = gpsData->alt;
+    int32_t droneRelativeAlt = gpsData->relative_alt;
+
+    int16_t droneVX = gpsData->vx;
+    int16_t droneVY = gpsData->vy;
+    int16_t droneVZ = gpsData->vz;
+
+    float xDiff = (droneLat-baseLat) * degToRad;
+    float yDiff = (droneLon-baseLon) * degToRad;
+    float a = pow(sin(xDiff/2),2) + cos(baseLat*degToRad) * cos(droneLat*degToRad) * pow(sin(yDiff/2),2);
+    float d = 2 * atan2(sqrt(a), sqrt(1-a));
+    float distance = radiusEarth * d;
+
+    float horizAngle = atan2(y,x)*radToDeg;
+    float vertAngle = atan((droneRelativeAlt)/(distance*1000)) * 180/M_PI;
+
+    y = sin(yDiff) * cos(droneLat*degToRad);
+    x = cos(baseLat*degToRad) * sin(droneLat*degToRad) - sin(baseLat*degToRad) * cos(droneLat*degToRad) * cos(yDiff);
+
     return "";
 }
