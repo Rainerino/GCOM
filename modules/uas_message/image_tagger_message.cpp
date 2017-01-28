@@ -13,10 +13,10 @@
 // Class Definitions
 //===================================================================
 ImageTaggerMessage::ImageTaggerMessage(unsigned char sequenceNumber,
-                                       unsigned char imageData[], int dataSize)
+                                       unsigned char imageData[], size_t dataSize)
 {
     this->sequenceNumber = sequenceNumber;
-    this->imageData.assign(imageData, imageData + dataSize);
+    this->imageData.assign(imageData, imageData + dataSize / sizeof(char));
 }
 
 ImageTaggerMessage::ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage)
