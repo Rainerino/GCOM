@@ -27,7 +27,7 @@ class ImageTaggerMessage: public UASMessage {
          * \brief ImageTaggerMessage constructor
          * \param [in] sequenceNumber a byte indicating the current image
          * \param [in] imageData[] a byte array holding the data of the current image
-         * \param [in] dataSize an int indicating the number of elements in the array
+         * \param [in] dataSize size_t indicating the size of the array
          */
         ImageTaggerMessage(unsigned char sequenceNumber, unsigned char imageData[], size_t dataSize);
 
