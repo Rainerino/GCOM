@@ -1,46 +1,63 @@
+//===================================================================
+// Includes
+//===================================================================
+// System Includes
+#include <QString>
+#include <QImage>
+// GCOM Includes
 #include "image_tagger.hpp"
 
-image_tagger::image_tagger(QObject *parent)
-    : QAbstractItemModel(parent)
+//===================================================================
+// Constants
+//===================================================================
+const QString IMG = "\IMG_";
+const QString JPG = ".JPG";
+
+//===================================================================
+// Public Class Declaration
+//===================================================================
+ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
 {
+    directory = dir;
+    QObject::connect(sender, &DCNC::receivedImageData,
+                     this, &ImageTagger::handleImageMessage);
+
+    if (toBeTagged != NULL) {
+        // TODO: Tag image
+    }
+    else {
+        // TODO: Don't tag image
+    }
 }
 
-QVariant image_tagger::headerData(int section, Qt::Orientation orientation, int role) const
+ImageTagger::~ImageTagger() { }
+
+void ImageTagger::handleImageMessage(std::unique_ptr<ImageTaggerMessage> message)
 {
-    // FIXME: Implement me!
-}
+    // Setup local variables
+    QString pathName = directory + IMG + JPG;   // eventually will have unique #
+    ImageTaggerMessage imgMessage = message.get();
+    unsigned char uniqueSeqNum = imgMessage.getSequenceNumber();
+    std::vector<unsigned char> imageData = imgMessage.getImageData();
 
-QModelIndex image_tagger::index(int row, int column, const QModelIndex &parent) const
-{
-    // FIXME: Implement me!
-}
+    // Convert image data to QImage
+    QByteArray imgArray = new QByteArray(imageData.data(), imageData.size());
+    QImage image = QImage::loadFromData(imgArray);
 
-QModelIndex image_tagger::parent(const QModelIndex &index) const
-{
-    // FIXME: Implement me!
-}
+    // Iterate through vector of sequence numbers
+    for (std::vector<unsigned char>::iterator seqNum = seqNumArr.begin();
+         seqNum != seqNumArr.end(); ++seqNum) {
+        // If duplicate is found
+        if (uniqueSeqNum == *seqNum) {
+            // TODO: Change path name for duplicate
+            image.save(pathName, "JPG");
+            emit taggedImage(pathName);
+            return;
+        }
+    }
 
-int image_tagger::rowCount(const QModelIndex &parent) const
-{
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
-}
-
-int image_tagger::columnCount(const QModelIndex &parent) const
-{
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
-}
-
-QVariant image_tagger::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    // FIXME: Implement me!
-    return QVariant();
+    // If no duplicate is found
+    seqNumArr.push_back(uniqueSeqNum);
+    image.save(fileName, "JPG");
+    emit taggedImage(pathName);
 }
