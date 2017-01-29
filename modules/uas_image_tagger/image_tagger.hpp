@@ -43,7 +43,6 @@ private slots:
     /*!
      * \brief handleImageMessage saves image to disk and sends a signal with
      *        the tagged image's file name
-     * \details removes duplicates based on image's unique sequence number
      */
     void handleImageMessage(std::unique_ptr<ImageTaggerMessage> message);
 private:
