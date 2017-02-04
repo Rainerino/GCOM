@@ -2,8 +2,8 @@
 
 AntennaTracker::AntennaTracker()
 {
-    arduino_serial = nullptr;
-    zaber_serial = nullptr;
+    arduinoSerial = nullptr;
+    zaberSerial = nullptr;
 
     degToRad = 0.01745329251;
     radToDeg = 57.2957795131;
@@ -27,7 +27,7 @@ AntennaTracker::~AntennaTracker()
     //close serial connection to arduino if it's open
     if(arduinoSerial != nullptr && arduinoSerial->isOpen()) {
         arduinoSerial->close();
-        delete zaber_serial;
+        delete zaberSerial;
     }
 
     //close serial connection to zaber if it's open
@@ -51,12 +51,13 @@ bool AntennaTracker::setStationPos(QString lon, QString lat)
 
 QList<QString> AntennaTracker::getArduinoList()
 {
+    QString arduinoPortKey = "Arduino";
     QList<QString> arduinoPorts;    //list of arduinos
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();    //get a list of all available ports
     //iterate through list of ports
     foreach(QSerialPortInfo currPort, portList) {
         //check for arduino ports and add to list
-        if(currPort.manufacturer().contains(this->arduino_port_name)) {
+        if(currPort.manufacturer().contains(arduinoPortKey)) {
             arduinoPorts.append(currPort.portName());
         }
     }
@@ -66,12 +67,13 @@ QList<QString> AntennaTracker::getArduinoList()
 
 QList<QString> AntennaTracker::getZaberList()
 {
+    QString zaberPortKey = "Zaber";
     QList<QString> zaberPorts;  //list of zaber controllers
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();    //get a list of all available ports
     //iterate through list of ports
     foreach(QSerialPortInfo currPort, portList) {
         //check for zaber ports and add to list
-        if(currPort.manufacturer().contains(this->zaber_port_name)) {
+        if(currPort.manufacturer().contains(zaberPortKey)) {
             zaberPorts.append(currPort.portName());
         }
     }
@@ -86,13 +88,13 @@ void AntennaTracker::setupDevice(QString arduinoPort, QString zaberPort, QSerial
     this->zaberPort = zaberPort;
 
     //intialize arduino serial port
-    this->arduinoPort = new QSerialPort(this->arduinoPort);
-    this->arduinoPort->setPortName("arduino");
-    this->arduinoPort->setBaudRate(arduinoBaud);
-    this->arduinoPort->setDataBits(QSerialPort::Data8);
-    this->arduinoPort->setParity(QSerialPort::NoParity);
-    this->arduinoPort->setStopBits(QSerialPort::OneStop);
-    this->arduinoPort->setFlowControl(QSerialPort::NoFlowControl);
+    this->arduinoSerial = new QSerialPort(this->arduinoPort);
+    this->arduinoSerial->setPortName("arduino");
+    this->arduinoSerial->setBaudRate(arduinoBaud);
+    this->arduinoSerial->setDataBits(QSerialPort::Data8);
+    this->arduinoSerial->setParity(QSerialPort::NoParity);
+    this->arduinoSerial->setStopBits(QSerialPort::OneStop);
+    this->arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
 
     //intializae zaber serial port
     this->zaberSerial = new QSerialPort(this->zaberPort);
@@ -109,10 +111,10 @@ AntennaTracker::deviceConnectionStat AntennaTracker::startDevice(MissionPlannerS
     //if arduino or zaber uninitialized, initialize first item in the list
 
     //failed if either arduino_serial or zaber_serial is uninitialized
-    if(this->arduino_serial == nullptr)
+    if(this->arduinoSerial == nullptr)
         return deviceConnectionStat::ARDUINO_UNINITIALIZED;
 
-    if(this->zaber_serial == nullptr)
+    if(this->zaberSerial == nullptr)
         return deviceConnectionStat::ZABER_UNITIALIZED;
 
     //open arduino_serial and zaber_serial
@@ -135,14 +137,14 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
 {
     qDebug() << "Mavlink signal consumed!!!!!!" << endl;
 
-    QByteArray request = QByteArray::fromStdString(this->arduino_request);  //convert request msg to qstring
-    this->arduino_serial->write(request);   //write request message to arduino
+    QByteArray request = QByteArray::fromStdString("put request msg here");  //convert request msg to qstring
+    this->arduinoSerial->write(request);   //write request message to arduino
 
     int delayMilsec = 2000;  //setup time-out delay (2 seconds)
     //read from arduino if ready to read
     //return if readyread has timed out
-    if(arduino_serial->waitForReadyRead(delayMilsec)) {
-        QByteArray arduinoInByte = this->arduino_serial->readAll();
+    if(arduinoSerial->waitForReadyRead(delayMilsec)) {
+        QByteArray arduinoInByte = this->arduinoSerial->readAll();
         QString arduinoInString = QString(arduinoInByte);
         qDebug() << "Received From Arduino: " << arduinoInString << endl;
 
@@ -167,8 +169,8 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     int16_t droneVY = gpsData->vy;
     int16_t droneVZ = gpsData->vz;
 
-    if(!(angle_diff > -0.01 && angle_diff < 0.01)) {
-        tracker_angle = tracker_angle + (yawIMU - prevYawIMU);
+    if(!(angleDiff > -0.01 && angleDiff < 0.01)) {
+        trackerAngle = trackerAngle + (yawIMU - prevYawIMU);
     }
 
     float xDiff = (droneLat-baseLat) * degToRad;
@@ -177,7 +179,7 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     float d = 2 * atan2(sqrt(a), sqrt(1-a));
     float distance = radiusEarth * d;
 
-    float y = sin(yDiff) * cos(droneLat*degToRad);
+    float y = sin(yDiff) * cos((droneLat*degToRad));
     float x = cos(baseLat*degToRad) * sin(droneLat*degToRad) - sin(baseLat*degToRad) * cos(droneLat*degToRad) * cos(yDiff);
 
     float horizAngle = atan2(y,x)*radToDeg;
@@ -202,17 +204,17 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     }
 
     QString commandSpeed = "";
-    if(angle_diff < 0.2 && angle_diff >= 0.03) {
-        speedm = "10";
+    if(angleDiff < 0.2 && angleDiff >= 0.03) {
+        commandSpeed = "10";
     }
-    else if(angle_diff < 2 && angle_diff >= 0.2) {
-        speedm = "20";
+    else if(angleDiff < 2 && angleDiff >= 0.2) {
+        commandSpeed = "20";
     }
-    else if(angle_diff >= 0.2) {
-        speedm = "300";
+    else if(angleDiff >= 0.2) {
+        commandSpeed = "300";
     }
     else {
-        speedm = "0";
+        commandSpeed = "0";
     }
 
     prevYawIMU = yawIMU;

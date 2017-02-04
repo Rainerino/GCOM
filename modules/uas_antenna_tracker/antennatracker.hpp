@@ -112,7 +112,7 @@ private:
      * the arduino.
      * \return command in the form of a string
      */
-    QString calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData);
+    QString calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU, float pitchIMU);
 };
 
 #endif // ANTENNATRACKER_H
