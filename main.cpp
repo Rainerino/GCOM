@@ -1,5 +1,6 @@
-#include "gcomcontroller.hpp"
+#include "gcom_controller.hpp"
 #include <QApplication>
+
 
 int main(int argc, char *argv[])
 {

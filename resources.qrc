@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="connection">
+    <file alias="mavlink_connecting.gif">assets/connection/mavlink_connecting.gif</file>
+	<file alias="disconnected.png">assets/connection/disconnected.png</file>
+	<file alias="connecting.png">assets/connection/connecting.png</file>
+	<file alias="connected.png">assets/connection/connected.png</file>
+</qresource>
+</RCC>
