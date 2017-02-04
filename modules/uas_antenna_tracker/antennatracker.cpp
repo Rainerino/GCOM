@@ -210,7 +210,7 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     else if(angleDiff < 2 && angleDiff >= 0.2) {
         commandSpeed = "20";
     }
-    else if(angleDiff >= 0.2) {
+    else if(angleDiff >= 2) {
         commandSpeed = "300";
     }
     else {

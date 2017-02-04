@@ -16,9 +16,9 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="1" column="1">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="arduinoConnectButton">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="connectionTab">
        <attribute name="title">
@@ -292,10 +292,108 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_4">
+      <widget class="QWidget" name="antennaTrackerTab">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Antenna Tracker</string>
        </attribute>
+       <widget class="QListView" name="availArduinoList">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>256</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="arduinoListLable">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Available Arduino Devices</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="arduinoRefreshButton">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>10</y>
+          <width>80</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Refresh List</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>230</y>
+          <width>80</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Connect</string>
+        </property>
+       </widget>
+       <widget class="QListView" name="availZaberList">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>30</y>
+          <width>256</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="zaberListController">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>10</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Available Zaber Controllers</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="zaberRefreshButton">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>10</y>
+          <width>80</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Refresh List</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="zaberConnectButton">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>230</y>
+          <width>80</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Connect</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -373,7 +471,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
