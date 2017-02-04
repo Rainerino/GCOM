@@ -3,7 +3,7 @@
 //===================================================================
 // System Includes
 #include <QString>
-#include <QImage>
+#include <QPixmap>
 // GCOM Includes
 #include "image_tagger.hpp"
 
@@ -22,8 +22,8 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
 
-    if (toBeTagged != NULL) { }     // TODO: Tag image
-    else { }                        // TODO: Don't tag image
+    if (toBeTagged != NULL) { }     // Tag image (not implemented yet)
+    else { }                        // Don't tag image
 }
 
 ImageTagger::~ImageTagger() { }
@@ -32,12 +32,17 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
 {
     // Setup local variables
     QString pathName = directory + IMG + JPG;   // eventually will have unique #
-    ImageTaggerMessage *imgMessage = message.get();
-    unsigned char uniqueSeqNum = imgMessage->getSequenceNumber();
-    std::vector<unsigned char> imageData = imgMessage->getImageData();
+    ImageTaggerMessage *imageMessage = message.get();
+    unsigned char uniqueSeqNum = imageMessage->getSequenceNumber();
+    std::vector<unsigned char> imageData = imageMessage->getImageData();
 
-    // TODO: Reimplement converting image data to QImage
-    QImage image;
+    // Convert image data to QPixmap
+    int numOfBytes = 0;
+    unsigned char *imageArray = &imageData[0];
+    for (auto data = imageData.begin(); data != imageData.end(); ++data)
+        numOfBytes++;
+    QPixmap image;
+    image.loadFromData(imageArray, numOfBytes, "JPG");
 
     // Iterate through vector of sequence numbers
     for (auto seqNum = seqNumArr.begin(); seqNum != seqNumArr.end(); ++seqNum) {
