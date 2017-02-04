@@ -13,7 +13,9 @@
 #include <memory>
 // GCOM Includes
 #include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/image_tagger_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
+
 
 //===================================================================
 // Public Class Declaration
@@ -107,7 +109,7 @@ signals:
     void receivedConnection();
     void droppedConnection();
     // Data Signals
-    void receivedImageData();
+    void receivedImageData(std::shared_ptr<ImageTaggerMessage> message);
 
 private slots:
     /*!
