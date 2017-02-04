@@ -44,7 +44,7 @@ private slots:
      * \brief handleImageMessage saves image to disk and sends a signal with
      *        the tagged image's file name
      */
-    void handleImageMessage(std::unique_ptr<ImageTaggerMessage> message);
+    void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
 private:
     QString directory;
     std::vector<unsigned char> seqNumArr;

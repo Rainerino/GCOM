@@ -28,7 +28,7 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
 
 ImageTagger::~ImageTagger() { }
 
-void ImageTagger::handleImageMessage(std::unique_ptr<ImageTaggerMessage> message)
+void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message)
 {
     // Setup local variables
     QString pathName = directory + IMG + JPG;   // eventually will have unique #
