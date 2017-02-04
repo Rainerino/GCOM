@@ -91,10 +91,14 @@ private:
 
     mavlink_global_position_int_t gpsData;
 
-    double degToRad;
-    double radToDeg;
-    double radiusEarth;
+    float degToRad;
+    float radToDeg;
+    float radiusEarth;
 
+    float prevYawIMU;
+    float droneAngle;
+    float trackerAngle;
+    float angleDiff;
 
     uint32_t baseLat;
     uint32_t baseLon;

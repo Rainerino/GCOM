@@ -13,6 +13,11 @@ AntennaTracker::AntennaTracker()
     baseLat = 9999;
     baseLon = 9999;
 
+    prevYawIMU = 0;
+    droneAngle = 0;
+    trackerAngle = 0;
+    angleDiff = 0;
+
     arduinoPortName = "Arduino";
     zaberPortName = "Zaber";
 }
@@ -149,7 +154,8 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
 }
 
 //NEEDS TO BE IMPLEMENTED
-QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData){
+QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU, float pitchIMU)
+{
     //Grabbing individual pieces of data from gpsData
     float droneLat = gpsData->lat;
     float droneLon = gpsData->lon;
@@ -161,17 +167,56 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     int16_t droneVY = gpsData->vy;
     int16_t droneVZ = gpsData->vz;
 
+    if(!(angle_diff > -0.01 && angle_diff < 0.01)) {
+        tracker_angle = tracker_angle + (yawIMU - prevYawIMU);
+    }
+
     float xDiff = (droneLat-baseLat) * degToRad;
     float yDiff = (droneLon-baseLon) * degToRad;
     float a = pow(sin(xDiff/2),2) + cos(baseLat*degToRad) * cos(droneLat*degToRad) * pow(sin(yDiff/2),2);
     float d = 2 * atan2(sqrt(a), sqrt(1-a));
     float distance = radiusEarth * d;
 
+    float y = sin(yDiff) * cos(droneLat*degToRad);
+    float x = cos(baseLat*degToRad) * sin(droneLat*degToRad) - sin(baseLat*degToRad) * cos(droneLat*degToRad) * cos(yDiff);
+
     float horizAngle = atan2(y,x)*radToDeg;
+    droneAngle = horizAngle;
     float vertAngle = atan((droneRelativeAlt)/(distance*1000)) * 180/M_PI;
 
-    y = sin(yDiff) * cos(droneLat*degToRad);
-    x = cos(baseLat*degToRad) * sin(droneLat*degToRad) - sin(baseLat*degToRad) * cos(droneLat*degToRad) * cos(yDiff);
+    angleDiff = droneAngle - trackerAngle;
+    if(angleDiff > 180) {
+        angleDiff -= 360;
+    }
+    else if(angleDiff < -180) {
+        angleDiff += 360;
+    }
 
-    return "";
+    QString commandDir = "";
+    if(angleDiff < 0) {
+        commandDir = "";
+        angleDiff *= -1;
+    }
+    else {
+        commandDir = "-";
+    }
+
+    QString commandSpeed = "";
+    if(angle_diff < 0.2 && angle_diff >= 0.03) {
+        speedm = "10";
+    }
+    else if(angle_diff < 2 && angle_diff >= 0.2) {
+        speedm = "20";
+    }
+    else if(angle_diff >= 0.2) {
+        speedm = "300";
+    }
+    else {
+        speedm = "0";
+    }
+
+    prevYawIMU = yawIMU;
+
+    QString commandMessage = "/1 move rel " + commandDir + commandSpeed;
+    return commandMessage;
 }
