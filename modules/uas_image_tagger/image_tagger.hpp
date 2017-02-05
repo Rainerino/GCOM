@@ -46,7 +46,8 @@ private slots:
      */
     void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
 private:
-    QString directory;
+    QString pathOfDir;
+    int numOfImages;
     std::vector<unsigned char> seqNumArr;
 };
 

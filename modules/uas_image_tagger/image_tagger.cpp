@@ -2,7 +2,7 @@
 // Includes
 //===================================================================
 // System Includes
-#include <QString>
+#include <QDir>
 #include <QPixmap>
 // GCOM Includes
 #include "image_tagger.hpp"
@@ -11,14 +11,21 @@
 // Constants
 //===================================================================
 const QString IMG = "\\IMG_";
-const QString JPG = ".JPG";
+const QString JPG = ".jpg";
 
 //===================================================================
 // Public Class Declaration
 //===================================================================
 ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
 {
-    directory = dir;
+    // Setup path of directory and filter for images
+    QDir directory(dir);
+    QStringList filters;
+    filters << "*.jpg";
+    directory.setNameFilters(filters);
+    pathOfDir = directory.absolutePath();
+    numOfImages = directory.entryList(QDir::NoDotAndDotDot).count();
+
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
 
@@ -31,10 +38,10 @@ ImageTagger::~ImageTagger() { }
 void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message)
 {
     // Setup local variables
-    QString pathName = directory + IMG + JPG;   // eventually will have unique #
     ImageTaggerMessage *imageMessage = message.get();
     unsigned char uniqueSeqNum = imageMessage->getSequenceNumber();
     std::vector<unsigned char> imageData = imageMessage->getImageData();
+    QString pathName = pathOfDir + IMG + QString(numOfImages++) + JPG;
 
     // Convert image data to QPixmap
     int numOfBytes = 0;
