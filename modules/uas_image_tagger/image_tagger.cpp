@@ -41,7 +41,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
     ImageTaggerMessage *imageMessage = message.get();
     unsigned char uniqueSeqNum = imageMessage->getSequenceNumber();
     std::vector<unsigned char> imageData = imageMessage->getImageData();
-    QString pathName = pathOfDir + IMG + QString(numOfImages++) + JPG;
+    QString pathName = pathOfDir + IMG + QString(++numOfImages) + JPG;
 
     // Convert image data to QPixmap
     int numOfBytes = 0;
