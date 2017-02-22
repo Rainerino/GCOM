@@ -26,7 +26,7 @@ class ImageTagger : public QObject
 public:
     /*!
      * \brief ImageTagger constructor that takes in the directory name
-     * \param dir Qstring path of directory
+     * \param dir QString path of directory
      * \param DCNC pointer to constant data indicating sender of signal
      * \param MAVLink pointer to const data indicating if image is to be tagged or not
      */
@@ -36,12 +36,25 @@ public:
      *  \brief ImageTagger deconstructor
      */
     ~ImageTagger();
+
+    /*!
+     * \brief saveImageToDisc helper function that does the saving
+     * \param pathName QString path of directory with filename
+     * \param data unsigned char pointer to image data
+     */
+    void saveImageToDisc(QString pathName, unsigned char *data);
+
+    /*!
+     * \brief setupDirectoryPath helper function to setup path name
+     * \param dir QString path of directory
+     */
+    void setupDirectoryPath(QString dir);
 signals:
     // Data Signals
     void taggedImage(QString pathName);
 private slots:
     /*!
-     * \brief handleImageMessage saves image to disk and sends a signal with
+     * \brief handleImageMessage saves image to disc and sends a signal with
      *        the tagged image's file name
      */
     void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
