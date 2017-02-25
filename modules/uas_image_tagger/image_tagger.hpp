@@ -47,8 +47,9 @@ public:
     /*!
      * \brief setupDirectoryPath helper function to setup path name
      * \param dir QString path of directory
+     * \param createDuplicates int 0 or 1 if duplicate folder is to be created
      */
-    void setupDirectoryPath(QString dir);
+    void setupDirectoryPath(QString dir, int createDuplicates);
 signals:
     // Data Signals
     void taggedImage(QString pathName);
@@ -60,7 +61,9 @@ private slots:
     void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
 private:
     QString pathOfDir;
+    QString pathOfDuplicates;
     int numOfImages;
+    int numOfDuplicates;
     std::vector<unsigned char> seqNumArr;
 };
 

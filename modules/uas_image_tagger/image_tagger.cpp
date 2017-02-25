@@ -10,6 +10,7 @@
 //===================================================================
 // Constants
 //===================================================================
+const QString DUP = "\\Duplicates";
 const QString IMG = "\\IMG_";
 const QString JPG = ".jpg";
 
@@ -19,7 +20,8 @@ const QString JPG = ".jpg";
 ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
 {
     // Setup
-    setupDirectoryPath(dir);
+    setupDirectoryPath(dir, 0);
+    setupDirectoryPath(dir + DUP, 1);
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
 
@@ -29,14 +31,24 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
 
 ImageTagger::~ImageTagger() { }
 
-void ImageTagger::setupDirectoryPath(QString dir)
+void ImageTagger::setupDirectoryPath(QString dir, int createDuplicates)
 {
+    // Create directory and set filters
     QDir directory(dir);
+    if (!directory.exists())
+        directory.mkpath(".");
     QStringList filters;
     filters << "*.jpg";
     directory.setNameFilters(filters);
-    pathOfDir = directory.absolutePath();
-    numOfImages = directory.entryList(QDir::NoDotAndDotDot).count();
+
+    if (createDuplicates) {     // if duplicates folder is to be created
+        pathOfDuplicates = directory.absolutePath();
+        numOfDuplicates = directory.count();
+    }
+    else {                      // else for parent directory
+        pathOfDir = directory.absolutePath();
+        numOfImages = directory.count();
+    }
 }
 
 void ImageTagger::saveImageToDisc(QString pathName, unsigned char *data)
@@ -62,8 +74,8 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
     for (auto seqNum = seqNumArr.begin(); seqNum != seqNumArr.end(); ++seqNum) {
         // If duplicate is found
         if (uniqueSeqNum == *seqNum) {
-            // TODO: Change path name for duplicate
-            pathName = pathOfDir + IMG + QString::number(++numOfImages) + JPG;
+            // Change path name for duplicate
+            pathName = pathOfDuplicates + IMG + QString::number(++numOfDuplicates) + JPG;
             saveImageToDisc(pathName, imageArray);
             emit taggedImage(pathName);
             return;
