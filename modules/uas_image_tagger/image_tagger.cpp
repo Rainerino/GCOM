@@ -10,7 +10,8 @@
 //===================================================================
 // Constants
 //===================================================================
-const QString DUP = "\\Duplicates";
+const QString DUPLFOLDER = "\\Duplicates";
+const QString DUPL = "\\DUPL_";
 const QString IMG = "\\IMG_";
 const QString JPG = ".jpg";
 
@@ -21,7 +22,7 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
 {
     // Setup
     setupDirectoryPath(dir, 0);
-    setupDirectoryPath(dir + DUP, 1);
+    setupDirectoryPath(dir + DUPLFOLDER, 1);
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
 
@@ -75,7 +76,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
         // If duplicate is found
         if (uniqueSeqNum == *seqNum) {
             // Change path name for duplicate
-            pathName = pathOfDuplicates + IMG + QString::number(++numOfDuplicates) + JPG;
+            pathName = pathOfDuplicates + DUPL + QString::number(++numOfDuplicates) + JPG;
             saveImageToDisc(pathName, imageArray);
             emit taggedImage(pathName);
             return;
