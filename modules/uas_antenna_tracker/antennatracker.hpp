@@ -19,7 +19,8 @@
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
 #include "Mavlink/common/mavlink.h"
-#include "modules/mavlink_relay/missionplannertcp.hpp"
+//#include "modules/mavlink_relay/missionplannertcp.hpp"
+#include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 
 /*!
  * \brief The AntennaTracker class
@@ -47,6 +48,12 @@ public:
         ZABER_NOT_OPEN
     };
 
+    enum class serialType
+    {
+        ARDUINO,
+        ZABER
+    };
+
     //SHOULD BE STATIC
     /*!
      * \brief getArduinoList returns a list of all available serial devices that can be identified as an Arduino
@@ -65,7 +72,9 @@ public:
      * \param zaber_port is the serial port for the zaber controller
      */
     void setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud);
-    deviceConnectionStat startDevice(MissionPlannerSocket * const relay);
+    void setupDevice(QString port, QSerialPort::BaudRate baud, serialType devType);
+
+    deviceConnectionStat startDevice(MAVLinkRelay * const relay);
 
     /*!
      * \brief setStationPos sets the GPS coordinates of the antenna tracker station

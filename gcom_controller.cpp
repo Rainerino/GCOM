@@ -12,6 +12,7 @@
 #include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_antenna_tracker/antennatracker.hpp"
 
 //===================================================================
 // Constants
@@ -53,6 +54,9 @@ GcomController::GcomController(QWidget *parent) :
     connect(mavlinkRelay, SIGNAL(mavlinkRelayDisconnected()),
             this, SLOT(mavlinkRelayDisconnected()));
     mavlinkConnectingMovie = new QMovie (":/connection/mavlink_connecting.gif");
+
+    // Antenna Tracker Setup
+    tracker = new AntennaTracker();
 }
 
 GcomController::~GcomController()
@@ -61,6 +65,8 @@ GcomController::~GcomController()
     delete mavlinkRelay;
     delete mavlinkConnectionTimer;
     delete mavlinkConnectingMovie;
+
+    delete tracker;
 }
 
 //===================================================================
@@ -154,4 +160,41 @@ QString GcomController::formatDuration(unsigned long seconds)
     minutes = minutes % 60;
 
     return QString("%1:%2:%3").arg(hours).arg(minutes).arg(seconds);
+}
+
+void GcomController::on_arduinoRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getArduinoList();
+
+    ui->availableArduinoPorts->clear();
+    ui->availableArduinoPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_arduinoConnectButton_clicked()
+{
+    QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
+    QString selectedPort = selectedIndex.data().toString();
+
+    tracker->setupDevice(selectedPort, QSerialPort::Baud9600, AntennaTracker::serialType::ARDUINO);
+}
+
+void GcomController::on_zaberRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getZaberList();
+
+    ui->availableZaberPorts->clear();
+    ui->availableZaberPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_zaberConnectButton_clicked()
+{
+    QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
+    QString selectedPort = selectedIndex.data().toString();
+
+    tracker->setupDevice(selectedPort, QSerialPort::Baud9600, AntennaTracker::serialType::ZABER);
+}
+
+void GcomController::on_startTrackButton_clicked()
+{
+    //AntennaTracker::deviceConnectionStat status = tracker->startDevice(mavlinkRelay);
 }

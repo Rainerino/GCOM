@@ -1,5 +1,20 @@
 #include "antennatracker.hpp"
+#include <QMainWindow>
+#include <string>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+#include <QString>
+#include <Qtcore/QDebug>
+#include <QList>
 
+#include <vector>
+#include <math.h>
+
+#include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/uas_message_tcp_framer.hpp"
+#include "Mavlink/common/mavlink.h"
+//#include "modules/mavlink_relay/missionplannertcp.hpp"
+#include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 AntennaTracker::AntennaTracker()
 {
     arduinoSerial = nullptr;
@@ -54,6 +69,7 @@ QList<QString> AntennaTracker::getArduinoList()
     QString arduinoPortKey = "Arduino";
     QList<QString> arduinoPorts;    //list of arduinos
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();    //get a list of all available ports
+
     //iterate through list of ports
     foreach(QSerialPortInfo currPort, portList) {
         //check for arduino ports and add to list
@@ -62,7 +78,12 @@ QList<QString> AntennaTracker::getArduinoList()
         }
     }
 
-    return arduinoPorts;    //return list of arduinos
+    if(arduinoPorts.isEmpty()) {
+        arduinoPorts.append(QString("NO ARDUINOS CONNECTED"));
+        return arduinoPorts;
+    }
+    else
+        return arduinoPorts;    //return list of arduinos
 }
 
 QList<QString> AntennaTracker::getZaberList()
@@ -70,6 +91,7 @@ QList<QString> AntennaTracker::getZaberList()
     QString zaberPortKey = "Zaber";
     QList<QString> zaberPorts;  //list of zaber controllers
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();    //get a list of all available ports
+
     //iterate through list of ports
     foreach(QSerialPortInfo currPort, portList) {
         //check for zaber ports and add to list
@@ -78,7 +100,12 @@ QList<QString> AntennaTracker::getZaberList()
         }
     }
 
-    return zaberPorts;   //return list of zaber controllers
+    if(zaberPorts.isEmpty()) {
+        zaberPorts.append(QString("NO ZABER CONTROLLER CONNECTED"));
+        return zaberPorts;
+    }
+    else
+        return zaberPorts;   //return list of zaber controllers
 }
 
 void AntennaTracker::setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud)
@@ -106,7 +133,37 @@ void AntennaTracker::setupDevice(QString arduinoPort, QString zaberPort, QSerial
     this->zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
 }
 
-AntennaTracker::deviceConnectionStat AntennaTracker::startDevice(MissionPlannerSocket * const relay)
+void AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud, serialType devType)
+{
+    if(devType == serialType::ARDUINO)
+    {
+        arduinoPort = port;
+
+        //initialize arduino serial port
+        this->arduinoSerial = new QSerialPort(port);
+        this->arduinoSerial->setPortName("arduino");
+        this->arduinoSerial->setBaudRate(baud);
+        this->arduinoSerial->setDataBits(QSerialPort::Data8);
+        this->arduinoSerial->setParity(QSerialPort::NoParity);
+        this->arduinoSerial->setStopBits(QSerialPort::OneStop);
+        this->arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
+    }
+    else if(devType == serialType::ZABER)
+    {
+        zaberPort = port;
+
+        //intializae zaber serial port
+        this->zaberSerial = new QSerialPort(port);
+        this->zaberSerial->setPortName("zaber controller");
+        this->zaberSerial->setBaudRate(baud);
+        this->zaberSerial->setDataBits(QSerialPort::Data8);
+        this->zaberSerial->setParity(QSerialPort::NoParity);
+        this->zaberSerial->setStopBits(QSerialPort::OneStop);
+        this->zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
+    }
+}
+
+AntennaTracker::deviceConnectionStat AntennaTracker::startDevice(MAVLinkRelay * const relay)
 {
     //if arduino or zaber uninitialized, initialize first item in the list
 
@@ -114,18 +171,22 @@ AntennaTracker::deviceConnectionStat AntennaTracker::startDevice(MissionPlannerS
     if(this->arduinoSerial == nullptr)
         return deviceConnectionStat::ARDUINO_UNINITIALIZED;
 
+    /*
     if(this->zaberSerial == nullptr)
         return deviceConnectionStat::ZABER_UNITIALIZED;
+        */
 
     //open arduino_serial and zaber_serial
-    bool zaberOpen = this->arduinoSerial->open(QIODevice::ReadWrite);
+    //bool zaberOpen = this->arduinoSerial->open(QIODevice::ReadWrite);
     bool arduinoOpen = this->zaberSerial->open(QIODevice::ReadWrite);
 
     //return true if both arduino and zaber are open, and false otherwise
     if(!arduinoOpen)
         return deviceConnectionStat::ARDUINO_NOT_OPEN;
+    /*
     else if(!zaberOpen)
         return deviceConnectionStat::ZABER_NOT_OPEN;
+        */
 
     //connect mavlink relay
     connect(relay, SIGNAL(mavlinkgpsinfo(std::shared_ptr<mavlink_global_position_int_t>)), this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));

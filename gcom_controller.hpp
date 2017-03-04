@@ -11,6 +11,7 @@
 #include <QTimer>
 // GCOM Includes
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_antenna_tracker/antennatracker.hpp"
 
 //===================================================================
 // Namespace Declarations
@@ -34,10 +35,19 @@ public:
 private slots:
     // UI Slots
     void on_mavlinkConnectionButton_clicked();
+    void on_arduinoRefreshButton_clicked();
     // MAVLinkRelay Slots
     void mavlinkRelayConnected();
     void mavlinkRelayDisconnected();
     void mavlinkTimerTimeout();
+
+    void on_arduinoConnectButton_clicked();
+
+    void on_zaberRefreshButton_clicked();
+
+    void on_zaberConnectButton_clicked();
+
+    void on_startTrackButton_clicked();
 
 private:
     // private member variables
@@ -48,6 +58,8 @@ private:
     void restMavlinkGUI();
     unsigned long mavlinkConnectionTime;
     QMovie *mavlinkConnectingMovie;
+    // Antenna Tracker
+    AntennaTracker *tracker;
     // private member methods
     QString formatDuration(unsigned long seconds);
 
