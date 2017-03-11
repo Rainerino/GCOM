@@ -1,25 +1,14 @@
 #ifndef ANTENNATRACKER_H
 #define ANTENNATRACKER_H
 
-/*
- * currently runs off main wind
- * SHOULD BE CHANGED TO RUN OFF A THREAD LATER ON!!!!
- */
-#include <QMainWindow>
-#include <string>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QString>
 #include <Qtcore/QDebug>
 #include <QList>
-
 #include <vector>
 #include <math.h>
-
-#include "modules/uas_message/uas_message.hpp"
-#include "modules/uas_message/uas_message_tcp_framer.hpp"
-#include "Mavlink/common/mavlink.h"
-//#include "modules/mavlink_relay/missionplannertcp.hpp"
+#include "../Mavlink/ardupilotmega/mavlink.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 
 /*!
@@ -71,7 +60,7 @@ public:
      * \param arduino_port is the serial port for the arduino
      * \param zaber_port is the serial port for the zaber controller
      */
-    void setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud);
+    //void setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud);
     void setupDevice(QString port, QSerialPort::BaudRate baud, serialType devType);
 
     deviceConnectionStat startDevice(MAVLinkRelay * const relay);
