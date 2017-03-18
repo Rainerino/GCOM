@@ -8,6 +8,9 @@
 #include <math.h>
 #include "../Mavlink/ardupilotmega/mavlink.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/request_message.hpp"
+#include "modules/uas_message/uas_message_serial_framer.hpp"
 
 //===================================================================
 // Constants
@@ -247,9 +250,17 @@ bool AntennaTracker::setStationPos(QString lon, QString lat)
 void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t> gps_data)
 {
     qDebug() << "Mavlink signal consumed!!!!!!" << endl;
+    QDataStream arduinoOut(arduinoSerial);
 
+    RequestMessage * IMURequest = new RequestMessage(UASMessage::MessageID::IMU_DATA);
+    UASMessageSerialFramer * framer = new UASMessageSerialFramer();
+    framer->frameMessage(* IMURequest);
+    arduinoOut << framer;
+
+    /*
     QByteArray request = QByteArray::fromStdString("put request msg here");  //convert request msg to qstring
     this->arduinoSerial->write(request);   //write request message to arduino
+    */
 
     int delayMilsec = 2000;  //setup time-out delay (2 seconds)
     //read from arduino if ready to read

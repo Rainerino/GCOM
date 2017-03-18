@@ -35,7 +35,8 @@ HEADERS  += \
     modules/uas_dcnc/dcnc.hpp \
     modules/uas_message/image_tagger_message.hpp \
     modules/uas_antenna_tracker/antennatracker.hpp \
-    modules/uas_message/uas_message_serial_framer.hpp
+    modules/uas_message/uas_message_serial_framer.hpp \
+    modules/uas_message/request_message.hpp
 
 FORMS    += gcomcontroller.ui
 

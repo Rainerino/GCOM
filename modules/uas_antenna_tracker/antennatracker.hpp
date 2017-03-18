@@ -10,6 +10,9 @@
 #include <math.h>
 #include "../Mavlink/ardupilotmega/mavlink.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/request_message.hpp"
+#include "modules/uas_message/uas_message_serial_framer.hpp"
 
 /*!
  * \brief The AntennaTracker class
