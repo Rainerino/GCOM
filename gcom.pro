@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     modules/mavlink_relay/mavlink_relay_tcp.cpp \
     modules/uas_dcnc/dcnc.cpp \
     modules/uas_message/image_tagger_message.cpp \
-    modules/uas_antenna_tracker/antennatracker.cpp
+    modules/uas_antenna_tracker/antennatracker.cpp \
+    modules/uas_message/uas_message_serial_framer.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -33,7 +34,8 @@ HEADERS  += \
     gcom_controller.hpp \
     modules/uas_dcnc/dcnc.hpp \
     modules/uas_message/image_tagger_message.hpp \
-    modules/uas_antenna_tracker/antennatracker.hpp
+    modules/uas_antenna_tracker/antennatracker.hpp \
+    modules/uas_message/uas_message_serial_framer.hpp
 
 FORMS    += gcomcontroller.ui
 

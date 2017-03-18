@@ -8,11 +8,14 @@
 #include <QRegExpValidator>
 #include <QRegExp>
 #include <QTimer>
+#include <QDebug>
 // GCOM Includes
 #include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
+#include "modules/uas_message/uas_message_serial_framer.hpp"
+
 
 //===================================================================
 // Constants
@@ -57,6 +60,7 @@ GcomController::GcomController(QWidget *parent) :
 
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
+    ui->antennaTrackerTab->setDisabled(true);
 }
 
 GcomController::~GcomController()
@@ -129,6 +133,8 @@ void GcomController::mavlinkRelayConnected()
     mavlinkConnectingMovie->stop();
     // Start the timer
     mavlinkConnectionTimer->start(1000);
+    // Enable the antenna tracker
+    ui->antennaTrackerTab->setDisabled(false);
 }
 
 void GcomController::mavlinkRelayDisconnected()
@@ -146,6 +152,71 @@ void GcomController::mavlinkRelayDisconnected()
     mavlinkConnectingMovie->stop();
     // Stop the timer
     mavlinkConnectionTimer->stop();
+    ui->antennaTrackerTab->setDisabled(true);
+    // Stop the tracker if its on
+
+}
+
+
+//===================================================================
+// Antenna Tracker
+//===================================================================
+void GcomController::on_arduinoRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getArduinoList();
+
+    ui->availableArduinoPorts->clear();
+    ui->availableArduinoPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_arduinoConnectButton_clicked()
+{
+    if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
+            != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+    {
+        QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
+        QString selectedPort = selectedIndex.data().toString();
+
+        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud115200,
+                             AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
+        if (status)
+            ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);
+    }
+    else
+    {
+        tracker->disconnectArduino();
+        ui->arduinoConnectButton->setText(CONNECT_BUTTON_TEXT);
+    }
+}
+
+void GcomController::on_zaberRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getZaberList();
+
+    ui->availableZaberPorts->clear();
+    ui->availableZaberPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_zaberConnectButton_clicked()
+{
+    QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
+    QString selectedPort = selectedIndex.data().toString();
+
+    tracker->setupDevice(selectedPort, QSerialPort::Baud115200, AntennaTracker::AntennaTrackerSerialDevice::ZABER);
+}
+
+void GcomController::on_startTrackButton_clicked()
+{
+    AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
+
+    if(status == AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+        qDebug() << "both devices started";
+    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED)
+        qDebug() << "arduino not initialized";
+    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_NOT_OPEN)
+        qDebug() << "arduino not open";
+    else
+        qDebug() << "wrong neighbourhood";
 }
 
 //===================================================================
@@ -162,49 +233,11 @@ QString GcomController::formatDuration(unsigned long seconds)
     return QString("%1:%2:%3").arg(hours).arg(minutes).arg(seconds);
 }
 
-void GcomController::on_arduinoRefreshButton_clicked()
+void GcomController::on_tabWidget_tabBarClicked(int index)
 {
-    QList<QString> portList = tracker->getArduinoList();
-
-    ui->availableArduinoPorts->clear();
-    ui->availableArduinoPorts->addItems(QStringList(portList));
-}
-
-void GcomController::on_arduinoConnectButton_clicked()
-{
-    QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
-    QString selectedPort = selectedIndex.data().toString();
-    qDebug() << selectedPort;
-
-    tracker->setupDevice(selectedPort, QSerialPort::Baud9600, AntennaTracker::serialType::ARDUINO);
-}
-
-void GcomController::on_zaberRefreshButton_clicked()
-{
-    QList<QString> portList = tracker->getZaberList();
-
-    ui->availableZaberPorts->clear();
-    ui->availableZaberPorts->addItems(QStringList(portList));
-}
-
-void GcomController::on_zaberConnectButton_clicked()
-{
-    QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
-    QString selectedPort = selectedIndex.data().toString();
-
-    tracker->setupDevice(selectedPort, QSerialPort::Baud9600, AntennaTracker::serialType::ZABER);
-}
-
-void GcomController::on_startTrackButton_clicked()
-{
-    AntennaTracker::deviceConnectionStat status = tracker->startDevice(mavlinkRelay);
-
-    if(status == AntennaTracker::deviceConnectionStat::SUCCESS)
-        qDebug() << "both devices started";
-    else if(status == AntennaTracker::deviceConnectionStat::ARDUINO_UNINITIALIZED)
-        qDebug() << "arduino not initialized";
-    else if(status == AntennaTracker::deviceConnectionStat::ARDUINO_NOT_OPEN)
-        qDebug() << "arduino not open";
-    else
-        qDebug() << "wrong neighbourhood";
+    if (index == 1)
+    {
+        on_arduinoRefreshButton_clicked();
+        on_zaberRefreshButton_clicked();
+    }
 }

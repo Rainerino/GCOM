@@ -28,22 +28,24 @@ public:
     /*!
      * \brief The DEVICE_STAT enum indicates current status of all devices connected.
      */
-    enum class deviceConnectionStat
+    enum class AntennaTrackerConnectionState
     {
         SUCCESS,
         ARDUINO_UNINITIALIZED,
         ZABER_UNITIALIZED,
         ARDUINO_NOT_OPEN,
-        ZABER_NOT_OPEN
+        ZABER_NOT_OPEN,
+        RELAY_NOT_OPEN,
+        FAILED
     };
 
-    enum class serialType
+    enum class AntennaTrackerSerialDevice
     {
         ARDUINO,
         ZABER
     };
 
-    //SHOULD BE STATIC
+    // TODO: Make static
     /*!
      * \brief getArduinoList returns a list of all available serial devices that can be identified as an Arduino
      * \return QList of port names
@@ -60,10 +62,13 @@ public:
      * \param arduino_port is the serial port for the arduino
      * \param zaber_port is the serial port for the zaber controller
      */
-    //void setupDevice(QString arduinoPort, QString zaberPort, QSerialPort::BaudRate arduinoBaud, QSerialPort::BaudRate zaberBaud);
-    void setupDevice(QString port, QSerialPort::BaudRate baud, serialType devType);
+    bool setupDevice(QString port, QSerialPort::BaudRate baud, AntennaTrackerSerialDevice devType);
+    AntennaTrackerConnectionState getDeviceStatus(AntennaTrackerSerialDevice device);
+    void disconnectArduino();
+    void disconnectZaber();
 
-    deviceConnectionStat startDevice(MAVLinkRelay * const relay);
+    AntennaTrackerConnectionState startTracking(MAVLinkRelay * const relay);
+    void stopTracking();
 
     /*!
      * \brief setStationPos sets the GPS coordinates of the antenna tracker station
@@ -81,11 +86,19 @@ public slots:
      */
     void receiveHandler(std::shared_ptr<mavlink_global_position_int_t> gpsData);
 
+signals:
+    void antennaTrackerDeviceDisconnected(AntennaTrackerSerialDevice device);
+    void antennaTrackerDisconnected();
+
 private:
+
     QString arduinoPort;
     QString zaberPort;
     QSerialPort *arduinoSerial;
     QSerialPort *zaberSerial;
+
+    // State Variables
+    bool antennaTrackerConnected;
 
     mavlink_global_position_int_t gpsData;
 
@@ -101,16 +114,16 @@ private:
     uint32_t baseLat;
     uint32_t baseLon;
 
-    QString arduinoPortName;
-    QString zaberPortName;
-    //std::string arduinoRequest = "GCOM_ready";
-
     /*!
      * \brief calcMovement returns a string command constrcuted based on GPS data and positional data form
      * the arduino.
      * \return command in the form of a string
      */
     QString calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU, float pitchIMU);
+
+private slots:
+    void zaberControllerDisconnected(QSerialPort::SerialPortError error);
+    void arduinoDisconnected(QSerialPort::SerialPortError);
 };
 
 #endif // ANTENNATRACKER_H

@@ -49,6 +49,8 @@ private slots:
 
     void on_startTrackButton_clicked();
 
+    void on_tabWidget_tabBarClicked(int index);
+
 private:
     // private member variables
     Ui::GcomController *ui;
