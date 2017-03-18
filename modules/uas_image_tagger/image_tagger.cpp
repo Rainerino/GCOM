@@ -6,6 +6,7 @@
 #include <QFile>
 // GCOM Includes
 #include "image_tagger.hpp"
+#include "exiv2/exiv2.hpp"
 
 //===================================================================
 // Constants
@@ -25,9 +26,13 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
     setupDirectoryPath(dir + DUPLFOLDER, 1);
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
+    connect(toBeTagged, &MAVLinkRelay::mavlinkRelayCameraInfo,
+            this, &ImageTagger::handleMavlinkRelay);
 
-    if (toBeTagged != NULL) { }     // Tag image (not implemented yet)
-    else { }                        // Don't tag image
+    if (toBeTagged != NULL)
+        gpsDataAvailable = 1;   // tag image
+    else
+        gpsDataAvailable = 0;   // do not tag image
 }
 
 ImageTagger::~ImageTagger() { }
@@ -60,6 +65,26 @@ void ImageTagger::saveImageToDisc(QString pathName, unsigned char *data)
     image.close();
 }
 
+void ImageTagger::tagImage(QString pathName)
+{
+    std::string pathOfImage = pathName.toStdString();
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
+    assert(image.get() != 0);   // check if image was opened
+
+    image->readMetadata();
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(gpsData->lat, 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(gpsData->lng, 10000000);
+    image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(gpsData->alt_msl, 1);
+    image->writeMetadata();
+}
+
+void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> cameraInfo)
+{
+    mavlink_camera_feedback_t *copyOfCameraInfo = cameraInfo.get();
+    gpsData = copyOfCameraInfo;
+}
+
 void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message)
 {
     // Setup local variables
@@ -68,7 +93,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
     std::vector<unsigned char> imageData = imageMessage->getImageData();
     QString pathName;
 
-    // Convert image data from vector to array
+    // A pointer to the image data
     unsigned char *imageArray = &imageData[0];
 
     // Iterate through vector of sequence numbers
@@ -78,6 +103,8 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
             // Change path name for duplicate
             pathName = pathOfDuplicates + DUPL + QString::number(++numOfDuplicates) + JPG;
             saveImageToDisc(pathName, imageArray);
+            if (gpsDataAvailable)
+                tagImage(pathName);     // tag image if MavLinkRelay was not NULL
             emit taggedImage(pathName);
             return;
         }
@@ -87,5 +114,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
     seqNumArr.push_back(uniqueSeqNum);
     pathName = pathOfDir + IMG + QString::number(++numOfImages) + JPG;
     saveImageToDisc(pathName, imageArray);
+    if (gpsDataAvailable)
+        tagImage(pathName);             // tag image if MavLinkRelay was not NULL
     emit taggedImage(pathName);
 }

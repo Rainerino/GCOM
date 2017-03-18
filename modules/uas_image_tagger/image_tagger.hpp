@@ -7,6 +7,7 @@
 // System Includes
 #include <QString>
 #include <QObject>
+#include <assert.h>
 // GCOM Includes
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_message/image_tagger_message.hpp"
@@ -38,6 +39,13 @@ public:
     ~ImageTagger();
 
     /*!
+     * \brief setupDirectoryPath helper function to setup path name
+     * \param dir QString path of directory
+     * \param createDuplicates int 0 or 1 if duplicate folder is to be created
+     */
+    void setupDirectoryPath(QString dir, int createDuplicates);
+
+    /*!
      * \brief saveImageToDisc helper function that does the saving
      * \param pathName QString path of directory with filename
      * \param data unsigned char pointer to image data
@@ -45,11 +53,10 @@ public:
     void saveImageToDisc(QString pathName, unsigned char *data);
 
     /*!
-     * \brief setupDirectoryPath helper function to setup path name
-     * \param dir QString path of directory
-     * \param createDuplicates int 0 or 1 if duplicate folder is to be created
+     * \brief tagImage write to image metadata the GPS information
+     * \param pathName QString path to location of image file
      */
-    void setupDirectoryPath(QString dir, int createDuplicates);
+    void tagImage(QString pathName);
 signals:
     // Data Signals
     void taggedImage(QString pathName);
@@ -59,12 +66,19 @@ private slots:
      *        the tagged image's file name
      */
     void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
+
+    /*!
+     * \brief handleMavlinkRelay copies camera feedback info to private pointer gpsData
+     */
+    void handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> cameraInfo);
 private:
     QString pathOfDir;
     QString pathOfDuplicates;
     int numOfImages;
     int numOfDuplicates;
+    int gpsDataAvailable;
     std::vector<unsigned char> seqNumArr;
+    mavlink_camera_feedback_t *gpsData;
 };
 
 #endif // IMAGETAGGER_HPP
