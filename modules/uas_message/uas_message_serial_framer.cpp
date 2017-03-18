@@ -21,8 +21,9 @@
 //===================================================================
 // Constants
 //===================================================================
-const int FRAMED_MESG_SIZE_FIELD_SIZE = 2;
-const int FRAMED_MESG_ID_FIELD_SIZE = 1;
+const int SIZE_FIELD_ID = 1;
+const int SIZE_FIELD_SIZE = 1;
+const int SIZE_HEADER = SIZE_FIELD_ID + SIZE_FIELD_SIZE;
 const int COBS_OVERHEAD = 2;
 
 //===================================================================
@@ -57,7 +58,7 @@ bool UASMessageSerialFramer::frameMessage(UASMessage &uasMessage)
     // Apply the cobs
     encodeCOBS(messageData);
     // update the status
-    ramerStatus = UASMessageSerialFramer::SerialFramerStatus::SUCCESS;
+    framerStatus = UASMessageSerialFramer::SerialFramerStatus::SUCCESS;
     return true;
 }
 
@@ -116,6 +117,33 @@ void UASMessageSerialFramer::encodeCOBS(std::vector<unsigned char> &messageData)
     messageData.assign(encodedMessageData.begin(), encodedMessageData.end());
 }
 
+
+bool UASMessageSerialFramer::decodeCOBS(std::vector<unsigned char> &messageData)
+{
+    std::vector<unsigned char> decodedMessageData;
+    decodedMessageData.resize(messageData.size());
+    const uint8_t *ptr = messageData.data();
+    uint8_t *dst = decodedMessageData.data();
+    const uint8_t *end = ptr + messageData.size();
+
+
+    while (ptr < end)
+    {
+        int code = *ptr++;
+        for (int i = 1; ptr < end && i < code; i++)
+          *dst++ = *ptr++;
+        if (code < 0xFF)
+          *dst++ = 0;
+    }
+
+    if (ptr > end)
+        return false;
+
+    messageData.assign(decodedMessageData.begin(), decodedMessageData.end());
+    messageData.resize(messageData.size() - COBS_OVERHEAD);
+    return true;
+}
+
 QDataStream& operator<<(QDataStream& outputStream, UASMessageSerialFramer& uasMessageSerialFramer)
 {
     // If there is no valid message then we return straight away
@@ -124,10 +152,10 @@ QDataStream& operator<<(QDataStream& outputStream, UASMessageSerialFramer& uasMe
 
     // Attempt to write the message's contents to the stream
     int writtenBytes = outputStream.writeRawData(reinterpret_cast<char*>(uasMessageSerialFramer.messageData.data()),
-                                                 uasMessageTCPFramer.messageData.size());
+                                                 uasMessageSerialFramer.messageData.size());
 
     // If there was an error in writing the data then set the internal flag
-    if ((outputStream.status() != QDataStream::Ok) || (writtenBytes != uasMessageTCPFramer.messageData.size()))
+    if ((outputStream.status() != QDataStream::Ok) || (writtenBytes != uasMessageSerialFramer.messageData.size()))
         uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::SEND_FAILURE;
 
 
@@ -135,35 +163,64 @@ QDataStream& operator<<(QDataStream& outputStream, UASMessageSerialFramer& uasMe
     return outputStream;
 }
 
-/*
+
 QDataStream& operator>>(QDataStream& inputStream, UASMessageSerialFramer& uasMessageSerialFramer)
 {
+    int bytesRead;
     // Reset the state of the framer to its default state
-    uasMessageTCPFramer.initializeDefaults();
+    uasMessageSerialFramer.initializeDefaults();
+    uasMessageSerialFramer.messageData.resize(SIZE_HEADER);
     // Then we need to check the state of the input stream
     if (inputStream.status() != QDataStream::Ok)
         return inputStream;
-    // Then we read a the ID byte from the input stream
-    inputStream >> uasMessageTCPFramer.messageData[0];
-    // Next we attempt to read the length of the message
-    uint32_t messageSize;
-    inputStream >> messageSize;
+    // Then we read the header of the message
+    bytesRead = inputStream.readRawData(reinterpret_cast<char *>(uasMessageSerialFramer.messageData.data()), SIZE_HEADER);
+    if (bytesRead < SIZE_HEADER)
+    {
+        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
+        return inputStream;
+    }
     // Check if not enough data is present
     if (inputStream.status() != QDataStream::Ok)
+    {
+        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
         return inputStream;
-    // Split the the length field into 4 bytes
-    for (int sizeFieldByte = 1; sizeFieldByte <= FRAMED_MESG_SIZE_FIELD_SIZE; sizeFieldByte++)
-         uasMessageTCPFramer.messageData.push_back((messageSize >> (8 * FRAMED_MESG_SIZE_FIELD_SIZE - sizeFieldByte ))& 0xFF);
-    // Attempt to retrieve the payload data
-    uasMessageTCPFramer.messageData.resize(uasMessageTCPFramer.messageData.size() + messageSize);
-    int readLength = inputStream.readRawData(reinterpret_cast<char*>(uasMessageTCPFramer.messageData.data()
-                                             + FRAMED_MESG_ID_FIELD_SIZE
-                                             + FRAMED_MESG_SIZE_FIELD_SIZE)
-                                             , messageSize);
-    // Finally we check if the entire payload was read successfully
-    if ((inputStream.status() != QDataStream::Ok) || (readLength != messageSize))
-        return inputStream;
+    }
 
-    uasMessageTCPFramer.framerStatus = true;
+    // Attempt to retrieve the payload data
+    uasMessageSerialFramer.messageData.resize(uasMessageSerialFramer.messageData.size() + uasMessageSerialFramer.messageData[1]);
+    bytesRead = inputStream.readRawData(reinterpret_cast<char*>(uasMessageSerialFramer.messageData.data()
+                                                                + SIZE_HEADER)
+                                        , uasMessageSerialFramer.messageData[1]);
+
+    // Finally we check if the entire payload was read successfully
+    if ((inputStream.status() != QDataStream::Ok) || (bytesRead < uasMessageSerialFramer.messageData[1]))
+    {
+        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
+        return inputStream;
+    }
+
+    // Attempt to decode the COBS
+    if(!UASMessageSerialFramer::decodeCOBS(uasMessageSerialFramer.messageData))
+    {
+        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::COBS_FAILURE;
+        return inputStream;
+    }
+
+    // Check the checksum
+    uint8_t checkSumLower = uasMessageSerialFramer.messageData.back();
+    uasMessageSerialFramer.messageData.pop_back();
+    uint8_t checkSumUpper = uasMessageSerialFramer.messageData.back();
+    uasMessageSerialFramer.messageData.pop_back();
+
+    UASMessageSerialFramer::appendFletchers16(uasMessageSerialFramer.messageData);
+    if((checkSumLower != uasMessageSerialFramer.messageData[uasMessageSerialFramer.messageData.size() - 1]) ||
+       (checkSumUpper != uasMessageSerialFramer.messageData[uasMessageSerialFramer.messageData.size() - 2]))
+    {
+        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::FAILED_FLETCHERS;
+        return inputStream;
+    }
+
+    uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::SUCCESS;
     return inputStream;
-}*/
+}

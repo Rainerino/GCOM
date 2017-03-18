@@ -83,6 +83,7 @@ public:
      * \return A pointer to the QDataStream to allow for linking << statements
      */
     friend QDataStream& operator<<(QDataStream& out, UASMessageSerialFramer& uasMessageSerialFramer);
+    static bool decodeCOBS(std::vector<unsigned char> &messageData);
 
     /*!
      * \brief operator >>
@@ -92,7 +93,7 @@ public:
      */
     friend QDataStream& operator>>(QDataStream& in, UASMessageSerialFramer& uasMessageSerialFramer);
     static void appendFletchers16(std::vector<unsigned char> messageData);
-    static void UASMessageSerialFramer::encodeCOBS(std::vector<unsigned char> &messageData);
+    static void encodeCOBS(std::vector<unsigned char> &messageData);
 
 
 private:
