@@ -33,7 +33,8 @@ class UASMessage
             SYSTEM_CONTROL          = 0x0E,
             IMAGE_DATA              = 0x0F,
             CLAW_IMAGE_DATA         = 0x10,
-            IMU_DATA                = 0x1A,
+            DATA_IMU                = 0x11,
+            DATA_GPS                = 0x12,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };

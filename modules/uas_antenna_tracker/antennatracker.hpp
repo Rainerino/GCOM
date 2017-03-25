@@ -99,23 +99,25 @@ private:
     QString zaberPort;
     QSerialPort *arduinoSerial;
     QSerialPort *zaberSerial;
+    QDataStream *arduinoDataStream;
+    UASMessageSerialFramer *arduinoFramer;
+
+    // Base station GPS
+    float latBase;
+    float lonBase;
 
     // State Variables
     bool antennaTrackerConnected;
 
     mavlink_global_position_int_t gpsData;
 
-    float degToRad;
-    float radToDeg;
-    float radiusEarth;
 
     float prevYawIMU;
     float droneAngle;
     float trackerAngle;
     float angleDiff;
 
-    uint32_t baseLat;
-    uint32_t baseLon;
+
 
     /*!
      * \brief calcMovement returns a string command constrcuted based on GPS data and positional data form

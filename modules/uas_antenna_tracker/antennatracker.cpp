@@ -1,28 +1,48 @@
+//===================================================================
+// Includes
+//===================================================================
+// GCOM Includes
 #include "antennatracker.hpp"
+#include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/request_message.hpp"
+#include "modules/uas_message/gps_message.hpp"
+#include "modules/uas_message/imu_message.hpp"
+#include "modules/uas_message/uas_message_serial_framer.hpp"
+#include "../Mavlink/ardupilotmega/mavlink.h"
+// QT Includes
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QString>
 #include <Qtcore/QDebug>
 #include <QList>
+#include <QtMath>
+#include <QElapsedTimer>
+#include <QDebug>
+// System Includes
 #include <vector>
 #include <math.h>
-#include "../Mavlink/ardupilotmega/mavlink.h"
-#include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
-#include "modules/uas_message/uas_message.hpp"
-#include "modules/uas_message/request_message.hpp"
-#include "modules/uas_message/uas_message_serial_framer.hpp"
+
+//===================================================================
+// Defines
+//===================================================================
+#define DEGREE_TO_MICROSTEPS 1599.722
+#define ANGLE_TO_MICROSTEPS(x) (x * DEGREE_TO_MICROSTEPS)
+#define UNPACK_LAT_LON(x) (float) (x/1e7)
 
 //===================================================================
 // Constants
 //===================================================================
-const QString zaberPortKey = "Microsoft";
-const QString zaberNoController = "NO ZABER CONTROLLER CONNECTED";
-const QString arduinoPortKey = "Arduino";
-const QString arduinoNotConnected = "NO ARDUINO CONNECTED";
+// Strings
+const QString ZABER_DEVICE_NAME = "Microsoft";
+const QString TEXT_ZABER_NO_CONTROLLER = "NO ZABER CONTROLLER CONNECTED";
+const QString ARDUINO_DEVICE_NAME = "Arduino";
+const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 // Zaber Command Templates
-const QString zaberStopCommandTemplate= "/1 %d stop\n";
-const QString zaberMoveCommandTemplate= "/1 %d move rel %d\n";
-
+const QString zaberStopCommandTemplate= "/1 %1 stop\n";
+const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
+// Constants
+const float RADIUS_EARTH = 6378137;
 
 //===================================================================
 // Class Definitions
@@ -32,17 +52,14 @@ AntennaTracker::AntennaTracker()
     // Default Values
     arduinoSerial = nullptr;
     zaberSerial = nullptr;
+    arduinoFramer = new UASMessageSerialFramer();
 
-    // Reste the state varaibles
+    // Reset the state varaibles
     antennaTrackerConnected = false;
 
-    degToRad = 0.01745329251;
-    radToDeg = 57.2957795131;
-    radiusEarth = 6378137;
-
     //initialize base coordinates with arbitrary garbage value
-    baseLat = 9999;
-    baseLon = 9999;
+    latBase = 0;
+    lonBase = 0;
 
     prevYawIMU = 0;
     droneAngle = 0;
@@ -53,13 +70,15 @@ AntennaTracker::AntennaTracker()
 AntennaTracker::~AntennaTracker()
 {
     //close serial connection to arduino if it's open
-    if(arduinoSerial != nullptr && arduinoSerial->isOpen()) {
+    if(arduinoSerial != nullptr && arduinoSerial->isOpen())
+    {
         arduinoSerial->close();
         delete zaberSerial;
     }
 
     //close serial connection to zaber if it's open
-    if(zaberSerial != nullptr && zaberSerial->isOpen()) {
+    if(zaberSerial != nullptr && zaberSerial->isOpen())
+    {
         zaberSerial->close();
         delete zaberSerial;
     }
@@ -81,15 +100,17 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
         if (arduinoSerial->isOpen())
             disconnectArduino();
 
+
+
+        if(!arduinoSerial->open(QIODevice::ReadWrite))
+            return false;
+
         // Initialize arduino serial port
-        arduinoSerial->setBaudRate(baud);
+        arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
         arduinoSerial->setDataBits(QSerialPort::Data8);
         arduinoSerial->setParity(QSerialPort::NoParity);
         arduinoSerial->setStopBits(QSerialPort::OneStop);
         arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
-
-        if(!arduinoSerial->open(QIODevice::ReadWrite))
-            return false;
 
         connect(arduinoSerial,
                 SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
@@ -122,6 +143,8 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
 
 AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVLinkRelay * const relay)
 {
+    QElapsedTimer timer;
+    timer.start();
     // Double check that the conditions required for the connection is correct
     if (arduinoSerial == nullptr)
         return AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED;
@@ -135,6 +158,47 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     if (!zaberSerial->isOpen())
         return AntennaTrackerConnectionState::ZABER_NOT_OPEN;
 
+    // Create the datastreams and framer
+    arduinoDataStream = new QDataStream(arduinoSerial);
+
+    // Retrieve the base's GPS Corrdinates
+    RequestMessage gpsRequest = RequestMessage(UASMessage::MessageID::DATA_GPS);
+    arduinoFramer->frameMessage(gpsRequest);
+    (*arduinoDataStream) << (*arduinoFramer);
+
+    // Verify the connection
+    if (!arduinoSerial->waitForReadyRead(3000))
+        return AntennaTrackerConnectionState::FAILED;
+
+    arduinoFramer->clearMessage();
+
+    // Attempt to read the GPS Message from the antenna tracker
+    // Note: This is a bad busy loop! We are only allowed to do this because the drone will not be
+    // in flight at this time!
+    while (true)
+    {
+        arduinoDataStream->startTransaction();
+        (*arduinoDataStream) >> (*arduinoFramer);
+        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+            break;
+        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
+            arduinoDataStream->rollbackTransaction();
+        else
+            return AntennaTrackerConnectionState::FAILED;
+        arduinoSerial->waitForReadyRead(10);
+    }
+    arduinoDataStream->commitTransaction();
+    qDebug() << timer.elapsed();
+
+    // Process the GPS Coordinates of the base station!
+    std::shared_ptr<UASMessage> gpsMessage = arduinoFramer->generateMessage();
+    if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
+        return AntennaTrackerConnectionState::FAILED;
+
+    lonBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lat;
+    latBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lon;
+
+
     // Connect the Mavlink Relay
     if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
         return AntennaTrackerConnectionState::RELAY_NOT_OPEN;
@@ -142,6 +206,7 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     connect(relay,
             SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
             this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+
     antennaTrackerConnected = true;
     return AntennaTrackerConnectionState::SUCCESS;
 }
@@ -234,78 +299,79 @@ void AntennaTracker::zaberControllerDisconnected(QSerialPort::SerialPortError er
     disconnectZaber();
 }
 
-bool AntennaTracker::setStationPos(QString lon, QString lat)
-{
-    baseLon = lon.toDouble();
-    baseLat = lat.toDouble();
-
-    //true if lat/lon changed, false if still garbage value(9999)
-    if(baseLon == 9999 || baseLat == 9999)
-        return false;
-    else
-        return true;
-}
-
-//incomplete
-void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t> gps_data)
+void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t> droneGPSData)
 {
     qDebug() << "Mavlink signal consumed!!!!!!" << endl;
-    QDataStream arduinoOut(arduinoSerial);
 
-    RequestMessage * IMURequest = new RequestMessage(UASMessage::MessageID::IMU_DATA);
-    UASMessageSerialFramer * framer = new UASMessageSerialFramer();
-    framer->frameMessage(* IMURequest);
-    arduinoOut << framer;
 
-    /*
-    QByteArray request = QByteArray::fromStdString("put request msg here");  //convert request msg to qstring
-    this->arduinoSerial->write(request);   //write request message to arduino
-    */
+    RequestMessage imuRequest(UASMessage::MessageID::DATA_IMU);
+    arduinoFramer->frameMessage(imuRequest);
+    (*arduinoDataStream) << (*arduinoFramer);
 
-    int delayMilsec = 2000;  //setup time-out delay (2 seconds)
-    //read from arduino if ready to read
-    //return if readyread has timed out
-    if(arduinoSerial->waitForReadyRead(delayMilsec)) {
-        QByteArray arduinoInByte = this->arduinoSerial->readAll();
-        QString arduinoInString = QString(arduinoInByte);
-        qDebug() << "Received From Arduino: " << arduinoInString << endl;
-
-        //QString moveCommand = calcMovement(gps_data);
+    // Wait till we recieve data from the IMU
+    while (true)
+    {
+        arduinoDataStream->startTransaction();
+        (*arduinoDataStream) >> (*arduinoFramer);
+        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+        {
+            break;
+        }
+        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
+        {
+            arduinoDataStream->rollbackTransaction();
+        }
+        else
+        {
+            arduinoDataStream->commitTransaction();
+            return;
+        }
+        arduinoSerial->waitForReadyRead(10);
     }
-    else {
+    arduinoDataStream->commitTransaction();
+
+
+    std::shared_ptr<UASMessage> imuMessage = arduinoFramer->generateMessage();
+    if ((imuMessage == nullptr) || (imuMessage->type() != UASMessage::MessageID::DATA_IMU))
         return;
-    }
+
+    float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
+    float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->z;
+
+    // Calculate Zaber Movement and send it.
+    QString zaberCommand = calcMovement(droneGPSData, yawBase, pitchBase);
+    zaberSerial->write(zaberCommand.toStdString().c_str());
 }
 
 //NEEDS TO BE IMPLEMENTED
-QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU, float pitchIMU)
+QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU, float pitchIMU)
 {
     //Grabbing individual pieces of data from gpsData
-    float droneLat = gpsData->lat;
-    float droneLon = gpsData->lon;
+    float droneLat = qDegreesToRadians(UNPACK_LAT_LON(droneGPSData->lat));
+    float droneLon = qDegreesToRadians(UNPACK_LAT_LON(droneGPSData->lon));
 
-    int32_t droneAlt = gpsData->alt;
-    int32_t droneRelativeAlt = gpsData->relative_alt;
+    int32_t droneAlt = droneGPSData->alt;
+    int32_t droneRelativeAlt = droneGPSData->relative_alt;
 
-    int16_t droneVX = gpsData->vx;
-    int16_t droneVY = gpsData->vy;
-    int16_t droneVZ = gpsData->vz;
+    int16_t droneVX = droneGPSData->vx;
+    int16_t droneVY = droneGPSData->vy;
+    int16_t droneVZ = droneGPSData->vz;
 
     // Current Tracker Angle
     if(!(angleDiff > -0.01 && angleDiff < 0.01)) {
         trackerAngle = trackerAngle + (yawIMU - prevYawIMU);
     }
 
-    float xDiff = (droneLat-baseLat) * degToRad;
-    float yDiff = (droneLon-baseLon) * degToRad;
-    float a = pow(sin(xDiff/2),2) + cos(baseLat*degToRad) * cos(droneLat*degToRad) * pow(sin(yDiff/2),2);
+    float xDiff = (droneLat-latBase);
+    float yDiff = (droneLon-lonBase);
+    float a = pow(sin(xDiff/2),2) + cos(latBase) * cos(droneLat) * pow(sin(yDiff/2),2);
     float d = 2 * atan2(sqrt(a), sqrt(1-a));
-    float distance = radiusEarth * d;
+    float distance = RADIUS_EARTH * d;
 
-    float y = sin(yDiff) * cos((droneLat*degToRad));
-    float x = cos(baseLat*degToRad) * sin(droneLat*degToRad) - sin(baseLat*degToRad) * cos(droneLat*degToRad) * cos(yDiff);
+    float y = sin(yDiff) * cos((droneLat));
+    float x = cos(latBase) * sin(droneLat) - sin(latBase) * cos(droneLat) * cos(yDiff);
 
-    float horizAngle = atan2(y,x)*radToDeg;
+    float horizAngle = qRadiansToDegrees(atan2(y,x));
     droneAngle = horizAngle;
     float vertAngle = atan((droneRelativeAlt)/(distance*1000)) * 180/M_PI;
 
@@ -318,37 +384,13 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
         angleDiff += 360;
     }
 
-    QString commandDir = "";
-    if(angleDiff < 0) {
-        commandDir = "";
-        angleDiff *= -1;
-    }
-    else {
-        commandDir = "-";
-    }
-
-    QString commandSpeed = "";
-    if(angleDiff < 0.2 && angleDiff >= 0.03) {
-        commandSpeed = "10";
-    }
-    else if(angleDiff < 2 && angleDiff >= 0.2) {
-        commandSpeed = "20";
-    }
-    else if(angleDiff >= 2) {
-        commandSpeed = "300";
-    }
-    else {
-        commandSpeed = "0";
-    }
-
     prevYawIMU = yawIMU;
+    float microSteps = ANGLE_TO_MICROSTEPS(angleDiff);
 
-    QString commandMessage = "/1 move rel " + commandDir + commandSpeed;
-    return commandMessage;
+
+
+    return QString(zaberMoveCommandTemplate).arg(2).arg(microSteps);
 }
-
-
-
 
 //===================================================================
 // Listing Functions
@@ -362,13 +404,13 @@ QList<QString> AntennaTracker::getZaberList()
     foreach(QSerialPortInfo currPort, portList)
     {
         //check for zaber ports and add to list
-        if(currPort.manufacturer().contains(zaberPortKey))
+        if(currPort.manufacturer().contains(ZABER_DEVICE_NAME))
             zaberPorts.append(currPort.portName());
     }
 
     if(zaberPorts.isEmpty())
     {
-        zaberPorts.append(zaberNoController);
+        zaberPorts.append(TEXT_ZABER_NO_CONTROLLER);
         return zaberPorts;
     }
     else
@@ -386,13 +428,13 @@ QList<QString> AntennaTracker::getArduinoList()
     foreach(QSerialPortInfo currPort, portList)
     {
         //check for arduino ports and add to list
-        if(currPort.manufacturer().contains(arduinoPortKey))
+        if(currPort.manufacturer().contains(ARDUINO_DEVICE_NAME))
             arduinoPorts.append(currPort.portName());
     }
 
     if(arduinoPorts.isEmpty())
     {
-        arduinoPorts.append(arduinoNotConnected);
+        arduinoPorts.append(TEXT_ARDUINO_NOT_CONNECTED);
         return arduinoPorts;
     }
     else

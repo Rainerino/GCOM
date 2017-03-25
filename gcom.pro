@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     modules/uas_dcnc/dcnc.cpp \
     modules/uas_message/image_tagger_message.cpp \
     modules/uas_antenna_tracker/antennatracker.cpp \
-    modules/uas_message/uas_message_serial_framer.cpp
+    modules/uas_message/uas_message_serial_framer.cpp \
+    modules/uas_message/gps_message.cpp \
+    modules/uas_message/imu_message.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -36,7 +38,9 @@ HEADERS  += \
     modules/uas_message/image_tagger_message.hpp \
     modules/uas_antenna_tracker/antennatracker.hpp \
     modules/uas_message/uas_message_serial_framer.hpp \
-    modules/uas_message/request_message.hpp
+    modules/uas_message/request_message.hpp \
+    modules/uas_message/gps_message.hpp \
+    modules/uas_message/imu_message.hpp
 
 FORMS    += gcomcontroller.ui
 

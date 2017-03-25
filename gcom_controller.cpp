@@ -177,7 +177,7 @@ void GcomController::on_arduinoConnectButton_clicked()
         QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
-        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud115200,
+        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
                              AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
         if (status)
             ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);

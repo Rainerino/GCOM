@@ -74,7 +74,34 @@ public:
      * \brief generateMessage given the contents of a framed serialized UAS message this function generates the message object
      * \return A smart unique pointer to a dynamically allocated UASMessage, if status is false nullptr is returned
      */
-    std::unique_ptr<UASMessage> generateMessage();
+    std::shared_ptr<UASMessage> generateMessage();
+
+    // Static Utility Functions
+    /*!
+     * \brief caculateFletchers16
+     * \param messageData
+     * \return
+     */
+    static uint16_t caculateFletchers16(const std::vector<unsigned char> &messageData);
+
+    /*!
+     * \brief appendFletchers16
+     * \param messageData
+     */
+    static void appendFletchers16(std::vector<unsigned char> &messageData);
+
+    /*!
+     * \brief encodeCOBS
+     * \param messageData
+     */
+    static void encodeCOBS(std::vector<unsigned char> &messageData);
+
+    /*!
+     * \brief decodeCOBS
+     * \param messageData
+     * \return
+     */
+    static bool decodeCOBS(std::vector<unsigned char> &messageData);
 
     /*!
      * \brief operator <<
@@ -83,7 +110,6 @@ public:
      * \return A pointer to the QDataStream to allow for linking << statements
      */
     friend QDataStream& operator<<(QDataStream& out, UASMessageSerialFramer& uasMessageSerialFramer);
-    static bool decodeCOBS(std::vector<unsigned char> &messageData);
 
     /*!
      * \brief operator >>
@@ -92,8 +118,6 @@ public:
      * \return A pointer to the QDataStream to allow for linking << statements
      */
     friend QDataStream& operator>>(QDataStream& in, UASMessageSerialFramer& uasMessageSerialFramer);
-    static void appendFletchers16(std::vector<unsigned char> messageData);
-    static void encodeCOBS(std::vector<unsigned char> &messageData);
 
 
 private:

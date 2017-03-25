@@ -4,6 +4,8 @@
 // UAS Includes
 #include "uas_message_serial_framer.hpp"
 #include "uas_message.hpp"
+#include "modules/uas_message/gps_message.hpp"
+#include "modules/uas_message/imu_message.hpp"
 #include "request_message.hpp"
 #include "system_info_message.hpp"
 // Qt Includes
@@ -38,6 +40,18 @@ void UASMessageSerialFramer::initializeDefaults()
 {
     framerStatus = SerialFramerStatus::INVALID_MESSAGE;
     messageData.clear();
+    messageData.resize(0);
+}
+
+void UASMessageSerialFramer::clearMessage()
+{
+    framerStatus = SerialFramerStatus::INVALID_MESSAGE;
+    messageData.clear();
+}
+
+UASMessageSerialFramer::SerialFramerStatus UASMessageSerialFramer::status()
+{
+    return framerStatus;
 }
 
 bool UASMessageSerialFramer::frameMessage(UASMessage &uasMessage)
@@ -50,7 +64,6 @@ bool UASMessageSerialFramer::frameMessage(UASMessage &uasMessage)
         return false;
     // Then we append its size to the front of the message (Big Endian)
     messageData.insert(messageData.begin(), serializedMessageSize & 0xFF);
-    messageData.insert(messageData.begin(), serializedMessageSize >> 8 & 0xFF);
     // Append the message ID to the very front of the message
     messageData.insert(messageData.begin(), static_cast<unsigned char>(uasMessage.type()));
     // Calculate Flecher's 16
@@ -62,31 +75,70 @@ bool UASMessageSerialFramer::frameMessage(UASMessage &uasMessage)
     return true;
 }
 
-void UASMessageSerialFramer::appendFletchers16(std::vector<unsigned char> messageData)
+std::shared_ptr<UASMessage> UASMessageSerialFramer::generateMessage()
 {
+    if (framerStatus != UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+        return nullptr;
 
+    std::vector<unsigned char> serializedMessage(messageData.data() + SIZE_HEADER,
+                                                 messageData.data() + messageData.size());
+    switch(messageData[0])
+    {
+        case UASMessage::MessageID::DATA_GPS:
+        {
+            std::shared_ptr<GPSMessage>returnMessage(new GPSMessage(serializedMessage));
+            return returnMessage;
+        }
+        break;
+        case UASMessage::MessageID::DATA_IMU:
+        {
+            std::shared_ptr<IMUMessage>returnMessage(new IMUMessage(serializedMessage));
+            return returnMessage;
+        }
+        break;
+    }
+
+    return nullptr;
+}
+
+//===================================================================
+// Utility Functions
+//===================================================================
+
+uint16_t UASMessageSerialFramer::caculateFletchers16(const std::vector<unsigned char> &messageData)
+{
     auto data = messageData.begin();
     size_t bytes = messageData.size();
 
     uint16_t sum1 = 0xff, sum2 = 0xff;
     size_t tlen;
 
-    while (bytes) {
-            tlen = ((bytes >= 20) ? 20 : bytes);
-            bytes -= tlen;
-            do {
-                    sum2 += sum1 += *data++;
-                    tlen--;
-            } while (tlen);
-            sum1 = (sum1 & 0xff) + (sum1 >> 8);
-            sum2 = (sum2 & 0xff) + (sum2 >> 8);
+    while (bytes)
+    {
+        tlen = ((bytes >= 20) ? 20 : bytes);
+        bytes -= tlen;
+        do
+        {
+            sum2 += sum1 += *data++;
+            tlen--;
+        } while (tlen);
+
+        sum1 = (sum1 & 0xff) + (sum1 >> 8);
+        sum2 = (sum2 & 0xff) + (sum2 >> 8);
     }
-    /* Second reduction step to reduce sums to 8 bits */
+    // Second reduction step to reduce sums to 8 bits
     sum1 = (sum1 & 0xff) + (sum1 >> 8);
     sum2 = (sum2 & 0xff) + (sum2 >> 8);
 
-    messageData.push_back(sum2);
-    messageData.push_back(sum1);
+    return (sum2 << 8) | sum1 ;
+}
+
+void UASMessageSerialFramer::appendFletchers16(std::vector<unsigned char> &messageData)
+{
+    uint16_t checksum = caculateFletchers16(messageData);
+
+    messageData.push_back(checksum >> 8);
+    messageData.push_back(checksum & 0xFF);
 }
 
 void UASMessageSerialFramer::encodeCOBS(std::vector<unsigned char> &messageData)
@@ -117,7 +169,6 @@ void UASMessageSerialFramer::encodeCOBS(std::vector<unsigned char> &messageData)
     messageData.assign(encodedMessageData.begin(), encodedMessageData.end());
 }
 
-
 bool UASMessageSerialFramer::decodeCOBS(std::vector<unsigned char> &messageData)
 {
     std::vector<unsigned char> decodedMessageData;
@@ -144,6 +195,10 @@ bool UASMessageSerialFramer::decodeCOBS(std::vector<unsigned char> &messageData)
     return true;
 }
 
+
+//===================================================================
+// Class Operators
+//===================================================================
 QDataStream& operator<<(QDataStream& outputStream, UASMessageSerialFramer& uasMessageSerialFramer)
 {
     // If there is no valid message then we return straight away
@@ -155,50 +210,39 @@ QDataStream& operator<<(QDataStream& outputStream, UASMessageSerialFramer& uasMe
                                                  uasMessageSerialFramer.messageData.size());
 
     // If there was an error in writing the data then set the internal flag
-    if ((outputStream.status() != QDataStream::Ok) || (writtenBytes != uasMessageSerialFramer.messageData.size()))
+    if ((outputStream.status() != QDataStream::Ok) ||
+        (writtenBytes != uasMessageSerialFramer.messageData.size()))
         uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::SEND_FAILURE;
-
 
     uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::SUCCESS;
     return outputStream;
 }
 
-
 QDataStream& operator>>(QDataStream& inputStream, UASMessageSerialFramer& uasMessageSerialFramer)
 {
     int bytesRead;
+    char messageByte = 0;
+    uint16_t retrievedChecksum, calculatedChecksum;
     // Reset the state of the framer to its default state
     uasMessageSerialFramer.initializeDefaults();
-    uasMessageSerialFramer.messageData.resize(SIZE_HEADER);
+    // Most of the errors are as a result of Incomplete messages
+    uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
     // Then we need to check the state of the input stream
     if (inputStream.status() != QDataStream::Ok)
         return inputStream;
-    // Then we read the header of the message
-    bytesRead = inputStream.readRawData(reinterpret_cast<char *>(uasMessageSerialFramer.messageData.data()), SIZE_HEADER);
-    if (bytesRead < SIZE_HEADER)
-    {
-        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
-        return inputStream;
-    }
-    // Check if not enough data is present
-    if (inputStream.status() != QDataStream::Ok)
-    {
-        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
-        return inputStream;
-    }
 
-    // Attempt to retrieve the payload data
-    uasMessageSerialFramer.messageData.resize(uasMessageSerialFramer.messageData.size() + uasMessageSerialFramer.messageData[1]);
-    bytesRead = inputStream.readRawData(reinterpret_cast<char*>(uasMessageSerialFramer.messageData.data()
-                                                                + SIZE_HEADER)
-                                        , uasMessageSerialFramer.messageData[1]);
-
-    // Finally we check if the entire payload was read successfully
-    if ((inputStream.status() != QDataStream::Ok) || (bytesRead < uasMessageSerialFramer.messageData[1]))
+    do
     {
-        uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE;
-        return inputStream;
-    }
+        bytesRead = inputStream.readRawData(&messageByte, 1);
+        if (bytesRead < 1)
+            return inputStream;
+
+        if (inputStream.status() != QDataStream::Ok)
+            return inputStream;
+
+        uasMessageSerialFramer.messageData.push_back(messageByte);
+
+    } while(messageByte != 0);
 
     // Attempt to decode the COBS
     if(!UASMessageSerialFramer::decodeCOBS(uasMessageSerialFramer.messageData))
@@ -207,20 +251,20 @@ QDataStream& operator>>(QDataStream& inputStream, UASMessageSerialFramer& uasMes
         return inputStream;
     }
 
-    // Check the checksum
-    uint8_t checkSumLower = uasMessageSerialFramer.messageData.back();
+    // Validate the checksum
+    retrievedChecksum = uasMessageSerialFramer.messageData.back();
     uasMessageSerialFramer.messageData.pop_back();
-    uint8_t checkSumUpper = uasMessageSerialFramer.messageData.back();
+    retrievedChecksum |= uasMessageSerialFramer.messageData.back() << 8;
     uasMessageSerialFramer.messageData.pop_back();
 
-    UASMessageSerialFramer::appendFletchers16(uasMessageSerialFramer.messageData);
-    if((checkSumLower != uasMessageSerialFramer.messageData[uasMessageSerialFramer.messageData.size() - 1]) ||
-       (checkSumUpper != uasMessageSerialFramer.messageData[uasMessageSerialFramer.messageData.size() - 2]))
+    calculatedChecksum =  UASMessageSerialFramer::caculateFletchers16(uasMessageSerialFramer.messageData);
+    if(calculatedChecksum  !=retrievedChecksum)
     {
         uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::FAILED_FLETCHERS;
         return inputStream;
     }
 
+    // TODO: Validate that the message ID falls within valid range of messages
     uasMessageSerialFramer.framerStatus = UASMessageSerialFramer::SerialFramerStatus::SUCCESS;
     return inputStream;
 }
