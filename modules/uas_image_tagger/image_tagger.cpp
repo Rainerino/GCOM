@@ -13,7 +13,7 @@
 // Constants
 //===================================================================
 const QString DUPLFOLDER = "\\Duplicates";
-const QString DUPL = "\\DUP_";
+const QString DUP = "\\DUP_";
 const QString IMG = "\\IMG_";
 const QString JPG = ".jpg";
 
@@ -22,7 +22,6 @@ const QString JPG = ".jpg";
 //===================================================================
 ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
 {
-    // Setup
     setupDirectoryPath(dir, 0);
     setupDirectoryPath(dir + DUPLFOLDER, 1);
     connect(sender, &DCNC::receivedImageData,
@@ -40,7 +39,6 @@ ImageTagger::~ImageTagger() { }
 
 void ImageTagger::setupDirectoryPath(QString dir, int createDuplicates)
 {
-    // Create directory
     QDir directory(dir);
     if (!directory.exists())
         directory.mkpath(".");
@@ -88,15 +86,14 @@ void ImageTagger::tagImage(QString pathName, QStringList tags)
 }
 
 void ImageTagger::tagAllImages() {
-    // Setup local variables
     QFileInfo image;
     QStringList exifTags;
     QString line, imageName, imageIndex;
-    QString filename = pathOfDir + "\\GPSExifTags.txt";
     // Iterator to go through main directory, as well as duplicates folder
     QDirIterator it(pathOfDir, QStringList() << "*.jpg", QDir::Files, QDirIterator::Subdirectories);
 
     // Iterate through each line of EXIF tags
+    QString filename = pathOfDir + "\\GPSExifTags.txt";
     QFile inputFile(filename);
     if (inputFile.open(QIODevice::ReadOnly)) {
         QTextStream in(&inputFile);
@@ -140,11 +137,10 @@ void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> 
 
 void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message)
 {
-    // Setup local variables
+    QString pathName;
     ImageTaggerMessage *imageMessage = message.get();
     unsigned char uniqueSeqNum = imageMessage->getSequenceNumber();
     std::vector<unsigned char> imageData = imageMessage->getImageData();
-    QString pathName;
 
     // A pointer to the image data
     unsigned char *imageArray = &imageData[0];
@@ -154,7 +150,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
         // If duplicate is found
         if (uniqueSeqNum == *seqNum) {
             // Change path name for duplicate
-            pathName = pathOfDuplicates + DUPL + QString::number(gpsData->img_idx) + JPG;
+            pathName = pathOfDuplicates + DUP + QString::number(gpsData->img_idx) + JPG;
             saveImageToDisc(pathName, imageArray);
             if (gpsDataAvailable)
                 tagImage(pathName);     // tag image if MavLinkRelay was not NULL
