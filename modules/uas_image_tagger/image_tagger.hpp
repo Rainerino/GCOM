@@ -57,6 +57,19 @@ public:
      * \param pathName QString path to location of image file
      */
     void tagImage(QString pathName);
+
+    /*!
+     * \brief tagImage function overload for alternative to tagging
+     * \param pathName QString path to location of image file
+     * \param tags QStringList list of EXIF tags
+     */
+    void tagImage(QString pathName, QStringList tags);
+
+    /*!
+     * \brief tagAllImages goes through all images and GPS data and
+     *        tags them based on the EXIF tags (alternative tagging)
+     */
+    void tagAllImages();
 signals:
     // Data Signals
     void taggedImage(QString pathName);
@@ -74,8 +87,6 @@ private slots:
 private:
     QString pathOfDir;
     QString pathOfDuplicates;
-    int numOfImages;
-    int numOfDuplicates;
     int gpsDataAvailable;
     std::vector<unsigned char> seqNumArr;
     mavlink_camera_feedback_t *gpsData;

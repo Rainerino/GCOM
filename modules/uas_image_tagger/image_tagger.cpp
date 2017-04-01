@@ -4,6 +4,7 @@
 // System Includes
 #include <QDir>
 #include <QFile>
+#include <QDirIterator>
 // GCOM Includes
 #include "image_tagger.hpp"
 #include "exiv2/exiv2.hpp"
@@ -12,7 +13,7 @@
 // Constants
 //===================================================================
 const QString DUPLFOLDER = "\\Duplicates";
-const QString DUPL = "\\DUPL_";
+const QString DUPL = "\\DUP_";
 const QString IMG = "\\IMG_";
 const QString JPG = ".jpg";
 
@@ -39,22 +40,15 @@ ImageTagger::~ImageTagger() { }
 
 void ImageTagger::setupDirectoryPath(QString dir, int createDuplicates)
 {
-    // Create directory and set filters
+    // Create directory
     QDir directory(dir);
     if (!directory.exists())
         directory.mkpath(".");
-    QStringList filters;
-    filters << "*.jpg";
-    directory.setNameFilters(filters);
 
-    if (createDuplicates) {     // if duplicates folder is to be created
+    if (createDuplicates)   // if duplicates folder is to be created
         pathOfDuplicates = directory.absolutePath();
-        numOfDuplicates = directory.count();
-    }
-    else {                      // else for parent directory
+    else                    // else for parent directory
         pathOfDir = directory.absolutePath();
-        numOfImages = directory.count();
-    }
 }
 
 void ImageTagger::saveImageToDisc(QString pathName, unsigned char *data)
@@ -79,10 +73,69 @@ void ImageTagger::tagImage(QString pathName)
     image->writeMetadata();
 }
 
+void ImageTagger::tagImage(QString pathName, QStringList tags)
+{
+    std::string pathOfImage = pathName.toStdString();
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
+    assert(image.get() != 0);   // check if image was opened
+
+    image->readMetadata();
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(tags.at(1).toInt(), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(tags.at(2).toInt(), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(tags.at(3).toFloat(), 1);
+    image->writeMetadata();
+}
+
+void ImageTagger::tagAllImages() {
+    // Setup local variables
+    QFileInfo image;
+    QStringList exifTags;
+    QString line, imageName, imageIndex;
+    QString filename = pathOfDir + "\\GPSExifTags.txt";
+    // Iterator to go through main directory, as well as duplicates folder
+    QDirIterator it(pathOfDir, QStringList() << "*.jpg", QDir::Files, QDirIterator::Subdirectories);
+
+    // Iterate through each line of EXIF tags
+    QFile inputFile(filename);
+    if (inputFile.open(QIODevice::ReadOnly)) {
+        QTextStream in(&inputFile);
+        while(!in.atEnd()) {
+            line = in.readLine();
+            exifTags = line.split('\t');
+
+            // Iterate through each image file (begins before first entry)
+            while (it.hasNext()) {
+                qDebug() << it.next();
+                image = it.fileInfo();
+                imageName = image.baseName();   // name is either IMG_* | DUP_*
+                imageIndex = imageName.mid(4);  // get everything after IMG_ | DUP_
+
+                if (imageIndex == exifTags.at(0))
+                    tagImage(it.filePath(), exifTags);
+            }
+        }
+    }
+    inputFile.close();
+}
+
 void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> cameraInfo)
 {
     mavlink_camera_feedback_t *copyOfCameraInfo = cameraInfo.get();
     gpsData = copyOfCameraInfo;
+
+    // Write EXIF tags to text file
+    // IMAGE_INDEX  LATITUDE  LONGITUDE  ALT_SEA_LVL  REL_ALT
+    QString filename = pathOfDir + "\\GPSExifTags.txt";
+    QFile outputFile(filename);
+    if (outputFile.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&outputFile);
+        stream << QString::number(gpsData->img_idx) << "\t"
+               << QString::number(gpsData->lat) << "\t"
+               << QString::number(gpsData->lng) << "\t"
+               << QString::number(gpsData->alt_msl) << "\t"
+               << QString::number(gpsData->alt_rel) << endl;
+    }
 }
 
 void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message)
@@ -101,7 +154,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
         // If duplicate is found
         if (uniqueSeqNum == *seqNum) {
             // Change path name for duplicate
-            pathName = pathOfDuplicates + DUPL + QString::number(++numOfDuplicates) + JPG;
+            pathName = pathOfDuplicates + DUPL + QString::number(gpsData->img_idx) + JPG;
             saveImageToDisc(pathName, imageArray);
             if (gpsDataAvailable)
                 tagImage(pathName);     // tag image if MavLinkRelay was not NULL
@@ -112,7 +165,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
 
     // If no duplicate is found
     seqNumArr.push_back(uniqueSeqNum);
-    pathName = pathOfDir + IMG + QString::number(++numOfImages) + JPG;
+    pathName = pathOfDir + IMG + QString::number(gpsData->img_idx) + JPG;
     saveImageToDisc(pathName, imageArray);
     if (gpsDataAvailable)
         tagImage(pathName);             // tag image if MavLinkRelay was not NULL
