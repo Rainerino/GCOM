@@ -28,7 +28,7 @@
 //===================================================================
 #define DEGREE_TO_MICROSTEPS 1599.722
 #define ANGLE_TO_MICROSTEPS(x) (x * DEGREE_TO_MICROSTEPS)
-#define UNPACK_LAT_LON(x) (float) (x/1e7)
+#define UNPACK_LAT_LON(x) (float) (x/10000000)
 
 //===================================================================
 // Constants
@@ -195,9 +195,9 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
         return AntennaTrackerConnectionState::FAILED;
 
-    lonBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lat;
-    latBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lon;
-
+    lonBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lon;
+    latBase = std::static_pointer_cast<GPSMessage>(gpsMessage)->lat;
+    lonBase = lonBase*-1;
 
     // Connect the Mavlink Relay
     if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
@@ -326,7 +326,7 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
             arduinoDataStream->commitTransaction();
             return;
         }
-        arduinoSerial->waitForReadyRead(10);
+        arduinoSerial->waitForReadyRead(3000);
     }
     arduinoDataStream->commitTransaction();
 
@@ -340,7 +340,9 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
 
     // Calculate Zaber Movement and send it.
     QString zaberCommand = calcMovement(droneGPSData, yawBase, pitchBase);
+    qDebug() << zaberCommand;
     zaberSerial->write(zaberCommand.toStdString().c_str());
+    zaberSerial->flush();
 }
 
 //NEEDS TO BE IMPLEMENTED
@@ -350,33 +352,26 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
     float droneLat = qDegreesToRadians(UNPACK_LAT_LON(droneGPSData->lat));
     float droneLon = qDegreesToRadians(UNPACK_LAT_LON(droneGPSData->lon));
 
-    int32_t droneAlt = droneGPSData->alt;
-    int32_t droneRelativeAlt = droneGPSData->relative_alt;
-
-    int16_t droneVX = droneGPSData->vx;
-    int16_t droneVY = droneGPSData->vy;
-    int16_t droneVZ = droneGPSData->vz;
-
     // Current Tracker Angle
-    if(!(angleDiff > -0.01 && angleDiff < 0.01)) {
+    /*if(!(angleDiff > -0.01 && angleDiff < 0.01)) {
         trackerAngle = trackerAngle + (yawIMU - prevYawIMU);
-    }
+    }*/
+    trackerAngle = yawIMU;
 
-    float xDiff = (droneLat-latBase);
     float yDiff = (droneLon-lonBase);
-    float a = pow(sin(xDiff/2),2) + cos(latBase) * cos(droneLat) * pow(sin(yDiff/2),2);
-    float d = 2 * atan2(sqrt(a), sqrt(1-a));
-    float distance = RADIUS_EARTH * d;
 
     float y = sin(yDiff) * cos((droneLat));
     float x = cos(latBase) * sin(droneLat) - sin(latBase) * cos(droneLat) * cos(yDiff);
 
     float horizAngle = qRadiansToDegrees(atan2(y,x));
     droneAngle = horizAngle;
-    float vertAngle = atan((droneRelativeAlt)/(distance*1000)) * 180/M_PI;
+
 
     // Find the quickest angle to reach the point
     angleDiff = droneAngle - trackerAngle;
+    qDebug() << "The drone angle is " << droneAngle;
+    qDebug() << "The tracker angle is " << trackerAngle;
+    qDebug() << "The angle dif is " << angleDiff;
     if(angleDiff > 180) {
         angleDiff -= 360;
     }
@@ -384,8 +379,9 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
         angleDiff += 360;
     }
 
-    prevYawIMU = yawIMU;
-    float microSteps = ANGLE_TO_MICROSTEPS(angleDiff);
+    //prevYawIMU = yawIMU;
+    int microSteps = ANGLE_TO_MICROSTEPS(angleDiff);
+    microSteps = (microSteps*-1);
 
 
 
