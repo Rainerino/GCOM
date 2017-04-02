@@ -89,8 +89,6 @@ void ImageTagger::tagAllImages() {
     QFileInfo image;
     QStringList exifTags;
     QString line, imageName, imageIndex;
-    // Iterator to go through main directory, as well as duplicates folder
-    QDirIterator it(pathOfDir, QStringList() << "*.jpg", QDir::Files, QDirIterator::Subdirectories);
 
     // Iterate through each line of EXIF tags
     QString filename = pathOfDir + "\\GPSExifTags.txt";
@@ -99,9 +97,11 @@ void ImageTagger::tagAllImages() {
         QTextStream in(&inputFile);
         while(!in.atEnd()) {
             line = in.readLine();
-            exifTags = line.split('\t');
+            exifTags = line.split(' ');
 
             // Iterate through each image file (begins before first entry)
+            QDirIterator it(pathOfDir, QStringList() << "*.jpg", QDir::Files,
+                            QDirIterator::Subdirectories);
             while (it.hasNext()) {
                 qDebug() << it.next();
                 image = it.fileInfo();
@@ -122,15 +122,15 @@ void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> 
     gpsData = copyOfCameraInfo;
 
     // Write EXIF tags to text file
-    // IMAGE_INDEX  LATITUDE  LONGITUDE  ALT_SEA_LVL  REL_ALT
+    // IMAGE_INDEX LATITUDE LONGITUDE ALT_SEA_LVL REL_ALT
     QString filename = pathOfDir + "\\GPSExifTags.txt";
     QFile outputFile(filename);
-    if (outputFile.open(QIODevice::ReadWrite)) {
+    if (outputFile.open(QIODevice::ReadWrite | QIODevice::Append)) {
         QTextStream stream(&outputFile);
-        stream << QString::number(gpsData->img_idx) << "\t"
-               << QString::number(gpsData->lat) << "\t"
-               << QString::number(gpsData->lng) << "\t"
-               << QString::number(gpsData->alt_msl) << "\t"
+        stream << QString::number(gpsData->img_idx) << " "
+               << QString::number(gpsData->lat) << " "
+               << QString::number(gpsData->lng) << " "
+               << QString::number(gpsData->alt_msl) << " "
                << QString::number(gpsData->alt_rel) << endl;
     }
 }
