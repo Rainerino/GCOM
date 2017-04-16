@@ -187,6 +187,8 @@ void GcomController::on_arduinoConnectButton_clicked()
         tracker->disconnectArduino();
         ui->arduinoConnectButton->setText(CONNECT_BUTTON_TEXT);
     }
+
+    updateStartTrackerButton();
 }
 
 void GcomController::on_zaberRefreshButton_clicked()
@@ -199,10 +201,35 @@ void GcomController::on_zaberRefreshButton_clicked()
 
 void GcomController::on_zaberConnectButton_clicked()
 {
-    QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
-    QString selectedPort = selectedIndex.data().toString();
+    if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ZABER)
+            != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+    {
+        QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
+        QString selectedPort = selectedIndex.data().toString();
 
-    tracker->setupDevice(selectedPort, QSerialPort::Baud115200, AntennaTracker::AntennaTrackerSerialDevice::ZABER);
+        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
+                             AntennaTracker::AntennaTrackerSerialDevice::ZABER);
+        if (status)
+            ui->zaberConnectButton->setText(DISCONNECT_BUTTON_TEXT);
+    }
+    else
+    {
+        tracker->disconnectZaber();
+        ui->zaberConnectButton->setText(CONNECT_BUTTON_TEXT);
+    }
+
+    updateStartTrackerButton();
+}
+
+void GcomController::updateStartTrackerButton()
+{
+    if ((tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ZABER)
+         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS) ||
+        (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
+         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS))
+        ui->startTrackButton->setEnabled(false);
+    else
+        ui->startTrackButton->setEnabled(true);
 }
 
 void GcomController::on_startTrackButton_clicked()

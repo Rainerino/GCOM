@@ -8,6 +8,7 @@
 #include <QList>
 #include <vector>
 #include <math.h>
+#include <atomic>
 #include "../Mavlink/ardupilotmega/mavlink.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_message/uas_message.hpp"
@@ -116,6 +117,8 @@ private:
     float droneAngle;
     float trackerAngle;
     float angleDiff;
+
+    std::atomic<bool> sentRequest;
 
 
 

@@ -65,6 +65,7 @@ AntennaTracker::AntennaTracker()
     droneAngle = 0;
     trackerAngle = 0;
     angleDiff = 0;
+    sentRequest = false;
 }
 
 AntennaTracker::~AntennaTracker()
@@ -342,6 +343,7 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     //qDebug() << zaberCommand;
     zaberSerial->write(zaberCommand.toStdString().c_str());
     zaberSerial->flush();
+
 }
 
 //NEEDS TO BE IMPLEMENTED
@@ -351,14 +353,6 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
 
     float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
     float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
-
-    // Current Tracker Angle
-    /*
-    if(!(angleDiff > -0.01 && angleDiff < 0.01)) {
-        trackerAngle = trackerAngle + (yawIMU - prevYawIMU);
-    }*/
-    //qDebug() << "yamIMU is: " << yawIMU;
-    //trackerAngle = yawIMU;
 
     float yDiff = (droneLon-lonBase);
 
@@ -371,19 +365,22 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
 
 
     // Find the quickest angle to reach the point
-    angleDiff = droneAngle - yawIMU;
-    //qDebug() << "The drone angle is " << droneAngle;
-    //qDebug() << "The tracker angle is " << trackerAngle;
-    //qDebug() << "The angle dif is " << angleDiff;
+    angleDiff = droneAngle - (yawIMU);
+
+    qDebug() << "angleDiff before is: " << angleDiff;
     if(angleDiff > 180) {
         angleDiff -= 360;
     }
     else if(angleDiff < -180) {
         angleDiff += 360;
     }
+    else if(angleDiff > -1 && angleDiff < 1) {
+        angleDiff = 0;
+    }
+    qDebug() << "yawIMU is: " << (yawIMU);
+    qDebug() << "angleDiff after is: " << angleDiff;
 
-    //prevYawIMU = yawIMU;
-    int microSteps = ANGLE_TO_MICROSTEPS(angleDiff);
+    int microSteps = -1 * ANGLE_TO_MICROSTEPS(angleDiff);
     //microSteps = (microSteps*-1);
 
 

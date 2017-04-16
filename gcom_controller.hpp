@@ -36,20 +36,16 @@ private slots:
     // UI Slots
     void on_mavlinkConnectionButton_clicked();
     void on_arduinoRefreshButton_clicked();
+    void on_tabWidget_tabBarClicked(int index);
     // MAVLinkRelay Slots
     void mavlinkRelayConnected();
     void mavlinkRelayDisconnected();
     void mavlinkTimerTimeout();
-
+    // Antenna Tracker Slots
     void on_arduinoConnectButton_clicked();
-
     void on_zaberRefreshButton_clicked();
-
     void on_zaberConnectButton_clicked();
-
     void on_startTrackButton_clicked();
-
-    void on_tabWidget_tabBarClicked(int index);
 
 private:
     // private member variables
@@ -64,7 +60,7 @@ private:
     AntennaTracker *tracker;
     // private member methods
     QString formatDuration(unsigned long seconds);
-
+    void updateStartTrackerButton();
 };
 
 #endif // GCOMCONTROLLER_HPP
