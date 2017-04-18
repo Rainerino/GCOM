@@ -13,6 +13,7 @@
 #include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_dcnc/dcnc.hpp"
 
 //===================================================================
 // Constants
@@ -23,12 +24,21 @@ const QString CONNECTING_LABEL("<font color='#EED202'> CONNECTING </font>"
                                "<img src=':/connection/connecting.png'>");
 const QString CONNECTED_LABEL("<font color='#05c400'> CONNECTED </font>"
                                "<img src=':/connection/connected.png'>");
-
+const QString SEARCHING_LABEL("<font color='#EED202'> SEARCHING </font>"
+                               "<img src=':/connection/connecting.png'>");
 const QRegExp IP_REGEX("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 
+// MAVLink Constants
 const QString CONNECT_BUTTON_TEXT("Connect");
 const QString CONNECTING_BUTTON_TEXT("Cancel Connecting");
 const QString DISCONNECT_BUTTON_TEXT("Disconnect");
+
+// DCNC Constants
+const QString START_SEARCHING_BUTTON_TEXT("Start Searching");
+const QString STOP_SEARCHING_BUTTON_TEXT("Stop Searching");
+const QString STOP_SERVER_BUTTON_TEXT("Stop Server");
+
+
 
 //===================================================================
 // Class Declarations
@@ -39,9 +49,13 @@ GcomController::GcomController(QWidget *parent) :
 {
     // General UI Setup
     ui->setupUi(this);
+    // Set up field validation
     ui->mavlinkPortField->setValidator(new QIntValidator(0,1000000));
     ui->mavlinkIPField->setValidator(new QRegExpValidator(IP_REGEX));
+    ui->dcncServerPortField->setValidator(new QIntValidator(0,1000000));
+    ui->dcncServerIPField->setValidator(new QRegExpValidator(IP_REGEX));
     restMavlinkGUI();
+    resetDCNCGUI();
 
     // Mavlink Setup
     mavlinkRelay = new MAVLinkRelay();
@@ -55,6 +69,16 @@ GcomController::GcomController(QWidget *parent) :
     mavlinkButtonDisconnect = false;
     mavlinkConnectingMovie = new QMovie (":/connection/mavlink_connecting.gif");
     mavlinkConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
+
+    // DCNC Setup
+    dcnc = new DCNC();
+    connect(dcnc, SIGNAL(receivedConnection()), this, SLOT(dcncConnected()));
+    /*connect(dcnc, SIGNAL(droppedConnection()),
+            this, SLOT(dcncDisconnected()));*/
+    dcncConnectionTimer = new QTimer();
+    //connect(dcncConnectionTimer, SIGNAL(timeout()),
+    //        this, SLOT(dcncTimerTimeout()));
+
 }
 
 GcomController::~GcomController()
@@ -63,6 +87,7 @@ GcomController::~GcomController()
     delete mavlinkRelay;
     delete mavlinkConnectionTimer;
     delete mavlinkConnectingMovie;
+    delete dcnc;
 }
 
 //===================================================================
@@ -148,6 +173,63 @@ void GcomController::mavlinkRelayDisconnected()
     mavlinkConnectionTimer->stop();
     // Reset the button method
     mavlinkButtonDisconnect = false;
+}
+
+//===================================================================
+// DCNC Methods
+//===================================================================
+
+void GcomController::resetDCNCGUI()
+{
+    dcncConnectionTime = 0;
+    ui->dcncConnectionTime->display(formatDuration(dcncConnectionTime));
+    ui->dcncConnectionStatusField->setText(DISCONNECT_LABEL);
+    ui->dcncStatusField->setText(DISCONNECT_LABEL);
+    ui->dcncConnectionButton->setText(START_SEARCHING_BUTTON_TEXT);
+    // Enable all input input fields
+    ui->dcncServerIPField->setDisabled(false);
+    ui->dcncServerPortField->setDisabled(false);
+}
+
+void GcomController::on_dcncConnectionButton_clicked()
+{
+    bool status;
+    switch(dcnc->status())
+    {
+        // If we are offline start the search
+        case DCNC::DCNCStatus::OFFLINE:
+        {
+            status = dcnc->startServer(
+                        ui->dcncServerIPField->text(),
+                        ui->dcncServerPortField->text().toInt());
+            if (status == false)
+                return;
+            // Change the connection status icons, buttons, and lock the status fields
+            ui->dcncServerIPField->setDisabled(true);
+            ui->dcncServerIPField->setDisabled(false);
+            // Then we need to start the timer
+            dcncConnectionTimer->start(1000);
+            // Update UI text to indicate searching
+            ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
+            ui->dcncConnectionStatusField->setText(SEARCHING_LABEL);
+        }
+        break;
+        // If we are searching then disconnect
+        case DCNC::DCNCStatus::SEARCHING:
+        {
+            dcnc->stopServer();
+            resetDCNCGUI();
+        }
+        break;
+    }
+}
+
+void GcomController::dcncConnected()
+{
+    // When we are connected then change the button to dissconnect server
+    ui->dcncConnectionStatusField->setText(STOP_SERVER_BUTTON_TEXT);
+    // Activate the drop gremlin button
+    ui->dcncDropGremlin->setDisabled(true);
 }
 
 //===================================================================

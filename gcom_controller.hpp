@@ -11,6 +11,8 @@
 #include <QTimer>
 // GCOM Includes
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
+#include "modules/uas_dcnc/dcnc.hpp"
+
 
 //===================================================================
 // Namespace Declarations
@@ -34,24 +36,41 @@ public:
 private slots:
     // UI Slots
     void on_mavlinkConnectionButton_clicked();
+    void on_dcncConnectionButton_clicked();
     // MAVLinkRelay Slots
     void mavlinkRelayConnected();
     void mavlinkRelayDisconnected();
     void mavlinkTimerTimeout();
+    // DCNC
+    void dcncConnected();
+    //void dcncDisconnected();
+    //void dcncTimerTimeout();
+
 
 private:
     // private member variables
     Ui::GcomController *ui;
-    // MAVLinkRelay Variables
+    // private member methods
+    QString formatDuration(unsigned long seconds);
+    // MAVLinkRelay
+    // Methods
+    void restMavlinkGUI();
+    // Variables
     MAVLinkRelay *mavlinkRelay;
     QTimer *mavlinkConnectionTimer;
-    void restMavlinkGUI();
     unsigned long mavlinkConnectionTime;
     QMovie *mavlinkConnectingMovie;
     QMovie *mavlinkConnectedMovie;
     bool mavlinkButtonDisconnect;
-    // private member methods
-    QString formatDuration(unsigned long seconds);
+    // DCNC Variables
+    DCNC *dcnc;
+    QTimer *dcncConnectionTimer;
+    unsigned long dcncConnectionTime;
+    QMovie *dcncConnectingMovie;
+    QMovie *dcncConnectedMovie;
+    // Methods
+    void resetDCNCGUI();
+
 
 };
 

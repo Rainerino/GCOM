@@ -81,6 +81,11 @@ void UASMessageTCPFramer::clearMessage()
     messageData.clear();
 }
 
+bool UASMessageTCPFramer::status()
+{
+    return framerStatus;
+}
+
 
 QDataStream& operator>>(QDataStream& inputStream, UASMessageTCPFramer& uasMessageTCPFramer)
 {

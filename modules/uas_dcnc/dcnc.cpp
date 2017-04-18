@@ -45,18 +45,6 @@ bool DCNC::startServer(QString address, int port)
     return startStatus;
 }
 
-bool DCNC::startServer(int port)
-{
-    if (serverStatus != DCNCStatus::OFFLINE)
-        stopServer();
-
-    bool startStatus = server->listen(QHostAddress::Any, port);
-    if (startStatus == true)
-        serverStatus = DCNCStatus::SEARCHING;
-
-    return startStatus;
-}
-
 void DCNC::stopServer()
 {
     // If there any client connections
@@ -123,7 +111,7 @@ void DCNC::handleClientDisconnected()
 
 void DCNC::handleClientData()
 {
-    /*//attempts to generate the message
+    //attempts to generate the message
     while(!messageFramer.status()){
         connectionData.startTransaction();
         connectionData >> messageFramer;
