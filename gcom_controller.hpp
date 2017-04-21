@@ -43,8 +43,8 @@ private slots:
     void mavlinkTimerTimeout();
     // DCNC
     void dcncConnected();
-    //void dcncDisconnected();
-    //void dcncTimerTimeout();
+    void dcncDisconnected();
+    void dcncTimerTimeout();
 
 
 private:

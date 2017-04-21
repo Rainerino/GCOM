@@ -40,11 +40,12 @@ public:
      * \brief The DCNCStatus enum lists all the possible states that the DCNC
      *        could be in
      */
-    enum class DCNCStatus : int
+    enum class DCNCStatus
     {
-        OFFLINE         = 0,
-        SEARCHING       = 1,
-        CONNECTED       = 2
+        OFFLINE,
+        SEARCHING,
+        RECONNECTING,
+        CONNECTED
     };
 
     // Public Member Methods
@@ -128,6 +129,13 @@ private slots:
      */
     void handleClientData();
 
+    /*!
+     * \brief handleClientMessage handles emiting the signals and carrying out the tasks for a
+     *        specific message
+     * \param message the message to be handled
+     */
+    void handleClientMessage(std::shared_ptr<UASMessage> message);
+
 private:
     // Private Member Variables
     int port;
@@ -135,9 +143,9 @@ private:
     QHostAddress hostAddress;
     QTcpServer *server;
     QTcpSocket *clientConnection;
-    QDataStream connectionData;
-    std::unique_ptr<UASMessage> message;
+    QDataStream connectionDataStream;
     UASMessageTCPFramer messageFramer;
+    std::unique_ptr<UASMessage> message;
     DCNCStatus serverStatus;
 };
 
