@@ -116,7 +116,8 @@ private:
     float prevYawIMU;
     float droneAngle;
     float trackerAngle;
-    float angleDiff;
+    float horzAngleDiff;
+    float vertAngleDiff;
 
     std::atomic<bool> sentRequest;
 
@@ -127,7 +128,8 @@ private:
      * the arduino.
      * \return command in the form of a string
      */
-    QString calcMovement(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU, float pitchIMU);
+    QString calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU);
+    QString calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
 
 private slots:
     void zaberControllerDisconnected(QSerialPort::SerialPortError error);

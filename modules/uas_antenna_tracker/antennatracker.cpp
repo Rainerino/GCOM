@@ -64,7 +64,8 @@ AntennaTracker::AntennaTracker()
     prevYawIMU = 0;
     droneAngle = 0;
     trackerAngle = 0;
-    angleDiff = 0;
+    horzAngleDiff = 0;
+    vertAngleDiff = 0;
     sentRequest = false;
 }
 
@@ -338,16 +339,18 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
     float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->z;
 
-    // Calculate Zaber Movement and send it.
-    QString zaberCommand = calcMovement(droneGPSData, yawBase, pitchBase);
-    //qDebug() << zaberCommand;
-    zaberSerial->write(zaberCommand.toStdString().c_str());
-    zaberSerial->flush();
+    // Do horizontal tracking.
+    QString horzZaberCommand = calcHorizontal(droneGPSData, yawBase);
+    zaberSerial->write(horzZaberCommand.toStdString().c_str());
 
+    // Do vertical tracking.
+    QString vertZaberCommand = calcVertical (droneGPSData, pitchBase);
+    zaberSerial->write(vertZaberCommand.toStdString().c_str());
+
+    zaberSerial->flush();
 }
 
-//NEEDS TO BE IMPLEMENTED
-QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU, float pitchIMU)
+QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU)
 {
     //Grabbing individual pieces of data from gpsData
 
@@ -365,27 +368,47 @@ QString AntennaTracker::calcMovement(std::shared_ptr<mavlink_global_position_int
 
 
     // Find the quickest angle to reach the point
-    angleDiff = droneAngle - (yawIMU);
+    horzAngleDiff = droneAngle - (yawIMU);
 
-    qDebug() << "angleDiff before is: " << angleDiff;
-    if(angleDiff > 180) {
-        angleDiff -= 360;
+    qDebug() << "angleDiff before is: " << horzAngleDiff;
+    if(horzAngleDiff > 180) {
+        horzAngleDiff -= 360;
     }
-    else if(angleDiff < -180) {
-        angleDiff += 360;
+    else if(horzAngleDiff < -180) {
+        horzAngleDiff += 360;
     }
-    else if(angleDiff > -1 && angleDiff < 1) {
-        angleDiff = 0;
+    else if(horzAngleDiff > -1 && horzAngleDiff < 1) {
+        horzAngleDiff = 0;
     }
     qDebug() << "yawIMU is: " << (yawIMU);
-    qDebug() << "angleDiff after is: " << angleDiff;
+    qDebug() << "angleDiff after is: " << horzAngleDiff;
 
-    int microSteps = -1 * ANGLE_TO_MICROSTEPS(angleDiff);
-    //microSteps = (microSteps*-1);
-
-
+    int microSteps = -1 * ANGLE_TO_MICROSTEPS(horzAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(2).arg(microSteps);
+}
+
+QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float pitchIMU)
+{
+    float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
+    float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
+
+    float droneRelativeAlt = droneGPSData->relative_alt;
+
+    float xDiff = (droneLat-latBase);
+    float yDiff = (droneLon-lonBase);
+
+    float a = pow(sin(xDiff/2),2)+cos(latBase) * cos(droneLat)*pow(sin(yDiff/2),2);
+    float d = 2 * atan2(sqrt(a), sqrt(1-a));
+    float distance = RADIUS_EARTH * d;
+
+    float vertAngle = atan((droneRelativeAlt)/(distance*1000))*180/M_PI;
+
+    vertAngleDiff = vertAngle - pitchIMU;
+
+    int microSteps = ANGLE_TO_MICROSTEPS(vertAngleDiff);
+
+    return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
 }
 
 //===================================================================
