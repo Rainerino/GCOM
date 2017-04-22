@@ -119,6 +119,7 @@ private:
     float horzAngleDiff;
     float vertAngleDiff;
 
+
     std::atomic<bool> sentRequest;
 
 

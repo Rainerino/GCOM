@@ -26,8 +26,10 @@
 //===================================================================
 // Defines
 //===================================================================
-#define DEGREE_TO_MICROSTEPS 1599.722
-#define ANGLE_TO_MICROSTEPS(x) (x * DEGREE_TO_MICROSTEPS)
+#define HORIZ_DEGREE_TO_MICROSTEPS 1599.722
+#define HORIZ_ANGLE_TO_MICROSTEPS(x) (x * HORIZ_DEGREE_TO_MICROSTEPS)
+#define VERT_DEGREE_TO_MICROSTEPS 10630.55555555556
+#define VERT_ANGLE_TO_MICROSTEPS(x) (x * HORIZ_DEGREE_TO_MICROSTEPS)
 #define UNPACK_LAT_LON(x)  (((float) x)/10000000)
 
 //===================================================================
@@ -41,6 +43,8 @@ const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 // Zaber Command Templates
 const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
+// Zaber Setup
+const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000";
 // Constants
 const float RADIUS_EARTH = 6378137;
 
@@ -192,6 +196,10 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     arduinoDataStream->commitTransaction();
     qDebug() << timer.elapsed();
 
+    // Setup desired speed for Zaber vertical movement
+    zaberSerial->write(zaberSetVerticalMoveSpeed);
+    zaberSerial->flush();
+
     // Process the GPS Coordinates of the base station!
     std::shared_ptr<UASMessage> gpsMessage = arduinoFramer->generateMessage();
     if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
@@ -337,7 +345,7 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
         return;
 
     float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
-    float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->z;
+    float pitchBase = (std::static_pointer_cast<IMUMessage>(imuMessage)->y) * -1;
 
     // Do horizontal tracking.
     QString horzZaberCommand = calcHorizontal(droneGPSData, yawBase);
@@ -364,13 +372,10 @@ QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_i
 
     float horizAngle = fmod((qRadiansToDegrees(atan2(y,x)) + 360), 360);
     droneAngle = horizAngle;
-    qDebug() << "droneAngle is: " << droneAngle;
-
 
     // Find the quickest angle to reach the point
     horzAngleDiff = droneAngle - (yawIMU);
 
-    qDebug() << "angleDiff before is: " << horzAngleDiff;
     if(horzAngleDiff > 180) {
         horzAngleDiff -= 360;
     }
@@ -380,10 +385,8 @@ QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_i
     else if(horzAngleDiff > -1 && horzAngleDiff < 1) {
         horzAngleDiff = 0;
     }
-    qDebug() << "yawIMU is: " << (yawIMU);
-    qDebug() << "angleDiff after is: " << horzAngleDiff;
 
-    int microSteps = -1 * ANGLE_TO_MICROSTEPS(horzAngleDiff);
+    int microSteps = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horzAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(2).arg(microSteps);
 }
@@ -393,7 +396,8 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
     float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
     float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
 
-    float droneRelativeAlt = droneGPSData->relative_alt;
+    float droneRelativeAlt = ((float)droneGPSData->relative_alt / 1000);
+    qDebug() << "The drone alt is: " << droneRelativeAlt;
 
     float xDiff = (droneLat-latBase);
     float yDiff = (droneLon-lonBase);
@@ -402,11 +406,18 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
     float d = 2 * atan2(sqrt(a), sqrt(1-a));
     float distance = RADIUS_EARTH * d;
 
-    float vertAngle = atan((droneRelativeAlt)/(distance*1000))*180/M_PI;
+    float vertAngle = atan((droneRelativeAlt)/distance)*180/M_PI;
+    qDebug() << "The angle is is: " << vertAngle;
 
+    qDebug() << "The pitchimu is is: " << pitchIMU;
     vertAngleDiff = vertAngle - pitchIMU;
+    qDebug() << "The dif is is: " << vertAngleDiff;
 
-    int microSteps = ANGLE_TO_MICROSTEPS(vertAngleDiff);
+    if(vertAngleDiff > -1 && vertAngleDiff < 1) {
+            vertAngleDiff = 0;
+    }
+
+    int microSteps = VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff) * -1 ;
 
     return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
 }
