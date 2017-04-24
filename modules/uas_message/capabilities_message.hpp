@@ -73,12 +73,19 @@ class CapabilitiesMessage : public UASMessage
         Capabilities capabilities;
 };
 
+//===================================================================
+// Enum Operator Declarations
+//===================================================================
+CapabilitiesMessage::Capabilities operator|(const CapabilitiesMessage::Capabilities &a,
+                                            const CapabilitiesMessage::Capabilities &b);
 
-/*!
- * \brief operator |
- * \param a a Capabilities enum value
- * \param b a Capabilities enum value
- * \return
- */
+CapabilitiesMessage::Capabilities operator&(const CapabilitiesMessage::Capabilities &a,
+                                            const CapabilitiesMessage::Capabilities &b);
+
+CapabilitiesMessage::Capabilities operator>>(const CapabilitiesMessage::Capabilities &a,
+                                             const int &shift_num);
+
+CapabilitiesMessage::Capabilities operator<<(const CapabilitiesMessage::Capabilities &a,
+                                             const int &shift_num);
 
 #endif // CAPABILITIES_MESSAGE_HPP

@@ -31,9 +31,38 @@ UASMessage::MessageID CapabilitiesMessage::type()
 std::vector<unsigned char> CapabilitiesMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;
-    serializedMessage.push_back((static_cast<uint32_t>(capabilities) >> 24) & 0xFF);
-    serializedMessage.push_back((static_cast<uint32_t>(capabilities) >> 16) & 0xFF);
-    serializedMessage.push_back((static_cast<uint32_t>(capabilities) >> 8) & 0xFF);
-    serializedMessage.push_back((static_cast<uint32_t>(capabilities)) & 0xFF);
+    serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 24) & 0xFF);
+    serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 16) & 0xFF);
+    serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 8) & 0xFF);
+    serializedMessage.push_back(static_cast<uint8_t>(capabilities) & 0xFF);
     return serializedMessage;
+}
+
+//===================================================================
+// Enum Operator Definitions
+//===================================================================
+CapabilitiesMessage::Capabilities operator|(const CapabilitiesMessage::Capabilities &a,
+                                            const CapabilitiesMessage::Capabilities &b)
+{
+    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) |
+                                                          static_cast<uint32_t>(b));
+}
+
+CapabilitiesMessage::Capabilities operator&(const CapabilitiesMessage::Capabilities &a,
+                                            const CapabilitiesMessage::Capabilities &b)
+{
+    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) &
+                                                          static_cast<uint32_t>(b));
+}
+
+CapabilitiesMessage::Capabilities operator>>(const CapabilitiesMessage::Capabilities &a,
+                                             const int &shift_num)
+{
+    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) >> shift_num);
+}
+
+CapabilitiesMessage::Capabilities operator<<(const CapabilitiesMessage::Capabilities &a,
+                                             const int &shift_num)
+{
+    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) << shift_num);
 }

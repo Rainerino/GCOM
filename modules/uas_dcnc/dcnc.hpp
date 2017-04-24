@@ -14,6 +14,9 @@
 // GCOM Includes
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
+#include "modules/uas_message/capabilities_message.hpp"
+#include "modules/uas_message/response_message.hpp"
+#include "modules/uas_message/command_message.hpp"
 
 //===================================================================
 // Public Class Declaration
@@ -100,8 +103,8 @@ public:
     void cancelConnection();
 
     // Data Methods
-    bool startImageTransfer();
-    bool stopImageTransfer();
+    void startImageRelay();
+    void stopImageRelay();
 
 signals:
     // DCNC Control Signals
@@ -110,6 +113,9 @@ signals:
     // Data Signals
     void receivedImageData();
     void receivedGremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
+    void receivedGremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
+    void receivedGremlinResponse(CommandMessage::Commands command,
+                                 ResponseMessage::ResponseCodes responses);
 
 private slots:
     /*!

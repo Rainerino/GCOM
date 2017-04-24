@@ -10,6 +10,7 @@
 #include "modules/uas_message/request_message.hpp"
 #include "modules/uas_message/system_info_message.hpp"
 #include "modules/uas_message/capabilities_message.hpp"
+#include "modules/uas_message/command_message.hpp"
 //===================================================================
 // Public Class Declaration
 //===================================================================
@@ -131,9 +132,29 @@ void DCNC::handleClientData()
     }
 }
 
+//===================================================================
+// Outgoing message methods
+//===================================================================
+void DCNC::startImageRelay()
+{
+    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_START);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
 
+void DCNC::stopImageRelay()
+{
+    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_STOP);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
+
+//===================================================================
+// Receive Handler
+//===================================================================
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
+    UASMessage *outgoingMessage = nullptr;
     switch (message->type())
     {
         case (UASMessage::MessageID::SYSTEM_INFO):
@@ -142,9 +163,36 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
+            // Send system capabilities request
+            // TODO: that the message is successfully sent
+            outgoingMessage = new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+
+
+            break;
+        }
+
+        case (UASMessage::MessageID::MESG_CAPABILITIES):
+        {
+            std::shared_ptr<CapabilitiesMessage> systemCapabilities =
+                    std::static_pointer_cast<CapabilitiesMessage>(message);
+            emit receivedGremlinCapabilities(systemCapabilities->getCapabilities());
+            break;
+        }
+
+        case (UASMessage::MessageID::RESPONSE):
+        {
+            std::shared_ptr<ResponseMessage> response =
+                    std::static_pointer_cast<ResponseMessage>(message);
+            emit receivedGremlinResponse(response->command(), response->responseCode());
             break;
         }
 
     }
 
+    if (outgoingMessage == nullptr)
+        return;
+
+    messageFramer.frameMessage(*outgoingMessage);
+    connectionDataStream << messageFramer;
+    delete outgoingMessage;
 }

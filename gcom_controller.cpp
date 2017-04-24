@@ -73,6 +73,10 @@ GcomController::GcomController(QWidget *parent) :
     dcnc = new DCNC();
     connect(dcnc, SIGNAL(receivedConnection()), this, SLOT(dcncConnected()));
     connect(dcnc, SIGNAL(droppedConnection()), this, SLOT(dcncDisconnected()));
+    connect(dcnc, SIGNAL(receivedGremlinInfo(QString,uint16_t,bool)),
+            this, SLOT(gremlinInfo(QString,uint16_t,bool)));
+    connect (dcnc, SIGNAL(receivedGremlinCapabilities(CapabilitiesMessage::Capabilities)),
+             this, SLOT(gremlinCapabilities(CapabilitiesMessage::Capabilities)));
     dcncConnectingMovie = new QMovie (":/connection/dcnc_connecting.gif");
     dcncConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
     dcncConnectionTimer = new QTimer();
@@ -260,6 +264,19 @@ void GcomController::dcncDisconnected()
     ui->dcncDropGremlin->setDisabled(false);
 }
 
+void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped)
+{
+    // TODO Handle Dropped Case for auto resume and manual resume.
+    (void) dropped;
+    ui->dcncDeviceIDField->setText(systemId);
+    ui->dcncVersionNumberField->setText(QString(versionNumber));
+}
+
+void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)
+{
+    if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::IMAGE_RELAY))
+        ui->dcncCapabilitiesField->addItem("Image Relay");
+}
 
 void GcomController::dcncTimerTimeout()
 {
