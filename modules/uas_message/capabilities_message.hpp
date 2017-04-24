@@ -80,22 +80,5 @@ class CapabilitiesMessage : public UASMessage
  * \param b a Capabilities enum value
  * \return
  */
-CapabilitiesMessage::Capabilities operator|(const CapabilitiesMessage::Capabilities &a,
-                                            const CapabilitiesMessage::Capabilities &b)
-{
-    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) |
-                                                          static_cast<uint32_t>(b));
-}
 
-CapabilitiesMessage::Capabilities operator>>(const CapabilitiesMessage::Capabilities &a,
-                                             const int &shift_num)
-{
-    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) >> shift_num);
-}
-
-CapabilitiesMessage::Capabilities operator<<(const CapabilitiesMessage::Capabilities &a,
-                                             const int &shift_num)
-{
-    return static_cast<CapabilitiesMessage::Capabilities>(static_cast<uint32_t>(a) << shift_num);
-}
 #endif // CAPABILITIES_MESSAGE_HPP

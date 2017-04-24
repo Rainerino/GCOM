@@ -8,7 +8,8 @@
 #include "dcnc.hpp"
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/request_message.hpp"
-
+#include "modules/uas_message/system_info_message.hpp"
+#include "modules/uas_message/capabilities_message.hpp"
 //===================================================================
 // Public Class Declaration
 //===================================================================
@@ -133,5 +134,17 @@ void DCNC::handleClientData()
 
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
+    switch (message->type())
+    {
+        case (UASMessage::MessageID::SYSTEM_INFO):
+        {
+            std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
+            emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
+                                     systemInfo->versionNumber,
+                                     systemInfo->dropped);
+            break;
+        }
+
+    }
 
 }

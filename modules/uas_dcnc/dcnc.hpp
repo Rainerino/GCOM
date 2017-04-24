@@ -109,6 +109,7 @@ signals:
     void droppedConnection();
     // Data Signals
     void receivedImageData();
+    void receivedGremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
 
 private slots:
     /*!
