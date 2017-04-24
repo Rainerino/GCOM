@@ -7,6 +7,7 @@
 // System Includes
 #include <QString>
 #include <QObject>
+#include <QQueue>
 #include <assert.h>
 // GCOM Includes
 #include "modules/uas_dcnc/dcnc.hpp"
@@ -47,23 +48,24 @@ public:
 
     /*!
      * \brief saveImageToDisc helper function that does the saving
-     * \param pathName QString path of directory with filename
+     * \param filePath QString path of directory with filename
      * \param data unsigned char pointer to image data
      */
-    void saveImageToDisc(QString pathName, unsigned char *data);
+    void saveImageToDisc(QString filePath, unsigned char *data);
 
     /*!
      * \brief tagImage write to image metadata the GPS information
-     * \param pathName QString path to location of image file
+     * \param filePath QString path to location of image file
+     * \param *tags mavlink_camera_feedback_t pointer to the EXIF tags
      */
-    void tagImage(QString pathName);
+    void tagImage(QString filePath, mavlink_camera_feedback_t *tags);
 
     /*!
      * \brief tagImage function overload for alternative to tagging
-     * \param pathName QString path to location of image file
+     * \param filePath QString path to location of image file
      * \param tags QStringList list of EXIF tags
      */
-    void tagImage(QString pathName, QStringList tags);
+    void tagImage(QString filePath, QStringList tags);
 
     /*!
      * \brief tagAllImages goes through all images and GPS data and
@@ -72,7 +74,7 @@ public:
     void tagAllImages();
 signals:
     // Data Signals
-    void taggedImage(QString pathName);
+    void taggedImage(QString filePath);
 private slots:
     /*!
      * \brief handleImageMessage saves image to disc and sends a signal with
@@ -87,9 +89,11 @@ private slots:
 private:
     QString pathOfDir;
     QString pathOfDuplicates;
+    int numOfImages;
+    int numOfDuplicates;
     int gpsDataAvailable;
     std::vector<unsigned char> seqNumArr;
-    mavlink_camera_feedback_t *gpsData;
+    QQueue<mavlink_camera_feedback_t *> gpsData;
 };
 
 #endif // IMAGETAGGER_HPP
