@@ -1,17 +1,3 @@
-/*
- * Need to reimplement code below so that it uses blocking
- * queues, as the likely scenario is data may come before
- * an image, or vice versa. The other case is x number of
- * GPS signals will arrive before y number of image signals,
- * so definitely need to use a queue.
- *
- * It is understod, however, that these will be one to one,
- * so if using a FIFO structure, the first ones coming out
- * of both queues should correspond to each other. In other
- * words, need to handle GPS signals arriving before image
- * signals, and vice versa.
- */
-
 //===================================================================
 // Includes
 //===================================================================
