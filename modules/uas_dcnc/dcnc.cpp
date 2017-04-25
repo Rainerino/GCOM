@@ -60,6 +60,9 @@ void DCNC::stopServer()
 
 void DCNC::cancelConnection()
 {
+    if (serverStatus != DCNCStatus::CONNECTED)
+        serverStatus = DCNCStatus::SEARCHING;
+
     if(clientConnection != nullptr)
     {
         clientConnection->close();
@@ -69,7 +72,9 @@ void DCNC::cancelConnection()
                    this, SLOT(handleClientDisconnected()));
         clientConnection->deleteLater();
         clientConnection = nullptr;
+        emit droppedConnection();
     }
+
     server->resumeAccepting();
 }
 
@@ -103,11 +108,10 @@ void DCNC::handleClientConection()
     emit receivedConnection();
 }
 
+// TODO Link Directly to handleClientDisconnection
 void DCNC::handleClientDisconnected()
 {
-    serverStatus = DCNCStatus::SEARCHING;
-    cancelConnection();
-    emit droppedConnection();
+    cancelConnection();    
 }
 
 void DCNC::handleClientData()

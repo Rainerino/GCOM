@@ -21,6 +21,9 @@ class CapabilitiesMessage : public UASMessage
          * \brief The Capabilities enum describes all possible capabilities that the
          *        drone supports, these capabilities denote what type of requests/commands
          *        the Gremlin will be able to handle
+         * \details The capabilities enum acts as a bit-field, it allows the user to combine
+         *          multiple capabilities (or extract them) through the use of the overloaded
+         *          bit operators (>> << | &)
          */
         enum class Capabilities : uint32_t
         {

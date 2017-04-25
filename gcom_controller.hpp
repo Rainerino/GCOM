@@ -37,6 +37,7 @@ private slots:
     // UI Slots
     void on_mavlinkConnectionButton_clicked();
     void on_dcncConnectionButton_clicked();
+    void on_dcncDropGremlin_clicked();
     // MAVLinkRelay Slots
     void mavlinkRelayConnected();
     void mavlinkRelayDisconnected();
@@ -47,9 +48,6 @@ private slots:
     void dcncTimerTimeout();
     void gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
     void gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
-
-
-
 private:
     // private member variables
     Ui::GcomController *ui;
@@ -68,6 +66,7 @@ private:
     // DCNC Variables
     DCNC *dcnc;
     QTimer *dcncConnectionTimer;
+    QTimer *dcncSearchTimeoutTimer;
     unsigned long dcncConnectionTime;
     QMovie *dcncConnectingMovie;
     QMovie *dcncConnectedMovie;

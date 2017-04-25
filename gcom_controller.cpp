@@ -38,8 +38,6 @@ const QString START_SEARCHING_BUTTON_TEXT("Start Searching");
 const QString STOP_SEARCHING_BUTTON_TEXT("Stop Searching");
 const QString STOP_SERVER_BUTTON_TEXT("Stop Server");
 
-
-
 //===================================================================
 // Class Declarations
 //===================================================================
@@ -80,6 +78,7 @@ GcomController::GcomController(QWidget *parent) :
     dcncConnectingMovie = new QMovie (":/connection/dcnc_connecting.gif");
     dcncConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
     dcncConnectionTimer = new QTimer();
+    dcncSearchTimeoutTimer = new QTimer();
     connect(dcncConnectionTimer, SIGNAL(timeout()), this, SLOT(dcncTimerTimeout()));
     resetDCNCGUI();
 }
@@ -221,6 +220,8 @@ void GcomController::on_dcncConnectionButton_clicked()
             dcncConnectingMovie->stop();
             ui->dcncStatusMovie->setMovie(dcncConnectingMovie);
             dcncConnectingMovie->start();
+            // Start the timeout timer
+            //dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField-);
         }
         break;
         // If we are searching then disconnect
@@ -232,6 +233,11 @@ void GcomController::on_dcncConnectionButton_clicked()
         }
         break;
     }
+}
+
+void GcomController::on_dcncDropGremlin_clicked()
+{
+    dcnc->cancelConnection();
 }
 
 void GcomController::dcncConnected()
@@ -269,7 +275,8 @@ void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool 
     // TODO Handle Dropped Case for auto resume and manual resume.
     (void) dropped;
     ui->dcncDeviceIDField->setText(systemId);
-    ui->dcncVersionNumberField->setText(QString(versionNumber));
+    QString versionString = QString(versionNumber);
+    ui->dcncVersionNumberField->setText(versionString);
 }
 
 void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)

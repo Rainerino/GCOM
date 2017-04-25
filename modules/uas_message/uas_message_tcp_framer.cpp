@@ -6,6 +6,7 @@
 #include "uas_message.hpp"
 #include "request_message.hpp"
 #include "system_info_message.hpp"
+#include "capabilities_message.hpp"
 // Qt Includes
 #include <QDataStream>
 #include <array>
@@ -83,6 +84,11 @@ std::shared_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
         case UASMessage::MessageID::SYSTEM_INFO:
         {
             std::shared_ptr<UASMessage> message(new SystemInfoMessage(serialMessagePayload));
+            return message;
+        }
+        case UASMessage::MessageID::MESG_CAPABILITIES:
+        {
+            std::shared_ptr<UASMessage> message(new CapabilitiesMessage(serialMessagePayload));
             return message;
         }
         default:
