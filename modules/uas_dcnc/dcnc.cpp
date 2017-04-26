@@ -11,6 +11,8 @@
 #include "modules/uas_message/system_info_message.hpp"
 #include "modules/uas_message/capabilities_message.hpp"
 #include "modules/uas_message/command_message.hpp"
+
+
 //===================================================================
 // Public Class Declaration
 //===================================================================
@@ -60,16 +62,16 @@ void DCNC::stopServer()
 
 void DCNC::cancelConnection()
 {
-    if (serverStatus != DCNCStatus::CONNECTED)
+    if (serverStatus == DCNCStatus::CONNECTED)
         serverStatus = DCNCStatus::SEARCHING;
 
     if(clientConnection != nullptr)
     {
-        clientConnection->close();
         disconnect(clientConnection, SIGNAL(readyRead()),
                    this, SLOT(handleClientData()));
         disconnect(clientConnection, SIGNAL(disconnected()),
                    this, SLOT(handleClientDisconnected()));
+        clientConnection->close();
         clientConnection->deleteLater();
         clientConnection = nullptr;
         emit droppedConnection();
@@ -87,8 +89,10 @@ void DCNC::handleClientConection()
 {
     // While this connection is established stop accepting more connections
     server->pauseAccepting();
-    // Setup the connection socket
+    // Setup the connection socket and the data stream
     clientConnection = server->nextPendingConnection();
+    // This is important due to the fact that after a disconnection this will be in an error state.
+    connectionDataStream.resetStatus();
     connectionDataStream.setDevice(clientConnection);
     // Connect the connection slot's signals
     connect(clientConnection, SIGNAL(readyRead()),
@@ -111,11 +115,12 @@ void DCNC::handleClientConection()
 // TODO Link Directly to handleClientDisconnection
 void DCNC::handleClientDisconnected()
 {
-    cancelConnection();    
+    cancelConnection();
 }
 
 void DCNC::handleClientData()
 {
+    messageFramer.clearMessage();
     while (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
     {
         connectionDataStream.startTransaction();
@@ -139,6 +144,20 @@ void DCNC::handleClientData()
 //===================================================================
 // Outgoing message methods
 //===================================================================
+
+bool DCNC::sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage)
+{
+    if (clientConnection == nullptr || clientConnection->state() != QTcpSocket::ConnectedState)
+        return false;
+
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+    if (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::SUCCESS)
+        return false;
+
+    return true;
+}
+
 void DCNC::startImageRelay()
 {
     CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_START);
@@ -149,6 +168,20 @@ void DCNC::startImageRelay()
 void DCNC::stopImageRelay()
 {
     CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_STOP);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
+
+void DCNC::requestImage()
+{
+    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_STOP);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
+
+void DCNC::requestCapabilities()
+{
+    RequestMessage outgoingMessage = RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
     messageFramer.frameMessage(outgoingMessage);
     connectionDataStream << messageFramer;
 }
@@ -167,11 +200,6 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
-            // Send system capabilities request
-            // TODO: that the message is successfully sent
-            outgoingMessage = new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
-
-
             break;
         }
 
@@ -197,6 +225,8 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         return;
 
     messageFramer.frameMessage(*outgoingMessage);
+    // TODO: that the message is successfully sent
     connectionDataStream << messageFramer;
+    qDebug() << ((int)messageFramer.status());
     delete outgoingMessage;
 }

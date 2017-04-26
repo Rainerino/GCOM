@@ -103,6 +103,7 @@ public:
     void cancelConnection();
 
     // Data Methods
+    bool sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage);
     void startImageRelay();
     void stopImageRelay();
 

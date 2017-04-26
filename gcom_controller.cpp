@@ -37,6 +37,8 @@ const QString DISCONNECT_BUTTON_TEXT("Disconnect");
 const QString START_SEARCHING_BUTTON_TEXT("Start Searching");
 const QString STOP_SEARCHING_BUTTON_TEXT("Stop Searching");
 const QString STOP_SERVER_BUTTON_TEXT("Stop Server");
+const QString UNKNOWN_LABEL("Unknown");
+const QString DISCONNECTED_LABEL("Disconnected");
 
 //===================================================================
 // Class Declarations
@@ -78,8 +80,9 @@ GcomController::GcomController(QWidget *parent) :
     dcncConnectingMovie = new QMovie (":/connection/dcnc_connecting.gif");
     dcncConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
     dcncConnectionTimer = new QTimer();
-    dcncSearchTimeoutTimer = new QTimer();
     connect(dcncConnectionTimer, SIGNAL(timeout()), this, SLOT(dcncTimerTimeout()));
+    dcncSearchTimeoutTimer = new QTimer();
+    connect(dcncSearchTimeoutTimer, SIGNAL(timeout()), this, SLOT(dcncSearchTimeout()));
     resetDCNCGUI();
 }
 
@@ -183,18 +186,29 @@ void GcomController::mavlinkRelayDisconnected()
 
 void GcomController::resetDCNCGUI()
 {
+    // Reset the connection timer
     dcncConnectionTime = 0;
     ui->dcncConnectionTime->display(formatDuration(dcncConnectionTime));
+    // Reset Lables
     ui->dcncConnectionStatusField->setText(DISCONNECT_LABEL);
     ui->dcncStatusField->setText(DISCONNECT_LABEL);
     ui->dcncConnectionButton->setText(START_SEARCHING_BUTTON_TEXT);
+    ui->dcncIPAdressField->setText(DISCONNECTED_LABEL);
+    ui->dcncIPVersionField->setText(DISCONNECTED_LABEL);
+    ui->dcncVersionNumberField->setText(DISCONNECTED_LABEL);
+    ui->dcncDeviceIDField->setText(DISCONNECTED_LABEL);
+    // Clear Capabilities
+    ui->dcncCapabilitiesField->clear();
     // Enable all input input fields
     ui->dcncServerIPField->setDisabled(false);
     ui->dcncServerPortField->setDisabled(false);
+    ui->dcncServerTimeoutField->setDisabled(false);
     // Reset the animations
     dcncConnectedMovie->stop();
     dcncConnectingMovie->stop();
     ui->dcncStatusMovie->setText(" ");
+    // Deactivate the drop gremlin button
+    ui->dcncDropGremlin->setDisabled(false);
 }
 
 void GcomController::on_dcncConnectionButton_clicked()
@@ -205,29 +219,43 @@ void GcomController::on_dcncConnectionButton_clicked()
         // If we are offline start the search
         case DCNC::DCNCStatus::OFFLINE:
         {
+            // Lock the input fields
+            ui->dcncServerIPField->setDisabled(true);
+            ui->dcncServerIPField->setDisabled(false);
+            ui->dcncServerTimeoutField->setDisabled(false);
+
             status = dcnc->startServer(
                         ui->dcncServerIPField->text(),
                         ui->dcncServerPortField->text().toInt());
+
+            // TODO Add a warning message
             if (status == false)
-                return;
-            // Change the connection status icons, buttons, and lock the status fields
-            ui->dcncServerIPField->setDisabled(true);
-            ui->dcncServerIPField->setDisabled(false);
+                resetDCNCGUI();
+
+
             // Update UI text to indicate searching
             ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
             ui->dcncStatusField->setText(SEARCHING_LABEL);
+            ui->dcncIPAdressField->setText(UNKNOWN_LABEL);
+            ui->dcncIPVersionField->setText(UNKNOWN_LABEL);
+            ui->dcncVersionNumberField->setText(UNKNOWN_LABEL);
+            ui->dcncDeviceIDField->setText(UNKNOWN_LABEL);
+
             // Update the status line
             dcncConnectingMovie->stop();
             ui->dcncStatusMovie->setMovie(dcncConnectingMovie);
             dcncConnectingMovie->start();
+
             // Start the timeout timer
-            //dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField-);
+            dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField->text().toULong() * 1000);
         }
         break;
-        // If we are searching then disconnect
+
+        // If we are searching or are connected then we just stop the server.
         case DCNC::DCNCStatus::SEARCHING:
         case DCNC::DCNCStatus::CONNECTED:
         {
+            dcncSearchTimeoutTimer->stop();
             dcnc->stopServer();
             resetDCNCGUI();
         }
@@ -240,55 +268,77 @@ void GcomController::on_dcncDropGremlin_clicked()
     dcnc->cancelConnection();
 }
 
+// TODO Pass the IP address and IP version
 void GcomController::dcncConnected()
 {
+    dcncSearchTimeoutTimer->stop();
+
     // When we are connected then change the button to dissconnect server
     ui->dcncConnectionButton->setText(STOP_SERVER_BUTTON_TEXT);
     ui->dcncConnectionStatusField->setText(CONNECTED_LABEL);
-    ui->dcncStatusField->setText(CONNECTED_LABEL);
-    // Start the timer
+
+    // Start the the connection timer and stop the timeout timer
     dcncConnectionTimer->start(1000);
-    // Update the UI
+    dcncSearchTimeoutTimer->stop();
+
+    // Update the status line
+    ui->dcncStatusField->setText(CONNECTED_LABEL);
     ui->dcncStatusMovie->setMovie(dcncConnectedMovie);
     dcncConnectingMovie->start();
+
     // Activate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(true);
 }
 
 void GcomController::dcncDisconnected()
 {
-    // When we are connected then change the button to dissconnect server
+    // Update the UI
     ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
     ui->dcncConnectionStatusField->setText(DISCONNECT_LABEL);
-    ui->dcncStatusField->setText(CONNECTING_LABEL);
-    // Start the timer
+    // Stop the connection timer
     dcncConnectionTimer->stop();
     // Update the UI
     ui->dcncStatusMovie->setMovie(dcncConnectingMovie);
     dcncConnectingMovie->start();
     // Activate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(false);
+    // Start the connection timeout timer.
+    dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField->text().toULong() * 1000);
 }
 
 void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped)
 {
-    // TODO Handle Dropped Case for auto resume and manual resume.
+
     (void) dropped;
     ui->dcncDeviceIDField->setText(systemId);
-    QString versionString = QString(versionNumber);
-    ui->dcncVersionNumberField->setText(versionString);
+    ui->dcncVersionNumberField->setText(QString::number(versionNumber));
+    dcnc->requestCapabilities();
 }
 
 void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)
 {
     if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::IMAGE_RELAY))
+    {
         ui->dcncCapabilitiesField->addItem("Image Relay");
+        dcnc->startImageRelay();
+    }
 }
 
 void GcomController::dcncTimerTimeout()
 {
     ui->dcncConnectionTime->display(formatDuration(++dcncConnectionTime));
 }
+
+
+void GcomController::dcncSearchTimeout()
+{
+    if(dcnc->status() == DCNC::DCNCStatus::SEARCHING)
+    {
+        dcnc->stopServer();
+        resetDCNCGUI();
+    }
+}
+
 
 //===================================================================
 // Utility Methods
