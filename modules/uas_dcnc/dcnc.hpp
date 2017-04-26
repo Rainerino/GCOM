@@ -118,6 +118,9 @@ signals:
     void receivedGremlinResponse(CommandMessage::Commands command,
                                  ResponseMessage::ResponseCodes responses);
 
+public slots:
+     void changeAutoResume(bool autoResume);
+
 private slots:
     /*!
      * \brief handleConection is a slot that gets notified whenever a new
@@ -155,6 +158,7 @@ private:
     UASMessageTCPFramer messageFramer;
     std::unique_ptr<UASMessage> message;
     DCNCStatus serverStatus;
+    bool autoResume;
 };
 
 #endif // DCNC_HPP

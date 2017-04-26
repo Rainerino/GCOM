@@ -83,6 +83,7 @@ GcomController::GcomController(QWidget *parent) :
     connect(dcncConnectionTimer, SIGNAL(timeout()), this, SLOT(dcncTimerTimeout()));
     dcncSearchTimeoutTimer = new QTimer();
     connect(dcncSearchTimeoutTimer, SIGNAL(timeout()), this, SLOT(dcncSearchTimeout()));
+    connect(ui->dcncServerAutoResume, SIGNAL(clicked(bool)), dcnc, SLOT(changeAutoResume(bool)));
     resetDCNCGUI();
 }
 
@@ -312,7 +313,6 @@ void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool 
     (void) dropped;
     ui->dcncDeviceIDField->setText(systemId);
     ui->dcncVersionNumberField->setText(QString::number(versionNumber));
-    dcnc->requestCapabilities();
 }
 
 void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)

@@ -24,6 +24,7 @@ DCNC::DCNC()
     port = 42069;
     clientConnection = nullptr;
     serverStatus = DCNCStatus::OFFLINE;
+    autoResume = true;
 
     // Connect Signals to Slots
     connect(server, SIGNAL(newConnection()),
@@ -141,6 +142,11 @@ void DCNC::handleClientData()
     }
 }
 
+void DCNC::changeAutoResume(bool autoResume)
+{
+    this->autoResume = autoResume;
+}
+
 //===================================================================
 // Outgoing message methods
 //===================================================================
@@ -150,7 +156,7 @@ bool DCNC::sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage)
     if (clientConnection == nullptr || clientConnection->state() != QTcpSocket::ConnectedState)
         return false;
 
-    messageFramer.frameMessage(outgoingMessage);
+    messageFramer.frameMessage(*outgoingMessage);
     connectionDataStream << messageFramer;
     if (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::SUCCESS)
         return false;
@@ -172,20 +178,6 @@ void DCNC::stopImageRelay()
     connectionDataStream << messageFramer;
 }
 
-void DCNC::requestImage()
-{
-    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_STOP);
-    messageFramer.frameMessage(outgoingMessage);
-    connectionDataStream << messageFramer;
-}
-
-void DCNC::requestCapabilities()
-{
-    RequestMessage outgoingMessage = RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
-    messageFramer.frameMessage(outgoingMessage);
-    connectionDataStream << messageFramer;
-}
-
 //===================================================================
 // Receive Handler
 //===================================================================
@@ -197,10 +189,16 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         case (UASMessage::MessageID::SYSTEM_INFO):
         {
             std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
+            if (systemInfo->dropped && autoResume)
+                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
+            else if (systemInfo->dropped)
+                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
+            else
+                outgoingMessage = new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+            break;
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
-            break;
         }
 
         case (UASMessage::MessageID::MESG_CAPABILITIES):
