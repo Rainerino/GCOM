@@ -147,6 +147,9 @@ private slots:
      */
     void handleClientMessage(std::shared_ptr<UASMessage> message);
 
+    UASMessage* handleResponse(CommandMessage::Commands command,
+                               ResponseMessage::ResponseCodes responses);
+
 private:
     // Private Member Variables
     int port;

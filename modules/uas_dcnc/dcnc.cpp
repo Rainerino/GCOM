@@ -213,10 +213,10 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         {
             std::shared_ptr<ResponseMessage> response =
                     std::static_pointer_cast<ResponseMessage>(message);
+            outgoingMessage = handleResponse(response->command(), response->responseCode());
             emit receivedGremlinResponse(response->command(), response->responseCode());
             break;
         }
-
     }
 
     if (outgoingMessage == nullptr)
@@ -227,4 +227,24 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     connectionDataStream << messageFramer;
     qDebug() << ((int)messageFramer.status());
     delete outgoingMessage;
+}
+
+
+UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
+                           ResponseMessage::ResponseCodes responses)
+{
+    switch(command)
+    {
+        case CommandMessage::Commands::SYSTEM_RESET:
+        case CommandMessage::Commands::SYSTEM_RESUME:
+        {
+            if (responses == ResponseMessage::ResponseCodes::NO_ERROR)
+                return new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+            else
+                 droppedConnection();
+        }
+        break;
+    }
+
+    return nullptr;
 }

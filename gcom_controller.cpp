@@ -309,7 +309,6 @@ void GcomController::dcncDisconnected()
 
 void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped)
 {
-
     (void) dropped;
     ui->dcncDeviceIDField->setText(systemId);
     ui->dcncVersionNumberField->setText(QString::number(versionNumber));
