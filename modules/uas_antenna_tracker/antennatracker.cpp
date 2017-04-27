@@ -197,7 +197,7 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     qDebug() << timer.elapsed();
 
     // Setup desired speed for Zaber vertical movement
-    zaberSerial->write(zaberSetVerticalMoveSpeed);
+    zaberSerial->write(zaberSetVerticalMoveSpeed.toStdString().c_str());
     zaberSerial->flush();
 
     // Process the GPS Coordinates of the base station!
