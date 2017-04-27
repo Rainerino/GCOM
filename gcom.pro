@@ -43,3 +43,8 @@ INCLUDEPATH += Mavlink
 CONFIG += c++14
 
 RESOURCES = resources.qrc
+
+unix {
+    INCLUDEPATH  += /usr/local/include
+    LIBS         += -L/usr/local/lib -lexiv2
+}

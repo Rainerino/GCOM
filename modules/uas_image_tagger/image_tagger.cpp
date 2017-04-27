@@ -67,10 +67,10 @@ void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
     assert(image.get() != 0);   // check if image was opened
 
     image->readMetadata();
-    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(tags->lat, 10000000);
-    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(tags->lng, 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(((int)tags->lat), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational((int)tags->lng, 10000000);
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
-    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(tags->alt_msl, 1);
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((float)tags->alt_msl, 1);
     image->writeMetadata();
 
     QFile::rename(filePath, QFileInfo(filePath).absolutePath() + "/" +
