@@ -34,6 +34,7 @@ public:
      */
     enum class AntennaTrackerConnectionState
     {
+        UNDEFINED_STATE,
         SUCCESS,
         ARDUINO_UNINITIALIZED,
         ZABER_UNITIALIZED,
@@ -45,6 +46,7 @@ public:
 
     enum class AntennaTrackerSerialDevice
     {
+        UNDEFINED_DEVICE,
         ARDUINO,
         ZABER
     };
@@ -55,6 +57,7 @@ public:
      * \return QList of port names
      */
     static QList<QString> getArduinoList();
+
     /*!
      * \brief getZaberList returns a list of all available serial devices that can be identified as a Zaber Controller
      * \return QList of port names
@@ -95,9 +98,23 @@ signals:
     void antennaTrackerDisconnected();
 
 private:
+    /*!
+     * \brief calcHorizontal returns a string command indicating the horizontal movement required to point at the drone.
+     * The calculation is based on positional data form the drone.
+     * \return command in the form of a string
+     */
+    QString calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU);
 
-    QString arduinoPort;
-    QString zaberPort;
+    /*!
+     * \brief calcVertical returns a string command indicating the vertical movement required to point at the drone.
+     * The calculation is based on positional data form the drone.
+     * \return command in the form of a string
+     */
+    QString calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
+
+    // ================
+    // Member Variables
+    // ================
     QSerialPort *arduinoSerial;
     QSerialPort *zaberSerial;
     QDataStream *arduinoDataStream;
@@ -110,27 +127,7 @@ private:
     // State Variables
     bool antennaTrackerConnected;
 
-    mavlink_global_position_int_t gpsData;
-
-
-    float prevYawIMU;
-    float droneAngle;
-    float trackerAngle;
-    float horzAngleDiff;
-    float vertAngleDiff;
-
-
     std::atomic<bool> sentRequest;
-
-
-
-    /*!
-     * \brief calcMovement returns a string command constrcuted based on GPS data and positional data form
-     * the arduino.
-     * \return command in the form of a string
-     */
-    QString calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU);
-    QString calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
 
 private slots:
     void zaberControllerDisconnected(QSerialPort::SerialPortError error);
