@@ -69,7 +69,7 @@ GcomController::GcomController(QWidget *parent) :
     mavlinkConnectingMovie = new QMovie (":/connection/mavlink_connecting.gif");
     mavlinkConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
 
-    // DCNC Setup
+    // DCNC Setup     
     dcnc = new DCNC();
     connect(dcnc, SIGNAL(receivedConnection()), this, SLOT(dcncConnected()));
     connect(dcnc, SIGNAL(droppedConnection()), this, SLOT(dcncDisconnected()));
@@ -77,6 +77,7 @@ GcomController::GcomController(QWidget *parent) :
             this, SLOT(gremlinInfo(QString,uint16_t,bool)));
     connect (dcnc, SIGNAL(receivedGremlinCapabilities(CapabilitiesMessage::Capabilities)),
              this, SLOT(gremlinCapabilities(CapabilitiesMessage::Capabilities)));
+
     dcncConnectingMovie = new QMovie (":/connection/dcnc_connecting.gif");
     dcncConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
     dcncConnectionTimer = new QTimer();
@@ -85,6 +86,14 @@ GcomController::GcomController(QWidget *parent) :
     connect(dcncSearchTimeoutTimer, SIGNAL(timeout()), this, SLOT(dcncSearchTimeout()));
     connect(ui->dcncServerAutoResume, SIGNAL(clicked(bool)), dcnc, SLOT(changeAutoResume(bool)));
     resetDCNCGUI();
+
+    // Image Tagger Setup
+    imageTagger = new ImageTagger(//TODO implement these parameters);
+    connect(dcnc, SIGNAL(receivedImageData(std::shared_ptr<ImageTaggerMessage>)),
+            imageTagger, SLOT(handleImageMessage(std::shared_ptr<ImageTaggerMessage>)));
+    connect(mavlinkRelay, SIGNAL(mavlinkRelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t>)),
+            imageTagger, SLOT(handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t>)));
+
 }
 
 GcomController::~GcomController()

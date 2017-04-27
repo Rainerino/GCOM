@@ -13,6 +13,7 @@
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_message/image_tagger_message.hpp"
+#include "modules/uas_image_tagger/image_tagger.hpp"
 
 
 //===================================================================
@@ -72,6 +73,9 @@ private:
     unsigned long dcncConnectionTime;
     QMovie *dcncConnectingMovie;
     QMovie *dcncConnectedMovie;
+    // Image Tagger Variables
+    ImageTagger* imageTagger;
+
     // Methods
     void resetDCNCGUI();
 
