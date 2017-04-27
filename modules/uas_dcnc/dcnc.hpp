@@ -17,6 +17,7 @@
 #include "modules/uas_message/capabilities_message.hpp"
 #include "modules/uas_message/response_message.hpp"
 #include "modules/uas_message/command_message.hpp"
+#include "modules/uas_message/image_tagger_message.hpp"
 
 //===================================================================
 // Public Class Declaration
@@ -112,7 +113,7 @@ signals:
     void receivedConnection();
     void droppedConnection();
     // Data Signals
-    void receivedImageData();
+    void receivedImageData(std::shared_ptr<UASMessage> imageMessage);
     void receivedGremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
     void receivedGremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
     void receivedGremlinResponse(CommandMessage::Commands command,
