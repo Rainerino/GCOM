@@ -11,7 +11,6 @@
 #include <QTcpSocket>
 #include <string>
 #include <memory>
-// GCOM Includes
 #include "../Mavlink/ardupilotmega/mavlink.h"
 
 //===================================================================

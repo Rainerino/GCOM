@@ -22,7 +22,7 @@ SOURCES += main.cpp\
     modules/mavlink_relay/mavlink_relay_tcp.cpp \
     modules/uas_dcnc/dcnc.cpp \
     modules/uas_message/image_tagger_message.cpp \
-    modules/uas_message/capabilities_message.cpp
+    modules/uas_image_tagger/image_tagger.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -45,3 +45,8 @@ INCLUDEPATH += Mavlink
 CONFIG += c++14
 
 RESOURCES = resources.qrc
+
+unix {
+    INCLUDEPATH  += /usr/local/include
+    LIBS         += -L/usr/local/lib -lexiv2
+}
