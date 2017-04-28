@@ -35,6 +35,15 @@ class UASMessageTCPFramer
 {
     public:
 
+        // Public Types
+        enum class TCPFramerStatus
+        {
+            INCOMPLETE_MESSAGE,
+            INVALID_MESSAGE,
+            SEND_FAILURE,
+            SUCCESS
+        };
+
         // Public Methods
         /*!
          * \brief UASMessageTCPFramer, constructs an empty framer
@@ -44,10 +53,11 @@ class UASMessageTCPFramer
 
         /*!
          * \brief status, reports the status of the framer to the user.
-         * \details Useful when using the >> operator and wanting to check that the deserialization was successful
-         * \return True if the framer contains a valid message. Otherwise, returns False.
+         * \details Useful when using the >> operator and wanting to check that the deserialization
+         *          was successful
+         * \return a TCPFramerStatus code that describes the cause of the error
          */
-        bool status();
+        TCPFramerStatus status();
 
         /*!
          * \brief clearMessage, deletes the message enclosed in the framer.
@@ -63,10 +73,13 @@ class UASMessageTCPFramer
 
 
         /*!
-         * \brief generateMessage given the contents of a framed serialized UAS message this function generates the message object
-         * \return A smart unique pointer to a dynamically allocated UASMessage, if status is false nullptr is returned
+         * \brief generateMessage given the contents of a framed serialized UAS message this
+         *        function generates the message object
+         * \return A smart unique pointer to a dynamically allocated UASMessage, if status is false
+         *         nullptr is returned
          */
-        std::unique_ptr<UASMessage> generateMessage();
+        std::shared_ptr<UASMessage> generateMessage();
+
 
         // Publicly overloaded operators
         /*!
@@ -88,8 +101,8 @@ class UASMessageTCPFramer
 
     private:
         // Private Member Variables
-        bool framerStatus;
-        std::vector<unsigned char> messageData;
+        TCPFramerStatus framerStatus;
+        std::vector<uint8_t> messageData;
         // Private Member Functions
         void initializeDefaults();
 };

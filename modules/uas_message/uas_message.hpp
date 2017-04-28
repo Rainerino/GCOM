@@ -24,7 +24,7 @@ class UASMessage
         /*!
          * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
-        enum class MessageID : unsigned char
+        enum class MessageID : uint8_t
         {
             REQUEST                 = 0x0A,
             COMMAND                 = 0x0B,
