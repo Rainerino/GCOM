@@ -50,8 +50,9 @@ public:
      * \brief saveImageToDisc helper function that does the saving
      * \param filePath QString path of directory with filename
      * \param data unsigned char pointer to image data
+     * \param size size_t the number of bytes to write to the file
      */
-    void saveImageToDisc(QString filePath, unsigned char *data);
+    void saveImageToDisc(QString filePath, unsigned char *data, size_t size);
 
     /*!
      * \brief tagImage write to image metadata the GPS information

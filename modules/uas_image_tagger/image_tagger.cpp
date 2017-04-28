@@ -52,11 +52,11 @@ void ImageTagger::setupDirectoryPath(QString dir, int createDuplicates)
     }
 }
 
-void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data)
+void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data, size_t size)
 {
     QFile image(filePath);
     if (image.open(QIODevice::ReadWrite))
-        image.write(reinterpret_cast<const char *>(data));
+        image.write(reinterpret_cast<const char *>(data), size);
     image.close();
 }
 
@@ -84,8 +84,8 @@ void ImageTagger::tagImage(QString filePath, QStringList tags)
     assert(image.get() != 0);   // check if image was opened
 
     image->readMetadata();
-    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(tags.at(1).toFloat(), 10000000);
-    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(tags.at(2).toFloat(), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(tags.at(1).toInt(), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(tags.at(2).toInt(), 10000000);
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
     image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(tags.at(3).toFloat(), 1);
     image->writeMetadata();
@@ -150,6 +150,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
 
     // A pointer to the image data
     unsigned char *imageArray = &imageData[0];
+    size_t sizeOfData = imageData.size();
 
     // Iterate through vector of sequence numbers
     for (auto seqNum = seqNumArr.begin(); seqNum != seqNumArr.end(); ++seqNum) {
@@ -157,7 +158,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
         if (uniqueSeqNum == *seqNum) {
             // Change path name for duplicate
             filePath = pathOfDuplicates + DUP + QString::number(++numOfDuplicates) + JPG;
-            saveImageToDisc(filePath, imageArray);
+            saveImageToDisc(filePath, imageArray, sizeOfData);
             if (gpsDataAvailable) {
                 while(gpsData.isEmpty())
                     qDebug() << "No GPS data in the queue";
@@ -171,7 +172,7 @@ void ImageTagger::handleImageMessage(std::shared_ptr<ImageTaggerMessage> message
     // If no duplicate is found
     seqNumArr.push_back(uniqueSeqNum);
     filePath = pathOfDir + IMG + QString::number(++numOfImages) + JPG;
-    saveImageToDisc(filePath, imageArray);
+    saveImageToDisc(filePath, imageArray, sizeOfData);
     if (gpsDataAvailable) {
         while(gpsData.isEmpty())
             qDebug() << "No GPS data in the queue";
