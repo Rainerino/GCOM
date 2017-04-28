@@ -37,7 +37,7 @@ class UASMessage
             DATA_IMU                = 0x11,
             DATA_GPS                = 0x12,
             ZEM_COMMAND             = 0x13,
-			MESG_CAPABILITIES       = 0x14,
+            MESG_CAPABILITIES       = 0x14,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };
