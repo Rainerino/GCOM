@@ -3,6 +3,7 @@
 //===================================================================
 // System Includes
 #include <vector>
+#include <string>
 // GCOM Includes
 #include "system_info_message.hpp"
 #include "uas_message.hpp"
@@ -10,18 +11,20 @@
 //===================================================================
 // Class Definitions
 //===================================================================
-SystemInfoMessage::SystemInfoMessage(unsigned char systemId, unsigned char versionNumber)
+SystemInfoMessage::SystemInfoMessage(std::string systemId, uint16_t versionNumber, bool dropped)
 {
     this->systemId = systemId;
     this->versionNumber = versionNumber;
-    cameraRelay = false;
+    this->dropped = dropped;
 }
 
 SystemInfoMessage::SystemInfoMessage(const std::vector<unsigned char> &serializedMessage)
 {
-    systemId = serializedMessage[0];
-    versionNumber = serializedMessage[1];
-    cameraRelay = serializedMessage[2];
+
+    versionNumber = (serializedMessage[0] << 8) ||  serializedMessage[1];
+    dropped = serializedMessage[2];
+    systemId = std::string(serializedMessage.begin()+3,serializedMessage.end());
+
 }
 
 SystemInfoMessage::~SystemInfoMessage()
@@ -31,15 +34,16 @@ SystemInfoMessage::~SystemInfoMessage()
 
 UASMessage::MessageID SystemInfoMessage::type()
 {
-    return MessageID::REQUEST;;
+    return MessageID::SYSTEM_INFO;
 }
 
 std::vector<unsigned char> SystemInfoMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;
-    serializedMessage.push_back(systemId);
-    serializedMessage.push_back(versionNumber);
-    serializedMessage.push_back(cameraRelay);
+    serializedMessage.push_back(versionNumber >> 8);
+    serializedMessage.push_back(versionNumber & 0xFF);
+    serializedMessage.push_back(dropped);
+    serializedMessage.insert(serializedMessage.end(), systemId.begin(),systemId.end());
     return serializedMessage;
 }
 

@@ -6,6 +6,8 @@
 //===================================================================
 // System Includes
 #include <vector>
+#include <string>
+#include <stdint.h>
 // GCOM Includes
 #include "uas_message.hpp"
 
@@ -24,7 +26,7 @@ class SystemInfoMessage : public UASMessage
          * \param [in] systemId, the unique identifier for the system
          * \param [in] versionNumber, version number for the system
          */
-        SystemInfoMessage(unsigned char systemId, unsigned char versionNumber);
+        SystemInfoMessage(std::string systemId, uint16_t versionNumber, bool dropped);
 
         /*!
          * \brief SystemInfoMessage constructor designed to initialize a message using a serialized payload
@@ -50,9 +52,9 @@ class SystemInfoMessage : public UASMessage
         std::vector<unsigned char> serialize();
 
         // Member Variables
-        unsigned char  systemId;
-        unsigned char  versionNumber;
-        bool cameraRelay;
+        std::string  systemId;
+        uint16_t  versionNumber;
+        bool dropped;
 };
 
 #endif // SYSTEMINFOMESSAGE_H
