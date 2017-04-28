@@ -88,7 +88,7 @@ GcomController::GcomController(QWidget *parent) :
     resetDCNCGUI();
 
     // Image Tagger Setup
-    imageTagger = new ImageTagger(//TODO implement these parameters);
+    imageTagger = new ImageTagger("/Home",dcnc,mavlinkRelay);
     connect(dcnc, SIGNAL(receivedImageData(std::shared_ptr<ImageTaggerMessage>)),
             imageTagger, SLOT(handleImageMessage(std::shared_ptr<ImageTaggerMessage>)));
     connect(mavlinkRelay, SIGNAL(mavlinkRelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t>)),
