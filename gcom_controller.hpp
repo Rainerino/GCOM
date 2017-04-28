@@ -12,12 +12,8 @@
 // GCOM Includes
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_dcnc/dcnc.hpp"
-<<<<<<< HEAD
 #include "modules/uas_message/image_tagger_message.hpp"
-
-=======
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
->>>>>>> 921cb00b1069fc5163634b412026a341980cdeca
 
 //===================================================================
 // Namespace Declarations

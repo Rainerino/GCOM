@@ -13,11 +13,13 @@
 #include <memory>
 // GCOM Includes
 #include "modules/uas_message/uas_message.hpp"
+#include "modules/uas_message/image_tagger_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
 #include "modules/uas_message/capabilities_message.hpp"
 #include "modules/uas_message/response_message.hpp"
 #include "modules/uas_message/command_message.hpp"
 #include "modules/uas_message/image_tagger_message.hpp"
+
 
 //===================================================================
 // Public Class Declaration
@@ -113,7 +115,8 @@ signals:
     void receivedConnection();
     void droppedConnection();
     // Data Signals
-    void receivedImageData(std::shared_ptr<ImageTaggerMessage> imageMessage);
+<<<<<<< HEAD
+    void receivedImageData(std::shared_ptr<UASMessage> imageMessage);
     void receivedGremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
     void receivedGremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
     void receivedGremlinResponse(CommandMessage::Commands command,
@@ -121,6 +124,9 @@ signals:
 
 public slots:
      void changeAutoResume(bool autoResume);
+=======
+    void receivedImageData(std::shared_ptr<ImageTaggerMessage> message);
+>>>>>>> image_tagger
 
 private slots:
     /*!
