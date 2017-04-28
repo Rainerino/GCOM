@@ -361,16 +361,21 @@ void GcomController::on_arduinoRefreshButton_clicked()
 
 void GcomController::on_arduinoConnectButton_clicked()
 {
+    qDebug() << "hello";
     if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
             != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
     {
+        qDebug() << "hi";
         QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
         bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
                              AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
         if (status)
+        {
             ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);
+            qDebug() << "Hey";
+        }
     }
     else
     {

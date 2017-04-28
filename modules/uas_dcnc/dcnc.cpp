@@ -33,8 +33,8 @@ DCNC::DCNC()
 
 DCNC::~DCNC()
 {
-    stopServer();
-    delete(server);
+    //stopServer();
+    //delete(server);
 }
 
 bool DCNC::startServer(QString address, int port)
@@ -216,6 +216,13 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             outgoingMessage = handleResponse(response->command(), response->responseCode());
             emit receivedGremlinResponse(response->command(), response->responseCode());
             break;
+        }
+
+        case (UASMessage::MessageID::IMAGE_DATA):
+        {
+            std::shared_ptr<ImageTaggerMessage> image =
+                    std::static_pointer_cast<ImageTaggerMessage>(message);
+            emit receivedImageData(image);
         }
     }
 

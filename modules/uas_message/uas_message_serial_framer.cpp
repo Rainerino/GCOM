@@ -82,7 +82,7 @@ std::shared_ptr<UASMessage> UASMessageSerialFramer::generateMessage()
 
     std::vector<unsigned char> serializedMessage(messageData.data() + SIZE_HEADER,
                                                  messageData.data() + messageData.size());
-    switch(messageData[0])
+    switch((UASMessage::MessageID)messageData[0])
     {
         case UASMessage::MessageID::DATA_GPS:
         {
