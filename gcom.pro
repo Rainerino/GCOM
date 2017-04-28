@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
     modules/uas_message/image_tagger_message.cpp \
-    modules/uas_image_tagger/image_tagger.cpp
+    modules/uas_image_tagger/image_tagger.cpp \
+    modules/uas_message/capabilities_message.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -44,7 +45,8 @@ HEADERS  += \
     modules/uas_message/request_message.hpp \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
-    modules/uas_message/capabilities_message.hpp
+    modules/uas_message/capabilities_message.hpp \
+    modules/uas_image_tagger/image_tagger.hpp
 
 FORMS    += gcomcontroller.ui
 

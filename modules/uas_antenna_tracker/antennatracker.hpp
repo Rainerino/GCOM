@@ -4,7 +4,7 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QString>
-#include <Qtcore/QDebug>
+#include <QDebug>
 #include <QList>
 #include <vector>
 #include <math.h>
