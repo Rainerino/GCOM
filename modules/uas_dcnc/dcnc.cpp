@@ -8,6 +8,10 @@
 #include "dcnc.hpp"
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/request_message.hpp"
+#include "modules/uas_message/system_info_message.hpp"
+#include "modules/uas_message/capabilities_message.hpp"
+#include "modules/uas_message/command_message.hpp"
+
 
 //===================================================================
 // Public Class Declaration
@@ -20,6 +24,7 @@ DCNC::DCNC()
     port = 42069;
     clientConnection = nullptr;
     serverStatus = DCNCStatus::OFFLINE;
+    autoResume = true;
 
     // Connect Signals to Slots
     connect(server, SIGNAL(newConnection()),
@@ -58,16 +63,21 @@ void DCNC::stopServer()
 
 void DCNC::cancelConnection()
 {
+    if (serverStatus == DCNCStatus::CONNECTED)
+        serverStatus = DCNCStatus::SEARCHING;
+
     if(clientConnection != nullptr)
     {
-        clientConnection->close();
         disconnect(clientConnection, SIGNAL(readyRead()),
                    this, SLOT(handleClientData()));
         disconnect(clientConnection, SIGNAL(disconnected()),
                    this, SLOT(handleClientDisconnected()));
+        clientConnection->close();
         clientConnection->deleteLater();
         clientConnection = nullptr;
+        emit droppedConnection();
     }
+
     server->resumeAccepting();
 }
 
@@ -80,8 +90,10 @@ void DCNC::handleClientConection()
 {
     // While this connection is established stop accepting more connections
     server->pauseAccepting();
-    // Setup the connection socket
+    // Setup the connection socket and the data stream
     clientConnection = server->nextPendingConnection();
+    // This is important due to the fact that after a disconnection this will be in an error state.
+    connectionDataStream.resetStatus();
     connectionDataStream.setDevice(clientConnection);
     // Connect the connection slot's signals
     connect(clientConnection, SIGNAL(readyRead()),
@@ -101,15 +113,15 @@ void DCNC::handleClientConection()
     emit receivedConnection();
 }
 
+// TODO Link Directly to handleClientDisconnection
 void DCNC::handleClientDisconnected()
 {
-    serverStatus = DCNCStatus::SEARCHING;
     cancelConnection();
-    emit droppedConnection();
 }
 
 void DCNC::handleClientData()
 {
+    messageFramer.clearMessage();
     while (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
     {
         connectionDataStream.startTransaction();
@@ -130,8 +142,109 @@ void DCNC::handleClientData()
     }
 }
 
+void DCNC::changeAutoResume(bool autoResume)
+{
+    this->autoResume = autoResume;
+}
 
+//===================================================================
+// Outgoing message methods
+//===================================================================
+
+bool DCNC::sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage)
+{
+    if (clientConnection == nullptr || clientConnection->state() != QTcpSocket::ConnectedState)
+        return false;
+
+    messageFramer.frameMessage(*outgoingMessage);
+    connectionDataStream << messageFramer;
+    if (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::SUCCESS)
+        return false;
+
+    return true;
+}
+
+void DCNC::startImageRelay()
+{
+    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_START);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
+
+void DCNC::stopImageRelay()
+{
+    CommandMessage outgoingMessage = CommandMessage(CommandMessage::Commands::IMAGE_RELAY_STOP);
+    messageFramer.frameMessage(outgoingMessage);
+    connectionDataStream << messageFramer;
+}
+
+//===================================================================
+// Receive Handler
+//===================================================================
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
+    UASMessage *outgoingMessage = nullptr;
+    switch (message->type())
+    {
+        case (UASMessage::MessageID::SYSTEM_INFO):
+        {
+            std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
+            if (systemInfo->dropped && autoResume)
+                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
+            else if (systemInfo->dropped)
+                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
+            else
+                outgoingMessage = new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+            break;
+            emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
+                                     systemInfo->versionNumber,
+                                     systemInfo->dropped);
+        }
 
+        case (UASMessage::MessageID::MESG_CAPABILITIES):
+        {
+            std::shared_ptr<CapabilitiesMessage> systemCapabilities =
+                    std::static_pointer_cast<CapabilitiesMessage>(message);
+            emit receivedGremlinCapabilities(systemCapabilities->getCapabilities());
+            break;
+        }
+
+        case (UASMessage::MessageID::RESPONSE):
+        {
+            std::shared_ptr<ResponseMessage> response =
+                    std::static_pointer_cast<ResponseMessage>(message);
+            outgoingMessage = handleResponse(response->command(), response->responseCode());
+            emit receivedGremlinResponse(response->command(), response->responseCode());
+            break;
+        }
+    }
+
+    if (outgoingMessage == nullptr)
+        return;
+
+    messageFramer.frameMessage(*outgoingMessage);
+    // TODO: that the message is successfully sent
+    connectionDataStream << messageFramer;
+    qDebug() << ((int)messageFramer.status());
+    delete outgoingMessage;
+}
+
+
+UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
+                           ResponseMessage::ResponseCodes responses)
+{
+    switch(command)
+    {
+        case CommandMessage::Commands::SYSTEM_RESET:
+        case CommandMessage::Commands::SYSTEM_RESUME:
+        {
+            if (responses == ResponseMessage::ResponseCodes::NO_ERROR)
+                return new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+            else
+                 droppedConnection();
+        }
+        break;
+    }
+
+    return nullptr;
 }

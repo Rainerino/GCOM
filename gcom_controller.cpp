@@ -280,39 +280,72 @@ void GcomController::on_dcncDropGremlin_clicked()
     dcnc->cancelConnection();
 }
 
+// TODO Pass the IP address and IP version
 void GcomController::dcncConnected()
 {
+    dcncSearchTimeoutTimer->stop();
+
     // When we are connected then change the button to dissconnect server
     ui->dcncConnectionButton->setText(STOP_SERVER_BUTTON_TEXT);
     ui->dcncConnectionStatusField->setText(CONNECTED_LABEL);
-    ui->dcncStatusField->setText(CONNECTED_LABEL);
-    // Start the timer
+
+    // Start the the connection timer and stop the timeout timer
     dcncConnectionTimer->start(1000);
-    // Update the UI
+    dcncSearchTimeoutTimer->stop();
+
+    // Update the status line
+    ui->dcncStatusField->setText(CONNECTED_LABEL);
     ui->dcncStatusMovie->setMovie(dcncConnectedMovie);
     dcncConnectingMovie->start();
+
     // Activate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(true);
 }
 
 void GcomController::dcncDisconnected()
 {
-    // When we are connected then change the button to dissconnect server
+    // Update the UI
     ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
     ui->dcncConnectionStatusField->setText(DISCONNECT_LABEL);
-    ui->dcncStatusField->setText(CONNECTING_LABEL);
-    // Start the timer
+    // Stop the connection timer
     dcncConnectionTimer->stop();
     // Update the UI
     ui->dcncStatusMovie->setMovie(dcncConnectingMovie);
     dcncConnectingMovie->start();
     // Activate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(false);
+    // Start the connection timeout timer.
+    dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField->text().toULong() * 1000);
+}
+
+void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped)
+{
+    (void) dropped;
+    ui->dcncDeviceIDField->setText(systemId);
+    ui->dcncVersionNumberField->setText(QString::number(versionNumber));
+}
+
+void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)
+{
+    if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::IMAGE_RELAY))
+    {
+        ui->dcncCapabilitiesField->addItem("Image Relay");
+        dcnc->startImageRelay();
+    }
 }
 
 void GcomController::dcncTimerTimeout()
 {
     ui->dcncConnectionTime->display(formatDuration(++dcncConnectionTime));
+}
+
+void GcomController::dcncSearchTimeout()
+{
+    if(dcnc->status() == DCNC::DCNCStatus::SEARCHING)
+    {
+        dcnc->stopServer();
+        resetDCNCGUI();
+    }
 }
 
 //===================================================================

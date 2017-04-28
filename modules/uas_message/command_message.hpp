@@ -28,6 +28,8 @@ class CommandMessage : public UASMessage
             SYSTEM_RESUME           = 0x03,
             IMAGE_RELAY_START       = 0x04,
             IMAGE_RELAY_STOP        = 0x05,
+            // Special Command used for responses to requests
+            DATA_REQUEST            = 0xFA
         };
 
         //Public Methods

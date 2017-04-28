@@ -6,6 +6,7 @@
 //===================================================================
 // System Includes
 #include <vector>
+#include <cstdint>
 // GCOM Includes
 #include "uas_message.hpp"
 #include "command_message.hpp"
@@ -21,10 +22,11 @@ class ResponseMessage : public UASMessage
          * \brief The ResponseCodes enum describes all the possible responses to any command
          *        message
          */
-        enum class ResponseCodes : unsigned char
+        enum class ResponseCodes : uint8_t
         {
-            SUCCESS         =   0x01,
-            FAILURE         =   0x02
+            NO_ERROR         =   0x00,
+            INVALID_COMMAD   =   0x02,
+            INVALID_REQUEST  =   0x03
         };
 
         /*!

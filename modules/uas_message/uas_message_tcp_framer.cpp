@@ -6,12 +6,18 @@
 #include "uas_message.hpp"
 #include "request_message.hpp"
 #include "system_info_message.hpp"
+#include "capabilities_message.hpp"
+#include "command_message.hpp"
+#include "image_tagger_message.hpp"
+#include "response_message.hpp"
 // Qt Includes
 #include <QDataStream>
 #include <array>
 #include <vector>
 // System Includes
 #include <memory>
+
+#include <QDebug>
 
 //===================================================================
 // Constants
@@ -78,9 +84,29 @@ std::shared_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
             std::shared_ptr<UASMessage> message(new RequestMessage(serialMessagePayload));
             return message;
         }
+        case UASMessage::MessageID::RESPONSE:
+        {
+            std::shared_ptr<UASMessage> message(new ResponseMessage(serialMessagePayload));
+            return message;
+        }
         case UASMessage::MessageID::SYSTEM_INFO:
         {
             std::shared_ptr<UASMessage> message(new SystemInfoMessage(serialMessagePayload));
+            return message;
+        }
+        case UASMessage::MessageID::MESG_CAPABILITIES:
+        {
+            std::shared_ptr<UASMessage> message(new CapabilitiesMessage(serialMessagePayload));
+            return message;
+        }
+        case UASMessage::MessageID::COMMAND:
+        {
+            std::shared_ptr<UASMessage> message(new CommandMessage(serialMessagePayload));
+            return message;
+        }
+        case UASMessage::MessageID::IMAGE_DATA:
+        {
+            std::shared_ptr<UASMessage> message(new ImageTaggerMessage(serialMessagePayload));
             return message;
         }
         default:
@@ -92,6 +118,7 @@ std::shared_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
 void UASMessageTCPFramer::clearMessage()
 {
     messageData.clear();
+    framerStatus = TCPFramerStatus::INVALID_MESSAGE;
 }
 
 UASMessageTCPFramer::TCPFramerStatus UASMessageTCPFramer::status()
@@ -125,7 +152,9 @@ QDataStream& operator>>(QDataStream& inputStream, UASMessageTCPFramer& uasMessag
         return inputStream;
 
     messageSize = messageHeader[1] << 24 | messageHeader[2] <<  16 | messageHeader[3] << 8 |
-                  messageHeader[4] << 8;
+                  messageHeader[4];
+
+    qDebug() << messageSize;
 
     // Change the message buffer to the appropriate size
     uasMessageTCPFramer.messageData.resize(FRAMED_MESG_HEADER_FIELD_SIZE + messageSize);

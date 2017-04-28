@@ -14,6 +14,9 @@
 // GCOM Includes
 #include "modules/uas_message/uas_message.hpp"
 #include "modules/uas_message/uas_message_tcp_framer.hpp"
+#include "modules/uas_message/capabilities_message.hpp"
+#include "modules/uas_message/response_message.hpp"
+#include "modules/uas_message/command_message.hpp"
 
 //===================================================================
 // Public Class Declaration
@@ -100,8 +103,9 @@ public:
     void cancelConnection();
 
     // Data Methods
-    bool startImageTransfer();
-    bool stopImageTransfer();
+    bool sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage);
+    void startImageRelay();
+    void stopImageRelay();
 
 signals:
     // DCNC Control Signals
@@ -109,6 +113,13 @@ signals:
     void droppedConnection();
     // Data Signals
     void receivedImageData();
+    void receivedGremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
+    void receivedGremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
+    void receivedGremlinResponse(CommandMessage::Commands command,
+                                 ResponseMessage::ResponseCodes responses);
+
+public slots:
+     void changeAutoResume(bool autoResume);
 
 private slots:
     /*!
@@ -136,6 +147,9 @@ private slots:
      */
     void handleClientMessage(std::shared_ptr<UASMessage> message);
 
+    UASMessage* handleResponse(CommandMessage::Commands command,
+                               ResponseMessage::ResponseCodes responses);
+
 private:
     // Private Member Variables
     int port;
@@ -147,6 +161,7 @@ private:
     UASMessageTCPFramer messageFramer;
     std::unique_ptr<UASMessage> message;
     DCNCStatus serverStatus;
+    bool autoResume;
 };
 
 #endif // DCNC_HPP

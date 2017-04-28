@@ -48,12 +48,14 @@ private slots:
     void dcncConnected();
     void dcncDisconnected();
     void dcncTimerTimeout();
+    void dcncSearchTimeout();
+    void gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
+    void gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
 	// Antenna Tracker Slots
     void on_arduinoConnectButton_clicked();
     void on_zaberRefreshButton_clicked();
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
-
 private:
     // private member variables
     Ui::GcomController *ui;
