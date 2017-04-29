@@ -73,6 +73,11 @@ public:
      *        tags them based on the EXIF tags (alternative tagging)
      */
     void tagAllImages();
+
+    /*!
+     * \brief getPathOfExifTags returns path to text file of EXIF tags
+     */
+    QString getPathOfExifTags();
 signals:
     // Data Signals
     void taggedImage(QString filePath);
