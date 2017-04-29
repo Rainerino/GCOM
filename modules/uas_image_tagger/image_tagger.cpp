@@ -12,9 +12,9 @@
 //===================================================================
 // Constants
 //===================================================================
-const QString DUPLFOLDER = "\\Duplicates";
-const QString DUP = "\\DUP_";
-const QString IMG = "\\IMG_";
+const QString DUPLFOLDER = "/Duplicates";
+const QString DUP = "/DUP_";
+const QString IMG = "/IMG_";
 const QString JPG = ".jpg";
 
 //===================================================================
@@ -105,7 +105,7 @@ void ImageTagger::tagAllImages()
     QString line, imageIndex;
 
     // Iterate through each line of EXIF tags
-    QString filename = pathOfDir + "\\GPSExifTags.txt";
+    QString filename = pathOfDir + "/GPSExifTags.txt";
     QFile inputFile(filename);
     if (inputFile.open(QIODevice::ReadOnly)) {
         QTextStream in(&inputFile);
@@ -137,7 +137,7 @@ void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> 
 
     // Write EXIF tags to text file
     // IMAGE_INDEX LATITUDE LONGITUDE ALT_SEA_LVL REL_ALT
-    QString filename = pathOfDir + "\\GPSExifTags.txt";
+    QString filename = pathOfDir + "/GPSExifTags.txt";
     QFile outputFile(filename);
     if (outputFile.open(QIODevice::ReadWrite | QIODevice::Append)) {
         QTextStream stream(&outputFile);
