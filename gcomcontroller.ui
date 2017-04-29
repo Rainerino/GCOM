@@ -428,7 +428,7 @@
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>111</width>
+          <width>211</width>
           <height>21</height>
          </rect>
         </property>
@@ -477,7 +477,7 @@
          <rect>
           <x>380</x>
           <y>20</y>
-          <width>111</width>
+          <width>211</width>
           <height>21</height>
          </rect>
         </property>
@@ -535,6 +535,24 @@
         </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="imageTaggerTab">
+       <attribute name="title">
+        <string>Image Tagger</string>
+       </attribute>
+       <widget class="QPushButton" name="tagImagesButton">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>30</y>
+          <width>471</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Tag All</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -545,7 +563,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>19</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

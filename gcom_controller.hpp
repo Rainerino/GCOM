@@ -14,6 +14,7 @@
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_message/image_tagger_message.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
+#include "modules/uas_image_tagger/image_tagger.hpp"
 
 //===================================================================
 // Namespace Declarations
@@ -38,29 +39,32 @@ private slots:
     // UI Slots
     void on_mavlinkConnectionButton_clicked();
     void on_dcncConnectionButton_clicked();
-	void on_arduinoRefreshButton_clicked();
+    void on_arduinoRefreshButton_clicked();
     void on_tabWidget_tabBarClicked(int index);
     void on_dcncDropGremlin_clicked();
     // MAVLinkRelay Slots
     void mavlinkRelayConnected();
     void mavlinkRelayDisconnected();
     void mavlinkTimerTimeout();
-    // DCNC
+    // DCNC Slots
     void dcncConnected();
     void dcncDisconnected();
     void dcncTimerTimeout();
     void dcncSearchTimeout();
     void gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped);
     void gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities);
-	// Antenna Tracker Slots
+    // Antenna Tracker Slots
     void on_arduinoConnectButton_clicked();
     void on_zaberRefreshButton_clicked();
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
+    // Image Tagger Slots
+    void on_tagImagesButton_clicked();
+
 private:
-    // private member variables
+    // Private Member Variables
     Ui::GcomController *ui;
-    // private member methods
+    // Private Member Methods
     QString formatDuration(unsigned long seconds);
 
     // MAVLinkRelay Variables
@@ -82,11 +86,14 @@ private:
     QMovie *dcncConnectedMovie;
     // Methods
     void resetDCNCGUI();
-	
+
     // Antenna Tracker Variables
     AntennaTracker *tracker;
     // Methods
     void updateStartTrackerButton();
+
+    // Image Tagger Variables
+    ImageTagger *imageTagger;
 };
 
 #endif // GCOMCONTROLLER_HPP
