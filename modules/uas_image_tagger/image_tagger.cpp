@@ -7,7 +7,7 @@
 #include <QDirIterator>
 // GCOM Includes
 #include "image_tagger.hpp"
-#include "exiv2/exiv2.hpp"
+// #include "exiv2/exiv2.hpp"
 
 //===================================================================
 // Constants
@@ -67,10 +67,12 @@ void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
     assert(image.get() != 0);   // check if image was opened
 
     image->readMetadata();
-    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(((int)tags->lat), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLatitudeRef"] = Exiv2::AsciiValue("N");  // set ref. to NORTH
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational((int)tags->lat, 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitudeRef"] = Exiv2::AsciiValue("W"); // set ref. to WEST
     image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational((int)tags->lng, 10000000);
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
-    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((float)tags->alt_msl, 1);
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)tags->alt_msl, 1);
     image->writeMetadata();
 
     QFile::rename(filePath, QFileInfo(filePath).absolutePath() + "/" +
@@ -83,11 +85,17 @@ void ImageTagger::tagImage(QString filePath, QStringList tags)
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
 
+    float lat = tags.at(1).toFloat();
+    float lng = tags.at(2).toFloat();
+    int alt_msl = tags.at(3).toInt();
+
     image->readMetadata();
-    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(tags.at(1).toInt(), 10000000);
-    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(tags.at(2).toInt(), 10000000);
-    image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
-    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(tags.at(3).toFloat(), 1);
+    image->exifData()["Exif.GPSInfo.GPSLatitudeRef"] = Exiv2::AsciiValue("N");  // set ref. to NORTH
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational((int)(lat * 10000000), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitudeRef"] = Exiv2::AsciiValue("W"); // set ref. to WEST
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational((int)(lng * 10000000), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);          // set alt. ref. to AMSL
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(alt_msl, 1);
     image->writeMetadata();
 }
 
