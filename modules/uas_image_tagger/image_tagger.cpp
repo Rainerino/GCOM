@@ -7,7 +7,7 @@
 #include <QDirIterator>
 // GCOM Includes
 #include "image_tagger.hpp"
-// #include "exiv2/exiv2.hpp"
+#include "exiv2/exiv2.hpp"
 
 //===================================================================
 // Constants
