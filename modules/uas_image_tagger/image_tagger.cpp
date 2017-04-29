@@ -72,7 +72,7 @@ void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
     image->exifData()["Exif.GPSInfo.GPSLongitudeRef"] = Exiv2::AsciiValue("W"); // set ref. to WEST
     image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational((int)tags->lng, 10000000);
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
-    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)tags->alt_msl, 1);
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(tags->alt_msl * 1000), 1000);
     image->writeMetadata();
 
     QFile::rename(filePath, QFileInfo(filePath).absolutePath() + "/" +
@@ -85,17 +85,17 @@ void ImageTagger::tagImage(QString filePath, QStringList tags)
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
 
-    float lat = tags.at(1).toFloat();
-    float lng = tags.at(2).toFloat();
-    int alt_msl = tags.at(3).toInt();
+    int lat = tags.at(1).toInt();
+    int lng = tags.at(2).toInt();
+    float alt_rel = tags.at(4).toFloat();
 
     image->readMetadata();
     image->exifData()["Exif.GPSInfo.GPSLatitudeRef"] = Exiv2::AsciiValue("N");  // set ref. to NORTH
-    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational((int)(lat * 10000000), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLatitude"] = Exiv2::Rational(lat, 10000000);
     image->exifData()["Exif.GPSInfo.GPSLongitudeRef"] = Exiv2::AsciiValue("W"); // set ref. to WEST
-    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational((int)(lng * 10000000), 10000000);
+    image->exifData()["Exif.GPSInfo.GPSLongitude"] = Exiv2::Rational(lng, 10000000);
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);          // set alt. ref. to AMSL
-    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational(alt_msl, 1);
+    image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(alt_rel * 1000), 1000);
     image->writeMetadata();
 }
 
