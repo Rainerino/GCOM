@@ -7,7 +7,7 @@
 #include <QDirIterator>
 // GCOM Includes
 #include "image_tagger.hpp"
-// #include "exiv2/exiv2.hpp"
+#include "exiv2/exiv2.hpp"
 
 //===================================================================
 // Constants
@@ -52,7 +52,6 @@ void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data, size_t 
 
 void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
 {
-    /*
     std::string pathOfImage = filePath.toStdString();
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
@@ -65,14 +64,13 @@ void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
     image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(tags->alt_msl * 1000), 1000);
     image->writeMetadata();
-    */
+
     QFile::rename(filePath, QFileInfo(filePath).absolutePath() + "/" +
                   QFileInfo(filePath).baseName().left(4) + QString::number(tags->img_idx) + JPG);
 }
 
 void ImageTagger::tagImage(QString filePath, QStringList tags)
 {
-    /*
     std::string pathOfImage = filePath.toStdString();
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
@@ -89,7 +87,6 @@ void ImageTagger::tagImage(QString filePath, QStringList tags)
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);          // set alt. ref. to AMSL
     image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(alt_rel * 1000), 1000);
     image->writeMetadata();
-    */
 }
 
 void ImageTagger::tagAllImages()
