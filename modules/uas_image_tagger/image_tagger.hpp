@@ -42,9 +42,8 @@ public:
     /*!
      * \brief setupDirectoryPath helper function to setup path name
      * \param dir QString path of directory
-     * \param createDuplicates int 0 or 1 if duplicate folder is to be created
      */
-    void setupDirectoryPath(QString dir, int createDuplicates);
+    void setupDirectoryPath(QString dir);
 
     /*!
      * \brief saveImageToDisc helper function that does the saving

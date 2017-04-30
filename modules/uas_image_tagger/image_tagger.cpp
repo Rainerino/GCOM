@@ -23,9 +23,7 @@ const QString JPG = ".jpg";
 //===================================================================
 ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
 {
-    setupDirectoryPath(dir, 0);
-    setupDirectoryPath(dir + DUPLFOLDER, 1);
-
+    setupDirectoryPath(dir);
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
     connect(toBeTagged, &MAVLinkRelay::mavlinkRelayCameraInfo,
@@ -36,21 +34,17 @@ ImageTagger::ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *to
 
 ImageTagger::~ImageTagger() { }
 
-void ImageTagger::setupDirectoryPath(QString dir, int createDuplicates)
+void ImageTagger::setupDirectoryPath(QString dir)
 {
-    QDir directory(dir);
-    if (!directory.exists())
-        directory.mkpath(".");
-    directory.setNameFilters(QStringList() << "*.jpg");
+    QDir homeDirectory(QDir::homePath());
+    if (!homeDirectory.mkdir(dir))
+        qDebug() << "Can't create folder";
 
-    if (createDuplicates) {     // if duplicates folder is to be created
-        pathOfDuplicates = directory.absolutePath();
-        numOfDuplicates = directory.count();
-    }
-    else {                      // else for parent directory
-        pathOfDir = directory.absolutePath();
-        numOfImages = directory.count();
-    }
+    pathOfDir = QDir::homePath() + "/" + dir;
+    QDir imageDirectory(pathOfDir);
+
+    imageDirectory.setNameFilters(QStringList() << "*.jpg");
+    numOfImages = imageDirectory.count();
 }
 
 void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data, size_t size)
@@ -137,20 +131,18 @@ QString ImageTagger::getPathOfExifTags()
 
 void ImageTagger::handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> cameraInfo)
 {
-    mavlink_camera_feedback_t *tags = cameraInfo.get();
-    gpsData.enqueue(tags);
-
     // Write EXIF tags to text file
     // IMAGE_INDEX LATITUDE LONGITUDE ALT_SEA_LVL REL_ALT
+    qDebug() << "Photo has been taken";
     QString filename = pathOfDir + EXIF;
     QFile outputFile(filename);
     if (outputFile.open(QIODevice::ReadWrite | QIODevice::Append)) {
         QTextStream stream(&outputFile);
-        stream << QString::number(tags->img_idx) << " "
-               << QString::number(tags->lat) << " "
-               << QString::number(tags->lng) << " "
-               << QString::number(tags->alt_msl) << " "
-               << QString::number(tags->alt_rel) << endl;
+        stream << QString::number(cameraInfo->img_idx) << " "
+               << QString::number(cameraInfo->lat) << " "
+               << QString::number(cameraInfo->lng) << " "
+               << QString::number(cameraInfo->alt_msl) << " "
+               << QString::number(cameraInfo->alt_rel) << endl;
     }
 }
 

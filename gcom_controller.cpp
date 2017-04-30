@@ -94,7 +94,7 @@ GcomController::GcomController(QWidget *parent) :
     ui->antennaTrackerTab->setDisabled(true);
 
     // Image Tagger Setup
-    QString dir = "/AlmaPictures";
+    QString dir = "AlmaPictures";
     imageTagger = new ImageTagger(dir, dcnc, mavlinkRelay);
 }
 
