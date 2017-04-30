@@ -114,16 +114,6 @@ void MAVLinkRelay::readBytes()
         {
             switch (message.msgid)
             {
-
-                case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                {
-                    std::shared_ptr<mavlink_global_position_int_t> gpsPacketPointer(
-                                new mavlink_global_position_int_t);
-                    mavlink_msg_global_position_int_decode(&message,gpsPacketPointer.get());
-                    emit mavlinkRelayGPSInfo(gpsPacketPointer);
-                    break;
-                }
-
                 case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
                 {
                     std::shared_ptr<mavlink_camera_feedback_t> cameraPacketPointer(

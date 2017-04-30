@@ -7,7 +7,7 @@
 #include <QDirIterator>
 // GCOM Includes
 #include "image_tagger.hpp"
-#include "exiv2/exiv2.hpp"
+// #include "exiv2/exiv2.hpp"
 
 //===================================================================
 // Constants
@@ -39,12 +39,7 @@ void ImageTagger::setupDirectoryPath(QString dir)
     QDir homeDirectory(QDir::homePath());
     if (!homeDirectory.mkdir(dir))
         qDebug() << "Can't create folder";
-
     pathOfDir = QDir::homePath() + "/" + dir;
-    QDir imageDirectory(pathOfDir);
-
-    imageDirectory.setNameFilters(QStringList() << "*.jpg");
-    numOfImages = imageDirectory.count();
 }
 
 void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data, size_t size)
@@ -57,6 +52,7 @@ void ImageTagger::saveImageToDisc(QString filePath, unsigned char *data, size_t 
 
 void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
 {
+    /*
     std::string pathOfImage = filePath.toStdString();
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
@@ -69,13 +65,14 @@ void ImageTagger::tagImage(QString filePath, mavlink_camera_feedback_t *tags)
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);  // set alt. ref. to AMSL
     image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(tags->alt_msl * 1000), 1000);
     image->writeMetadata();
-
+    */
     QFile::rename(filePath, QFileInfo(filePath).absolutePath() + "/" +
                   QFileInfo(filePath).baseName().left(4) + QString::number(tags->img_idx) + JPG);
 }
 
 void ImageTagger::tagImage(QString filePath, QStringList tags)
 {
+    /*
     std::string pathOfImage = filePath.toStdString();
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(pathOfImage);
     assert(image.get() != 0);   // check if image was opened
@@ -92,12 +89,15 @@ void ImageTagger::tagImage(QString filePath, QStringList tags)
     image->exifData()["Exif.GPSInfo.GPSAltitudeRef"] = Exiv2::byte(0);          // set alt. ref. to AMSL
     image->exifData()["Exif.GPSInfo.GPSAltitude"] = Exiv2::Rational((int)(alt_rel * 1000), 1000);
     image->writeMetadata();
+    */
 }
 
 void ImageTagger::tagAllImages()
 {
     QStringList exifTags;
     QString line, imageIndex;
+    QFileInfo entry;
+    int counter = 0;
 
     // Iterate through each line of EXIF tags
     QString filename = pathOfDir + EXIF;
@@ -108,17 +108,15 @@ void ImageTagger::tagAllImages()
             line = in.readLine();
             exifTags = line.split(' ');
 
-            // Iterate through each image file (begins before first entry)
-            QDirIterator it(pathOfDir, QStringList() << "*.jpg", QDir::Files,
-                            QDirIterator::Subdirectories);
-            while (it.hasNext()) {
-                it.next();
-                imageIndex = it.fileInfo().baseName().mid(4);
-
-                tagImage(it.filePath(), exifTags);
-                if (imageIndex == exifTags.at(0))
-                    std::cout << "WARNING: Mismatch for " << it.fileInfo().baseName().toStdString();
-            }
+            // Iterate through each image file
+            QDir imageDirectory(pathOfDir);
+            QFileInfoList imageEntries = imageDirectory.entryInfoList(QStringList() << "*.jpg",
+                                                                      QDir::Files, QDir::Name);
+            entry = imageEntries.at(counter++);
+            tagImage(entry.filePath(), exifTags);
+            imageIndex = entry.baseName().mid(4);
+            if (imageIndex != exifTags.at(0))
+                qDebug() << "WARNING: Mismatch for " << entry.baseName();
         }
     }
     inputFile.close();
