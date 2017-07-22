@@ -15,7 +15,6 @@
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
-#include "modules/uas_image_tagger/image_tagger.hpp"
 #include "modules/uas_message/uas_message_serial_framer.hpp"
 
 //===================================================================
@@ -92,10 +91,6 @@ GcomController::GcomController(QWidget *parent) :
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
-
-    // Image Tagger Setup
-    QString dir = "AlmaPictures";
-    imageTagger = new ImageTagger(dir, dcnc, mavlinkRelay);
 }
 
 GcomController::~GcomController()
@@ -106,7 +101,6 @@ GcomController::~GcomController()
     delete mavlinkConnectingMovie;
     delete dcnc;
     delete tracker;
-    delete imageTagger;
 }
 
 //===================================================================
@@ -440,14 +434,6 @@ void GcomController::on_startTrackButton_clicked()
         qDebug() << "arduino not open";
     else
         qDebug() << "wrong neighbourhood";
-}
-
-//===================================================================
-// Image Tagger Methods
-//===================================================================
-void GcomController::on_tagImagesButton_clicked()
-{
-    imageTagger->tagAllImages();
 }
 
 //===================================================================

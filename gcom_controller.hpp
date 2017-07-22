@@ -14,7 +14,6 @@
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_message/image_tagger_message.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
-#include "modules/uas_image_tagger/image_tagger.hpp"
 
 //===================================================================
 // Namespace Declarations
@@ -58,8 +57,6 @@ private slots:
     void on_zaberRefreshButton_clicked();
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
-    // Image Tagger Slots
-    void on_tagImagesButton_clicked();
 
 private:
     // Private Member Variables
@@ -91,9 +88,6 @@ private:
     AntennaTracker *tracker;
     // Methods
     void updateStartTrackerButton();
-
-    // Image Tagger Variables
-    ImageTagger *imageTagger;
 };
 
 #endif // GCOMCONTROLLER_HPP
