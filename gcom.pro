@@ -10,6 +10,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 TARGET = gcom
 TEMPLATE = app
 
+INCLUDEPATH += Mavlink
+
+CONFIG += c++14
+
+RESOURCES = resources.qrc
 
 SOURCES += main.cpp\
     modules/uas_message/uas_message_tcp_framer.cpp \
@@ -25,7 +30,6 @@ SOURCES += main.cpp\
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
     modules/uas_message/image_tagger_message.cpp \
-    modules/uas_image_tagger/image_tagger.cpp \
     modules/uas_message/capabilities_message.cpp
 
 HEADERS  += \
@@ -45,18 +49,6 @@ HEADERS  += \
     modules/uas_message/request_message.hpp \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
-    modules/uas_message/capabilities_message.hpp \
-    modules/uas_image_tagger/image_tagger.hpp
+    modules/uas_message/capabilities_message.hpp
 
 FORMS    += gcomcontroller.ui
-
-INCLUDEPATH += Mavlink
-
-CONFIG += c++14
-
-RESOURCES = resources.qrc
-
-unix {
-    INCLUDEPATH  += /usr/local/include
-    LIBS         += -L/usr/local/lib -lexiv2
-}

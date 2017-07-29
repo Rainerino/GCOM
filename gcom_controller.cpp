@@ -87,9 +87,9 @@ GcomController::GcomController(QWidget *parent) :
     connect(dcncSearchTimeoutTimer, SIGNAL(timeout()), this, SLOT(dcncSearchTimeout()));
     connect(ui->dcncServerAutoResume, SIGNAL(clicked(bool)), dcnc, SLOT(changeAutoResume(bool)));
     resetDCNCGUI();
-	
-	// Antenna Tracker Setup
-	tracker = new AntennaTracker();
+
+    // Antenna Tracker Setup
+    tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
 }
 
@@ -100,7 +100,7 @@ GcomController::~GcomController()
     delete mavlinkConnectionTimer;
     delete mavlinkConnectingMovie;
     delete dcnc;
-	delete tracker;
+    delete tracker;
 }
 
 //===================================================================
@@ -187,8 +187,8 @@ void GcomController::mavlinkRelayDisconnected()
     mavlinkConnectingMovie->stop();
     // Stop the timer
     mavlinkConnectionTimer->stop();
-	// Stop the tracker if its on
-	ui->antennaTrackerTab->setDisabled(true);
+    // Stop the tracker if its on
+    ui->antennaTrackerTab->setDisabled(true);
     // Reset the button method
     mavlinkButtonDisconnect = false;
 }
@@ -349,7 +349,7 @@ void GcomController::dcncSearchTimeout()
 }
 
 //===================================================================
-// Antenna Tracker
+// Antenna Tracker Methods
 //===================================================================
 void GcomController::on_arduinoRefreshButton_clicked()
 {
