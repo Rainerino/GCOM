@@ -30,6 +30,11 @@ UASMessage::MessageID RequestMessage::type()
     return MessageID::REQUEST;
 }
 
+UASMessage::MessageID RequestMessage::request()
+{
+    return requestedMessage;
+}
+
 std::vector<unsigned char> RequestMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;

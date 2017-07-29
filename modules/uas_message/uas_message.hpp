@@ -6,6 +6,7 @@
 //===================================================================
 // System Includes
 #include <vector>
+#include <cstdint>
 
 //===================================================================
 // Public Class Declarations
@@ -24,7 +25,7 @@ class UASMessage
         /*!
          * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
-        enum class MessageID : unsigned char
+        enum class MessageID : uint8_t
         {
             REQUEST                 = 0x0A,
             COMMAND                 = 0x0B,
@@ -36,6 +37,7 @@ class UASMessage
             DATA_IMU                = 0x11,
             DATA_GPS                = 0x12,
             ZEM_COMMAND             = 0x13,
+            MESG_CAPABILITIES       = 0x14,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };

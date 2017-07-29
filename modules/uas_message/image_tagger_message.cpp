@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iterator>
 // GCOM Includes
-#include "image_tagger_message.hpp"
+#include "modules/uas_message/image_tagger_message.hpp"
 #include "modules/uas_message/uas_message.hpp"
 
 //===================================================================

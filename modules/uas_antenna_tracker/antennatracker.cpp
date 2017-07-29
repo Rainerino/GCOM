@@ -14,7 +14,6 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QString>
-#include <Qtcore/QDebug>
 #include <QList>
 #include <QtMath>
 #include <QElapsedTimer>
@@ -36,7 +35,7 @@
 // Constants
 //===================================================================
 // Strings
-const QString ZABER_DEVICE_NAME = "Microsoft";
+const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
 const QString TEXT_ZABER_NO_CONTROLLER = "NO ZABER CONTROLLER CONNECTED";
 const QString ARDUINO_DEVICE_NAME = "Arduino";
 const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
@@ -45,7 +44,7 @@ const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
 // Zaber Setup
 const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000";
-// Constants
+// Constant
 const float RADIUS_EARTH = 6378137;
 
 //===================================================================
@@ -65,11 +64,6 @@ AntennaTracker::AntennaTracker()
     latBase = 0;
     lonBase = 0;
 
-    prevYawIMU = 0;
-    droneAngle = 0;
-    trackerAngle = 0;
-    horzAngleDiff = 0;
-    vertAngleDiff = 0;
     sentRequest = false;
 }
 
@@ -88,63 +82,84 @@ AntennaTracker::~AntennaTracker()
         zaberSerial->close();
         delete zaberSerial;
     }
+
+    delete arduinoDataStream;
+
+    delete arduinoFramer;
 }
 
 bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
                                  AntennaTrackerSerialDevice devType)
 {
+    qDebug()<<"Bonjour";
     if (antennaTrackerConnected)
         stopTracking();
 
-    if(devType == AntennaTrackerSerialDevice::ARDUINO)
+    bool success = false;
+
+    switch(devType)
     {
-        // Create the object if its not already initialized
-        if (arduinoSerial == nullptr)
-            arduinoSerial = new QSerialPort(port);
+        case AntennaTrackerSerialDevice::ARDUINO:
+            // Create the object if its not already initialized
+            if (arduinoSerial == nullptr)
+                arduinoSerial = new QSerialPort(port);
 
-        // Close the port if its open
-        if (arduinoSerial->isOpen())
-            disconnectArduino();
+            // Close the port if its open
+            if (arduinoSerial->isOpen())
+                disconnectArduino();
 
 
 
-        if(!arduinoSerial->open(QIODevice::ReadWrite))
-            return false;
+            if(!arduinoSerial->open(QIODevice::ReadWrite))
+            {
+                qDebug() << "Howdy";
+                return false;
 
-        // Initialize arduino serial port
-        arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
-        arduinoSerial->setDataBits(QSerialPort::Data8);
-        arduinoSerial->setParity(QSerialPort::NoParity);
-        arduinoSerial->setStopBits(QSerialPort::OneStop);
-        arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
+            }
 
-        connect(arduinoSerial,
-                SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
-                SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
-    }
-    else if(devType == AntennaTrackerSerialDevice::ZABER)
-    {
-        if (zaberSerial == nullptr)
+            // Initialize arduino serial port
+            arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
+            arduinoSerial->setDataBits(QSerialPort::Data8);
+            arduinoSerial->setParity(QSerialPort::NoParity);
+            arduinoSerial->setStopBits(QSerialPort::OneStop);
+            arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
+
+            connect(arduinoSerial,
+                    SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
+                    SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
+            qDebug() << "Hola";
+            success = true;
+            break;
+
+        case AntennaTrackerSerialDevice::ZABER:
+            if (zaberSerial == nullptr)
+                zaberSerial = new QSerialPort(port);
+
+            if (zaberSerial->isOpen())
+                disconnectZaber();
+
+            // Init the  zaber serial port
             zaberSerial = new QSerialPort(port);
+            zaberSerial->setBaudRate(baud);
+            zaberSerial->setDataBits(QSerialPort::Data8);
+            zaberSerial->setParity(QSerialPort::NoParity);
+            zaberSerial->setStopBits(QSerialPort::OneStop);
+            zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
+            if (!zaberSerial->open(QIODevice::ReadWrite))
+                return false;
 
-        if (zaberSerial->isOpen())
-            disconnectZaber();
+            connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
+                    this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
 
-        // Init the  zaber serial port
-        zaberSerial = new QSerialPort(port);
-        zaberSerial->setBaudRate(baud);
-        zaberSerial->setDataBits(QSerialPort::Data8);
-        zaberSerial->setParity(QSerialPort::NoParity);
-        zaberSerial->setStopBits(QSerialPort::OneStop);
-        zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
-        if (!zaberSerial->open(QIODevice::ReadWrite))
-            return false;
+            success = true;
+            break;
 
-        connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
-                this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
+        default:
+            success = false;
+            break;
     }
 
-    return true;
+    return success;
 }
 
 AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVLinkRelay * const relay)
@@ -344,8 +359,8 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     if ((imuMessage == nullptr) || (imuMessage->type() != UASMessage::MessageID::DATA_IMU))
         return;
 
-    float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
-    float pitchBase = (std::static_pointer_cast<IMUMessage>(imuMessage)->y) * -1;
+    const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
+    const float pitchBase = (std::static_pointer_cast<IMUMessage>(imuMessage)->y) * -1;
 
     // Do horizontal tracking.
     QString horzZaberCommand = calcHorizontal(droneGPSData, yawBase);
@@ -360,21 +375,23 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
 
 QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU)
 {
+    // ====================================================================
+    // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
+    // ====================================================================
+
     //Grabbing individual pieces of data from gpsData
+    const float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
+    const float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
 
-    float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
-    float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
+    const float yDiff = (droneLon-lonBase);
 
-    float yDiff = (droneLon-lonBase);
+    const float y = sin(yDiff) * cos(droneLat);
+    const float x = (cos(latBase) * sin(droneLat)) - (sin(latBase) * cos(droneLat) * cos(yDiff));
 
-    float y = sin(yDiff) * cos(droneLat);
-    float x = (cos(latBase) * sin(droneLat)) - (sin(latBase) * cos(droneLat) * cos(yDiff));
-
-    float horizAngle = fmod((qRadiansToDegrees(atan2(y,x)) + 360), 360);
-    droneAngle = horizAngle;
+    const float horizAngle = fmod((qRadiansToDegrees(atan2(y,x)) + 360), 360);
 
     // Find the quickest angle to reach the point
-    horzAngleDiff = droneAngle - (yawIMU);
+    float horzAngleDiff = horizAngle - (yawIMU);
 
     if(horzAngleDiff > 180) {
         horzAngleDiff -= 360;
@@ -383,41 +400,43 @@ QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_i
         horzAngleDiff += 360;
     }
     else if(horzAngleDiff > -1 && horzAngleDiff < 1) {
+        // don't move if angle is too small to reduce drifting
         horzAngleDiff = 0;
     }
 
-    int microSteps = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horzAngleDiff);
+    const int microSteps = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horzAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(2).arg(microSteps);
 }
 
 QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float pitchIMU)
 {
-    float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
-    float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
+    // ====================================================================
+    // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
+    // ====================================================================
 
-    float droneRelativeAlt = ((float)droneGPSData->relative_alt / 1000);
-    qDebug() << "The drone alt is: " << droneRelativeAlt;
+    const float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
+    const float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
 
-    float xDiff = (droneLat-latBase);
-    float yDiff = (droneLon-lonBase);
+    const float droneRelativeAlt = ((float)droneGPSData->relative_alt / 1000);
 
-    float a = pow(sin(xDiff/2),2)+cos(latBase) * cos(droneLat)*pow(sin(yDiff/2),2);
-    float d = 2 * atan2(sqrt(a), sqrt(1-a));
-    float distance = RADIUS_EARTH * d;
+    const float xDiff = (droneLat-latBase);
+    const float yDiff = (droneLon-lonBase);
 
-    float vertAngle = atan((droneRelativeAlt)/distance)*180/M_PI;
-    qDebug() << "The angle is is: " << vertAngle;
+    const float a = pow(sin(xDiff/2),2)+cos(latBase) * cos(droneLat)*pow(sin(yDiff/2),2);
+    const float d = 2 * atan2(sqrt(a), sqrt(1-a));
+    const float distance = RADIUS_EARTH * d;
 
-    qDebug() << "The pitchimu is is: " << pitchIMU;
-    vertAngleDiff = vertAngle - pitchIMU;
-    qDebug() << "The dif is is: " << vertAngleDiff;
+    const float vertAngle = atan((droneRelativeAlt)/distance)*180/M_PI;
+
+    float vertAngleDiff = vertAngle - pitchIMU;
 
     if(vertAngleDiff > -1 && vertAngleDiff < 1) {
-            vertAngleDiff = 0;
+        // don't move if angle is too small to reduce drifting
+        vertAngleDiff = 0;
     }
 
-    int microSteps = VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff) * -1 ;
+    int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
 }
