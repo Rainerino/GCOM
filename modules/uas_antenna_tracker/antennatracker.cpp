@@ -35,7 +35,11 @@
 // Constants
 //===================================================================
 // Strings
-const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
+#ifdef __linux__
+   const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
+#elif __WIN32
+   const QString ZABER_DEVICE_NAME = "Microsoft";
+#endif
 const QString TEXT_ZABER_NO_CONTROLLER = "NO ZABER CONTROLLER CONNECTED";
 const QString ARDUINO_DEVICE_NAME = "Arduino";
 const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
@@ -179,53 +183,16 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     if (!zaberSerial->isOpen())
         return AntennaTrackerConnectionState::ZABER_NOT_OPEN;
 
-    // Create the datastreams and framer
-    arduinoDataStream = new QDataStream(arduinoSerial);
-
-    // Retrieve the base's GPS Corrdinates
-    RequestMessage gpsRequest = RequestMessage(UASMessage::MessageID::DATA_GPS);
-    arduinoFramer->frameMessage(gpsRequest);
-    (*arduinoDataStream) << (*arduinoFramer);
-
-    // Verify the connection
-    if (!arduinoSerial->waitForReadyRead(3000))
+    if(!retrieveStationPos())
         return AntennaTrackerConnectionState::FAILED;
-
-    arduinoFramer->clearMessage();
-
-    // Attempt to read the GPS Message from the antenna tracker
-    // Note: This is a bad busy loop! We are only allowed to do this because the drone will not be
-    // in flight at this time!
-    while (true)
-    {
-        arduinoDataStream->startTransaction();
-        (*arduinoDataStream) >> (*arduinoFramer);
-        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
-            break;
-        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
-            arduinoDataStream->rollbackTransaction();
-        else
-            return AntennaTrackerConnectionState::FAILED;
-        arduinoSerial->waitForReadyRead(10);
-    }
-    arduinoDataStream->commitTransaction();
-    qDebug() << timer.elapsed();
-
-    // Setup desired speed for Zaber vertical movement
-    zaberSerial->write(zaberSetVerticalMoveSpeed.toStdString().c_str());
-    zaberSerial->flush();
-
-    // Process the GPS Coordinates of the base station!
-    std::shared_ptr<UASMessage> gpsMessage = arduinoFramer->generateMessage();
-    if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
-        return AntennaTrackerConnectionState::FAILED;
-
-    lonBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lon * -1);
-    latBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lat);
 
     // Connect the Mavlink Relay
     if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
         return AntennaTrackerConnectionState::RELAY_NOT_OPEN;
+
+    // Setup desired speed for Zaber vertical movement
+    zaberSerial->write(zaberSetVerticalMoveSpeed.toStdString().c_str());
+    zaberSerial->flush();
 
     connect(relay,
             SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
@@ -439,6 +406,51 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
     int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
+}
+
+bool AntennaTracker::retrieveStationPos()
+{
+    // Create the datastreams and framer
+    arduinoDataStream = new QDataStream(arduinoSerial);
+
+    // Retrieve the base's GPS Corrdinates
+    RequestMessage gpsRequest = RequestMessage(UASMessage::MessageID::DATA_GPS);
+    arduinoFramer->frameMessage(gpsRequest);
+    (*arduinoDataStream) << (*arduinoFramer);
+
+    // Verify the connection
+    if (!arduinoSerial->waitForReadyRead(3000))
+        return false;
+
+    arduinoFramer->clearMessage();
+
+    // Attempt to read the GPS Message from the antenna tracker
+    // Note: This is a bad busy loop! We are only allowed to do this because the drone will not be
+    // in flight at this time!
+    while (true)
+    {
+        arduinoDataStream->startTransaction();
+        (*arduinoDataStream) >> (*arduinoFramer);
+        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+            break;
+        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
+            arduinoDataStream->rollbackTransaction();
+        else
+            return false;
+        arduinoSerial->waitForReadyRead(10);
+    }
+    arduinoDataStream->commitTransaction();
+    // qDebug() << timer.elapsed();
+
+    // Process the GPS Coordinates of the base station!
+    std::shared_ptr<UASMessage> gpsMessage = arduinoFramer->generateMessage();
+    if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
+        return false;
+
+    lonBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lon * -1);
+    latBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lat);
+
+    return true;
 }
 
 //===================================================================

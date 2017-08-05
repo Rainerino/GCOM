@@ -78,7 +78,7 @@ public:
     void stopTracking();
 
     /*!
-     * \brief setStationPos sets the GPS coordinates of the antenna tracker station
+     * \brief setStationPos overrides the GPS coordinates of the antenna tracker station with the inputted parameters.
      * \param lon is the longitude
      * \param lat is the latitude
      * \return whether the position has been set
@@ -111,6 +111,12 @@ private:
      * \return command in the form of a string
      */
     QString calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
+
+    /*!
+     * \brief retrieveStationPos sets the actual GPS coordinates of the antenna tracker station.
+     * \return false if the antenna tracker connection state has failed
+     */
+    bool retrieveStationPos();
 
     // ================
     // Member Variables

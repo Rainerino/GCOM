@@ -423,117 +423,111 @@
        <attribute name="title">
         <string>Antenna Tracker</string>
        </attribute>
-       <widget class="QLabel" name="arduinoListLable">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>211</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Available Arduino Devices</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="arduinoRefreshButton">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>10</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Refresh List</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="arduinoConnectButton">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>290</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Connect</string>
-        </property>
-       </widget>
-       <widget class="QListWidget" name="availableArduinoPorts">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>341</width>
-          <height>231</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="zaberListLabel">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>20</y>
-          <width>211</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Available Zaber Controllers</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="zaberRefreshButton">
-        <property name="geometry">
-         <rect>
-          <x>600</x>
-          <y>10</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Refresh List</string>
-        </property>
-       </widget>
-       <widget class="QListWidget" name="availableZaberPorts">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>50</y>
-          <width>341</width>
-          <height>231</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="zaberConnectButton">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>290</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Connect</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="startTrackButton">
-        <property name="geometry">
-         <rect>
-          <x>280</x>
-          <y>350</y>
-          <width>171</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Start Tracker</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QHBoxLayout" name="antennaTrackerGroupHorizontal">
+          <item>
+           <layout class="QVBoxLayout" name="antennaTrackerArduinoGroup">
+            <item>
+             <widget class="QLabel" name="arduinoListLable">
+              <property name="text">
+               <string>Available Arduino Devices</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="arduinoRefreshButton">
+              <property name="text">
+               <string>Refresh List</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="availableArduinoPorts"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="arduinoConnectButton">
+              <property name="text">
+               <string>Connect</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="antennaTrackerZaberGroup">
+            <item>
+             <widget class="QLabel" name="zaberListLabel">
+              <property name="text">
+               <string>Available Zaber Controllers</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="zaberRefreshButton">
+              <property name="text">
+               <string>Refresh List</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="availableZaberPorts"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="zaberConnectButton">
+              <property name="text">
+               <string>Connect</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item alignment="Qt::AlignLeft|Qt::AlignTop">
+           <widget class="QGroupBox" name="antennaTrackerGPSOverrideGroup">
+            <property name="title">
+             <string>GPS Override</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="1" column="0" alignment="Qt::AlignTop">
+              <widget class="QLabel" name="antennaTrackerLongitudeLabel">
+               <property name="text">
+                <string>Longitude</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" alignment="Qt::AlignTop">
+              <widget class="QLabel" name="antennaTrackerLatitudeLabel">
+               <property name="text">
+                <string>Latitude</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" alignment="Qt::AlignTop">
+              <widget class="QCheckBox" name="antennaTrackerGPSOverrideCheckBox">
+               <property name="text">
+                <string>Override GPS</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="antennaTrackerLatitudeField"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="antennaTrackerLongitudeField"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="startTrackButton">
+          <property name="text">
+           <string>Start Tracker</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -545,7 +539,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
