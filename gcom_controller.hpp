@@ -57,6 +57,7 @@ private slots:
     void on_zaberRefreshButton_clicked();
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
+    void on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked);
 
 private:
     // Private Member Variables

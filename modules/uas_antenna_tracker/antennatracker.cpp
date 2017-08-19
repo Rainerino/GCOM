@@ -63,6 +63,7 @@ AntennaTracker::AntennaTracker()
 
     // Reset the state varaibles
     antennaTrackerConnected = false;
+    overrideGPSToggle = false;
 
     //initialize base coordinates with arbitrary garbage value
     latBase = 0;
@@ -183,8 +184,14 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     if (!zaberSerial->isOpen())
         return AntennaTrackerConnectionState::ZABER_NOT_OPEN;
 
-    if(!retrieveStationPos())
-        return AntennaTrackerConnectionState::FAILED;
+    // Create the datastreams and framer
+    arduinoDataStream = new QDataStream(arduinoSerial);
+
+    // if the GPS is not overrided retrieve the gps location from arduino
+    if (!overrideGPSToggle) {
+        if(!retrieveStationPos())
+            return AntennaTrackerConnectionState::FAILED;
+    }
 
     // Connect the Mavlink Relay
     if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
@@ -327,7 +334,7 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
         return;
 
     const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
-    const float pitchBase = (std::static_pointer_cast<IMUMessage>(imuMessage)->y) * -1;
+    const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
 
     // Do horizontal tracking.
     QString horzZaberCommand = calcHorizontal(droneGPSData, yawBase);
@@ -410,9 +417,6 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
 
 bool AntennaTracker::retrieveStationPos()
 {
-    // Create the datastreams and framer
-    arduinoDataStream = new QDataStream(arduinoSerial);
-
     // Retrieve the base's GPS Corrdinates
     RequestMessage gpsRequest = RequestMessage(UASMessage::MessageID::DATA_GPS);
     arduinoFramer->frameMessage(gpsRequest);
@@ -451,6 +455,28 @@ bool AntennaTracker::retrieveStationPos()
     latBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lat);
 
     return true;
+}
+
+bool AntennaTracker::setStationPos(float lon, float lat)
+{
+    // check inputs in range
+    if((lat < -90 || lat > 90) || (lon < -180 || lat > 180))
+        return false;
+
+    // check if the tracker is running
+    if(antennaTrackerConnected)
+        return false;
+
+    lonBase = qDegreesToRadians(lon);
+    latBase = qDegreesToRadians(lat);
+
+    // lat lon successfully set
+    return true;
+}
+
+void AntennaTracker::setOverrideGPSToggle(bool toggled)
+{
+    overrideGPSToggle = toggled;
 }
 
 //===================================================================

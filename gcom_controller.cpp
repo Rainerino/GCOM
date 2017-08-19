@@ -429,6 +429,16 @@ void GcomController::updateStartTrackerButton()
 
 void GcomController::on_startTrackButton_clicked()
 {
+    if(ui->antennaTrackerGPSOverrideCheckBox->checkState() == Qt::Checked) {
+        float overrideLonBase = ui->antennaTrackerOverrideLongitudeField->text().toFloat();
+        float overrideLatBase = ui->antennaTrackerOverrideLatitudeField->text().toFloat();
+
+        if(!tracker->setStationPos(overrideLonBase, overrideLatBase)) {
+            qDebug() << "Override GPS failed";
+            return;
+        }
+    }
+
     AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
 
     if(status == AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
@@ -439,6 +449,11 @@ void GcomController::on_startTrackButton_clicked()
         qDebug() << "arduino not open";
     else
         qDebug() << "wrong neighbourhood";
+}
+
+void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
+{
+    tracker->setOverrideGPSToggle(checked);
 }
 
 //===================================================================

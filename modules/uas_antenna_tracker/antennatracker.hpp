@@ -83,7 +83,12 @@ public:
      * \param lat is the latitude
      * \return whether the position has been set
      */
-    bool setStationPos(QString lon, QString lat);
+    bool setStationPos(float lon, float lat);
+
+    /*!
+     * \brief overrideGPSToggle sets overrideGPSToggle to the given state
+     */
+    void setOverrideGPSToggle(bool toggled);
 
 public slots:
     /*!
@@ -132,6 +137,7 @@ private:
 
     // State Variables
     bool antennaTrackerConnected;
+    bool overrideGPSToggle;
 
     std::atomic<bool> sentRequest;
 
