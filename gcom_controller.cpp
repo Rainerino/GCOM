@@ -437,6 +437,11 @@ void GcomController::on_startTrackButton_clicked()
             qDebug() << "Override GPS failed";
             return;
         }
+
+        // when override is successful, disable fields
+        ui->antennaTrackerOverrideLatitudeField->setDisabled(true);
+        ui->antennaTrackerOverrideLongitudeField->setDisabled(true);
+        ui->antennaTrackerGPSOverrideCheckBox->setDisabled(true);
     }
 
     AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
@@ -454,6 +459,13 @@ void GcomController::on_startTrackButton_clicked()
 void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
 {
     tracker->setOverrideGPSToggle(checked);
+}
+
+void GcomController::resetOverrideGPSGUI()
+{
+    ui->antennaTrackerOverrideLatitudeField->setDisabled(false);
+    ui->antennaTrackerOverrideLongitudeField->setDisabled(false);
+    ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
 }
 
 //===================================================================

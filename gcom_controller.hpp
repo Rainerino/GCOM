@@ -89,6 +89,7 @@ private:
     AntennaTracker *tracker;
     // Methods
     void updateStartTrackerButton();
+    void resetOverrideGPSGUI();
 };
 
 #endif // GCOMCONTROLLER_HPP
