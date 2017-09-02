@@ -13,7 +13,7 @@ This is a repository for UBC Unmanned Aircraft Systems' ground control station s
 *	Perform analytics on retrieved images
 *	Keep a reliable/recoverable communication with the drone
 
-To keep the program as sreamlined and optimized as possible, the software uses a modular design, with a solid and well-documented framework to hold everything together. This allows the deployment of numerous versions of GCOM, one for each of our drones, where each version will have different modules enabled.
+To keep the program as sreamlined and optimized as possible, the software uses a modular design, with a solid and well-documented framework to hold everything together. This allows for the deployment of numerous versions of GCOM, one for each of our drones, where each version will have different modules enabled.
 
 ### Prerequisities
 
@@ -36,7 +36,7 @@ Module | Designation
 
 ### MAVLink Relay
 
-The MAVLink Relay relays MAVLink messages from either [Mission Planner](http://ardupilot.org/planner/ "Mission Planner Homepage") to other modules within GCOM. Connection to Mission Planner or any other MAVLink source is done via TCP protocol, continously receiving message through the socket. These messages are then decoded using MAVLink libraries.
+The MAVLink Relay relays MAVLink messages from [Mission Planner](http://ardupilot.org/planner/ "Mission Planner Homepage") to other modules within GCOM. Connection to Mission Planner or any other MAVLink source is done via TCP protocol, continously receiving messages through the socket. These messages are then decoded using MAVLink libraries.
 
 Two message types are filtered out and relayed:
 
@@ -49,15 +49,15 @@ The former is used by the antenna tracker module, and the latter is used by the 
 
 ### Ground Antenna Controller
 
-The antenna tracker currently uses an Arduino Uno as a data acquisition module, specifically to gather GPS and altitude information of the antenna tracker. GCOM also constantly receives telemetry packets from Mission Planner. Using this date it is possible to calculate the required movements for the antenna tracker so that it is constantly facing the drone. The software then uses a Zaber controller to move the antenna tracker accordingly.
+The antenna tracker currently uses an Arduino Uno as a data acquisition module, specifically to gather GPS and altitude information of the antenna tracker. GCOM also constantly receives telemetry packets from Mission Planner. Using this data it is possible to calculate the required movements for the antenna tracker so that it is constantly facing the drone. The software then uses a Zaber controller to move the antenna tracker accordingly.
 
 ### Image Fetch & Tag
 
-The image fetcher and tagger basically saves incoming images retrieved from the drone to disc and tags them with GPS coordinates based on telemetry data received from Mission Planner.
+The image fetcher and tagger saves incoming images retrieved from the drone to disc and tags them with GPS coordinates based on telemetry data received from Mission Planner.
 
 ### Drone Command & Control
 
-The Drone Command and Control is GCOM's primary means of communication with the drone's on-board Raspberry Pi. It handles sending commands to the Pi in our own UASMessage format. This module also handles receiving responses from the Pi and signaling and passing on responses to the appropriate listenenrs of these responses.
+The Drone Command and Control is GCOM's primary means of communication with the drone's on-board Raspberry Pi. It handles sending commands to the Pi in our own UASMessage format. This module also handles receiving responses from the Pi and signaling and passing on responses to the appropriate listeners of these responses.
 
 ### Collision Avoidance
 
