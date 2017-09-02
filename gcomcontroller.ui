@@ -512,14 +512,14 @@
              <item row="0" column="1">
               <widget class="QLineEdit" name="antennaTrackerOverrideLatitudeField">
                <property name="text">
-                <string>0</string>
+                <string>49.2623902</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
               <widget class="QLineEdit" name="antennaTrackerOverrideLongitudeField">
                <property name="text">
-                <string>0</string>
+                <string>-123.2482716</string>
                </property>
               </widget>
              </item>

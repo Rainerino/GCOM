@@ -139,6 +139,9 @@ private:
     bool antennaTrackerConnected;
     bool overrideGPSToggle;
 
+    // Mavlink relay
+    MAVLinkRelay *mavlinkRelay;
+
     std::atomic<bool> sentRequest;
 
 private slots:

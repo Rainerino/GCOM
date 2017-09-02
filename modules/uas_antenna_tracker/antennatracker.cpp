@@ -69,6 +69,9 @@ AntennaTracker::AntennaTracker()
     latBase = 0;
     lonBase = 0;
 
+    // Mavlink Relay
+    mavlinkRelay = new MAVLinkRelay();
+
     sentRequest = false;
 }
 
@@ -171,6 +174,8 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
 {
     QElapsedTimer timer;
     timer.start();
+    this->mavlinkRelay = relay;
+
     // Double check that the conditions required for the connection is correct
     if (arduinoSerial == nullptr)
         return AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED;
@@ -215,7 +220,9 @@ void AntennaTracker::stopTracking()
         return;
 
     // Disconnect the mavlink relay
-    disconnect(this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+    disconnect(this->mavlinkRelay,
+            SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
+            this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
     antennaTrackerConnected = false;
     emit antennaTrackerDisconnected();
 }
