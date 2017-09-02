@@ -17,11 +17,8 @@ To keep the program as sreamlined and optimized as possible, the software uses a
 
 ### Prerequisities
 
+* [Qt](https://www.qt.io/ "Qt's Homepage")
 *	[MAVLink](https://github.com/mavlink/mavlink "MAVLink Git Repo")
-
-### Installing
-
-
 
 ## Modules
 
@@ -57,7 +54,7 @@ The image fetcher and tagger saves incoming images retrieved from the drone to d
 
 ### Drone Command & Control
 
-The Drone Command and Control is GCOM's primary means of communication with the drone's on-board Raspberry Pi. It handles sending commands to the Pi in our own UASMessage format. This module also handles receiving responses from the Pi and signaling and passing on responses to the appropriate listeners of these responses.
+The Drone Command and Control is GCOM's primary means of communication with the drone's on-board Raspberry Pi. It handles sending commands to the Pi in our own message format. This module also handles receiving responses from the Pi and signaling and passing on responses to the appropriate listeners of these responses.
 
 ### Collision Avoidance
 
@@ -71,11 +68,3 @@ The GCOM Controller refers to the GUI for GCOM, besides providing a user-friendl
 *	Drone Command & Control
 
 Upon creation, the controller creates the MAVLink relay, as well as the DCNC. Users of GCOM are then presented with two possible actions.
-
-## Deployment
-
-
-
-## Built With
-
-*	[Qt](https://www.qt.io/ "Qt's Homepage")
