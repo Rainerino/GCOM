@@ -35,7 +35,7 @@
 // Constants
 //===================================================================
 // Strings
-const QString ZABER_DEVICE_NAME = "Microsoft";
+const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
 const QString TEXT_ZABER_NO_CONTROLLER = "NO ZABER CONTROLLER CONNECTED";
 const QString ARDUINO_DEVICE_NAME = "Arduino";
 const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
@@ -91,6 +91,7 @@ AntennaTracker::~AntennaTracker()
 bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
                                  AntennaTrackerSerialDevice devType)
 {
+    qDebug()<<"Bonjour";
     if (antennaTrackerConnected)
         stopTracking();
 
@@ -110,7 +111,11 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
 
 
             if(!arduinoSerial->open(QIODevice::ReadWrite))
+            {
+                qDebug() << "Howdy";
                 return false;
+
+            }
 
             // Initialize arduino serial port
             arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
@@ -122,7 +127,7 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
             connect(arduinoSerial,
                     SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
                     SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
-
+            qDebug() << "Hola";
             success = true;
             break;
 

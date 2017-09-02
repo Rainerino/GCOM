@@ -33,8 +33,8 @@ DCNC::DCNC()
 
 DCNC::~DCNC()
 {
-    stopServer();
-    delete(server);
+    //stopServer();
+    //delete(server);
 }
 
 bool DCNC::startServer(QString address, int port)

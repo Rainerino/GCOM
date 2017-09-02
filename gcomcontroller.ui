@@ -118,7 +118,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="connectionTab">
        <attribute name="title">
@@ -535,24 +535,6 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="imageTaggerTab">
-       <attribute name="title">
-        <string>Image Tagger</string>
-       </attribute>
-       <widget class="QPushButton" name="tagImagesButton">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>30</y>
-          <width>471</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Tag All</string>
-        </property>
-       </widget>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -563,7 +545,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>17</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
