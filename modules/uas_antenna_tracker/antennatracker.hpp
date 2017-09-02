@@ -90,6 +90,12 @@ public:
      */
     void setOverrideGPSToggle(bool toggled);
 
+    /*!
+     * \brief AntennaTracker::getAntennaTrackerConnected returns the tracking state of the antenna tracker
+     * \return true if antenna tracker is tracking, else false
+     */
+    bool getAntennaTrackerConnected();
+
 public slots:
     /*!
      * \brief receiveHandler handles getting serial data from the arduino once a set of

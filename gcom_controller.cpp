@@ -42,6 +42,10 @@ const QString STOP_SERVER_BUTTON_TEXT("Stop Server");
 const QString UNKNOWN_LABEL("Unknown");
 const QString DISCONNECTED_LABEL("Disconnected");
 
+// Antenna Tracker Constants
+const QString START_TRACKING_BUTTON_TEXT("Start Tracking");
+const QString STOP_TRACKING_BUTTON_TEXT("Stop Tracking");
+
 //===================================================================
 // Class Declarations
 //===================================================================
@@ -381,6 +385,7 @@ void GcomController::on_arduinoConnectButton_clicked()
     {
         tracker->disconnectArduino();
         ui->arduinoConnectButton->setText(CONNECT_BUTTON_TEXT);
+        resetOverrideGPSGUI();
     }
 
     updateStartTrackerButton();
@@ -411,6 +416,7 @@ void GcomController::on_zaberConnectButton_clicked()
     {
         tracker->disconnectZaber();
         ui->zaberConnectButton->setText(CONNECT_BUTTON_TEXT);
+        resetOverrideGPSGUI();
     }
 
     updateStartTrackerButton();
@@ -421,39 +427,49 @@ void GcomController::updateStartTrackerButton()
     if ((tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ZABER)
          != AntennaTracker::AntennaTrackerConnectionState::SUCCESS) ||
         (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
-         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS))
+         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)) {
         ui->startTrackButton->setEnabled(false);
-    else
+    }
+    else {
         ui->startTrackButton->setEnabled(true);
+        ui->startTrackButton->setText(START_TRACKING_BUTTON_TEXT);
+    }
 }
 
 void GcomController::on_startTrackButton_clicked()
 {
-    if(ui->antennaTrackerGPSOverrideCheckBox->checkState() == Qt::Checked) {
-        float overrideLonBase = ui->antennaTrackerOverrideLongitudeField->text().toFloat();
-        float overrideLatBase = ui->antennaTrackerOverrideLatitudeField->text().toFloat();
+    if(!tracker->getAntennaTrackerConnected()) {
+        if(ui->antennaTrackerGPSOverrideCheckBox->checkState() == Qt::Checked) {
+            float overrideLonBase = ui->antennaTrackerOverrideLongitudeField->text().toFloat();
+            float overrideLatBase = ui->antennaTrackerOverrideLatitudeField->text().toFloat();
 
-        if(!tracker->setStationPos(overrideLonBase, overrideLatBase)) {
-            qDebug() << "Override GPS failed";
-            return;
+            if(!tracker->setStationPos(overrideLonBase, overrideLatBase)) {
+                qDebug() << "Override GPS failed";
+                return;
+            }
+
+            // when override is successful, disable fields
+            ui->antennaTrackerOverrideLatitudeField->setDisabled(true);
+            ui->antennaTrackerOverrideLongitudeField->setDisabled(true);
+            ui->antennaTrackerGPSOverrideCheckBox->setDisabled(true);
         }
 
-        // when override is successful, disable fields
-        ui->antennaTrackerOverrideLatitudeField->setDisabled(true);
-        ui->antennaTrackerOverrideLongitudeField->setDisabled(true);
-        ui->antennaTrackerGPSOverrideCheckBox->setDisabled(true);
+        AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
+        ui->startTrackButton->setText(STOP_TRACKING_BUTTON_TEXT);
+
+        if(status == AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+            qDebug() << "both devices started";
+        else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED)
+            qDebug() << "arduino not initialized";
+        else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_NOT_OPEN)
+            qDebug() << "arduino not open";
+        else
+            qDebug() << "wrong neighbourhood";
+    } else {
+        tracker->stopTracking();
+        ui->startTrackButton->setText(START_TRACKING_BUTTON_TEXT);
+        resetOverrideGPSGUI();
     }
-
-    AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
-
-    if(status == AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
-        qDebug() << "both devices started";
-    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED)
-        qDebug() << "arduino not initialized";
-    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_NOT_OPEN)
-        qDebug() << "arduino not open";
-    else
-        qDebug() << "wrong neighbourhood";
 }
 
 void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)

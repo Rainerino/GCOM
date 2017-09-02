@@ -486,6 +486,11 @@ void AntennaTracker::setOverrideGPSToggle(bool toggled)
     overrideGPSToggle = toggled;
 }
 
+bool AntennaTracker::getAntennaTrackerConnected()
+{
+   return this->antennaTrackerConnected;
+}
+
 //===================================================================
 // Listing Functions
 //===================================================================
