@@ -1,63 +1,62 @@
-#ifndef UAS_MESSAGE_HPP
-#define UAS_MESSAGE_HPP
+#ifndef UASMESSAGE_HPP
+#define UASMESSAGE_HPP
 
+//===================================================================
+// Includes
+//===================================================================
+// System Includes
+#include <vector>
+#include <cstdint>
 
-/*!
- *
- */
-namespace UasMessage
-{
-
-/*!
- * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
- */
-enum class MeeageIds : uint8_t
-{
-    request         = 0x0A,
-    version         = 0x0B,
-    name            = 0x0C,
-    capabilities    = 0x0D,
-    image           = 0x0E,
-    unspecified     = 0xFF
-};
-
+//===================================================================
+// Public Class Declarations
+//===================================================================
 /*!
  * \brief UASMessage is an interface that any UAS message must inherit inorder to be handled by G-COM or Gremlin
- * \details The UASMessage interface should be subclassed by all message objects regardless of the way they will be transporterd
- *          UASMessage enforces that each implimentation have atleast a way to serialize its contents into a byte array and a way to
- *          reconstruct it using the given array. The array is specified to be a primative array of bytes to ensure portability.
- *          However, for the sake of simplicity on any given platform additional serialize methods that return other array types.
+ * \details The UASMessage interface should be subclassed by all message objects regardless of the way they will be transported
+ *          UASMessage enforces that each implementation at least have a way to serialize its contents into a byte vector and a way to
+ *          reconstruct it using the given array. The vector is specified to be std::vector<uchar> to ensure portability
+ *          However, for the sake of simplicity on any given platform additional serialize methods that return other array types can be included.
  */
 class UASMessage
 {
     public:
-        //Public Methods
-        /*!
-         * \brief Pure virtual constructor that creates a blank message so that it can be programatically built up.
-         */
-        virtual UASMessage()=0;
 
         /*!
-         * \brief Pure virtual constructor designed to initialize a message using a serialized payload
-         * \param [in] messagePayload A pointer to the serialized message's const byte array
-         * \param [in] size The size of the payload array
+         * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
-        virtual UASMessage(const byte* messagePayload, size_t size)=0;
+        enum class MessageID : uint8_t
+        {
+            REQUEST                 = 0x0A,
+            COMMAND                 = 0x0B,
+            RESPONSE                = 0x0C,
+            SYSTEM_INFO             = 0x0D,
+            SYSTEM_CONTROL          = 0x0E,
+            IMAGE_DATA              = 0x0F,
+            CLAW_IMAGE_DATA         = 0x10,
+            DATA_IMU                = 0x11,
+            DATA_GPS                = 0x12,
+            ZEM_COMMAND             = 0x13,
+            MESG_CAPABILITIES       = 0x14,
+            DEBUG                   = 0xFF,
+            UNSPECIFIED             = 0xFF
+        };
 
         /*!
-         * \brief Pure virtual function that serializes the message into a byte array
-         * \param [out] messagePayload A pointer that will point to a newly allocated byte array
-         * \return The size of the array created
-         * \warning The array produced by this method needs to be deleted to avoid memory leaks
+         * \brief ~UASMessage a virtual destructor that must be implemented in order for proper polymorphic behavior
          */
-        virtual int serialize(byte* messagePayload)=0;
+        virtual ~UASMessage(){}
 
         /*!
-         * \brief This function returns the type of the message
-         * \return The type of the enclosed message as a MeeageIds enum value
+         * \brief Pure virtual function that returns the type of the message as a MeesageId
+         * \return The type of the enclosed message as a MeeageId enum value
          */
-        virtual MeeageIds type()=0;
+        virtual MessageID type()=0;
+
+        /*!
+         * \brief Pure virtual function that serializes the message into a unsigned char vector
+         * \return An standard unsigned vector containing the message's serialized contents
+         */
+        virtual std::vector<unsigned char> serialize()=0;
 };
-}
-
 #endif // UAS_MESSAGE_HPP
