@@ -96,6 +96,9 @@ std::shared_ptr<UASMessage> UASMessageSerialFramer::generateMessage()
             return returnMessage;
         }
         break;
+
+        default:
+        break;
     }
 
     return nullptr;

@@ -186,7 +186,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     UASMessage *outgoingMessage = nullptr;
     switch (message->type())
     {
-        case (UASMessage::MessageID::SYSTEM_INFO):
+        case UASMessage::MessageID::SYSTEM_INFO:
         {
             std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
             if (systemInfo->dropped && autoResume)
@@ -201,7 +201,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
                                      systemInfo->dropped);
         }
 
-        case (UASMessage::MessageID::MESG_CAPABILITIES):
+        case UASMessage::MessageID::MESG_CAPABILITIES:
         {
             std::shared_ptr<CapabilitiesMessage> systemCapabilities =
                     std::static_pointer_cast<CapabilitiesMessage>(message);
@@ -209,7 +209,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             break;
         }
 
-        case (UASMessage::MessageID::RESPONSE):
+        case UASMessage::MessageID::RESPONSE:
         {
             std::shared_ptr<ResponseMessage> response =
                     std::static_pointer_cast<ResponseMessage>(message);
@@ -218,12 +218,15 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             break;
         }
 
-        case (UASMessage::MessageID::IMAGE_DATA):
+        case UASMessage::MessageID::IMAGE_DATA:
         {
             std::shared_ptr<ImageTaggerMessage> image =
                     std::static_pointer_cast<ImageTaggerMessage>(message);
             emit receivedImageData(image);
         }
+
+        default:
+            outgoingMessage = nullptr;
     }
 
     if (outgoingMessage == nullptr)
@@ -250,6 +253,9 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
             else
                  droppedConnection();
         }
+        break;
+
+        default:
         break;
     }
 
