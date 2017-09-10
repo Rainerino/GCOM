@@ -18,7 +18,7 @@
 /*!
  * \brief The AntennaTracker class
  */
-class AntennaTracker : QObject
+class AntennaTracker : public QObject
 {
     Q_OBJECT
 
@@ -107,6 +107,7 @@ public slots:
 signals:
     void antennaTrackerDeviceDisconnected(AntennaTrackerSerialDevice device);
     void antennaTrackerDisconnected();
+    void antennaTrackerPositionUpdate(float latitude, float longitude);
 
 private:
     /*!

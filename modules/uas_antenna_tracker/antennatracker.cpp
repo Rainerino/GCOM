@@ -99,7 +99,6 @@ AntennaTracker::~AntennaTracker()
 bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
                                  AntennaTrackerSerialDevice devType)
 {
-    qDebug()<<"Bonjour";
     if (antennaTrackerConnected)
         stopTracking();
 
@@ -116,14 +115,8 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
             if (arduinoSerial->isOpen())
                 disconnectArduino();
 
-
-
             if(!arduinoSerial->open(QIODevice::ReadWrite))
-            {
-                qDebug() << "Howdy";
                 return false;
-
-            }
 
             // Initialize arduino serial port
             arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
@@ -135,7 +128,6 @@ bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
             connect(arduinoSerial,
                     SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
                     SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
-            qDebug() << "Hola";
             success = true;
             break;
 
@@ -211,6 +203,8 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
             this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
 
     antennaTrackerConnected = true;
+
+    emit antennaTrackerPositionUpdate(qRadiansToDegrees(latBase), qRadiansToDegrees(lonBase));
     return AntennaTrackerConnectionState::SUCCESS;
 }
 
@@ -306,8 +300,7 @@ void AntennaTracker::zaberControllerDisconnected(QSerialPort::SerialPortError er
 
 void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_t> droneGPSData)
 {
-    qDebug() << "Mavlink signal consumed!!!!!!" << endl;
-
+    qDebug() << "Mavlink signal consumed!" << endl;
 
     RequestMessage imuRequest(UASMessage::MessageID::DATA_IMU);
     arduinoFramer->frameMessage(imuRequest);
@@ -451,7 +444,6 @@ bool AntennaTracker::retrieveStationPos()
         arduinoSerial->waitForReadyRead(10);
     }
     arduinoDataStream->commitTransaction();
-    // qDebug() << timer.elapsed();
 
     // Process the GPS Coordinates of the base station!
     std::shared_ptr<UASMessage> gpsMessage = arduinoFramer->generateMessage();

@@ -95,6 +95,10 @@ GcomController::GcomController(QWidget *parent) :
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
+    connect(tracker,
+            SIGNAL(antennaTrackerPositionUpdate(float,float)),
+            this,
+            SLOT(antennaTrackerPositionInterface(float,float)));
 }
 
 GcomController::~GcomController()
@@ -365,21 +369,16 @@ void GcomController::on_arduinoRefreshButton_clicked()
 
 void GcomController::on_arduinoConnectButton_clicked()
 {
-    qDebug() << "hello";
     if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
             != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
     {
-        qDebug() << "hi";
         QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
         bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
                              AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
         if (status)
-        {
             ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);
-            qDebug() << "Hey";
-        }
     }
     else
     {
@@ -439,6 +438,7 @@ void GcomController::updateStartTrackerButton()
 void GcomController::on_startTrackButton_clicked()
 {
     if(!tracker->getAntennaTrackerConnected()) {
+        // checks if the GPS override is enabled
         if(ui->antennaTrackerGPSOverrideCheckBox->checkState() == Qt::Checked) {
             float overrideLonBase = ui->antennaTrackerOverrideLongitudeField->text().toFloat();
             float overrideLatBase = ui->antennaTrackerOverrideLatitudeField->text().toFloat();
@@ -482,6 +482,13 @@ void GcomController::resetOverrideGPSGUI()
     ui->antennaTrackerOverrideLatitudeField->setDisabled(false);
     ui->antennaTrackerOverrideLongitudeField->setDisabled(false);
     ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
+}
+
+void GcomController::antennaTrackerPositionInterface(float latitude, float longitude)
+{
+    // updates the GUI with the set latitude and longitude of the tracking station
+    ui->antennaTrackerCurrentLongitudeField->setText(QString::number(latitude));
+    ui->antennaTrackerCurrentLatitudeField->setText(QString::number(longitude));
 }
 
 //===================================================================

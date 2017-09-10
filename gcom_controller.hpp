@@ -58,6 +58,7 @@ private slots:
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
     void on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked);
+    void antennaTrackerPositionInterface(float latitude, float longitude);
 
 private:
     // Private Member Variables
