@@ -25,8 +25,8 @@ class ResponseMessage : public UASMessage
         enum class ResponseCodes : uint8_t
         {
             NO_ERROR         =   0x00,
-            INVALID_COMMAD   =   0x02,
-            INVALID_REQUEST  =   0x03
+            INVALID_COMMAD   =   0x01,
+            INVALID_REQUEST  =   0x02
         };
 
         /*!
@@ -40,25 +40,12 @@ class ResponseMessage : public UASMessage
          * \brief RequestMessage constructor designed to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        ResponseMessage(const std::vector<unsigned char> &serializedMessage);
+        ResponseMessage(const std::vector<uint8_t> &serializedMessage);
 
         /*!
          * \brief ~ResponseMessage destroys the message and frees all internally allocated memory
          */
         ~ResponseMessage();
-
-        /*!
-         * \brief command, returns the command that this response is targeted towards
-         * \return A Commands enum value representing the command that the response
-         *         is targeted towards
-         */
-        CommandMessage::Commands command();
-
-        /*!
-         * \brief responseCode, returns the response code
-         * \return A ResponseCodes enum value representing the response to a command
-         */
-        ResponseCodes responseCode();
 
         /*!
          * \brief type returns the type of the message as a MeesageId
@@ -70,11 +57,16 @@ class ResponseMessage : public UASMessage
          * \brief serialize serializes the message into a unsigned char vector
          * \return An standard unsigned vector containing the message's serialized contents
          */
-        std::vector<unsigned char> serialize();
+        std::vector<uint8_t> serialize();
 
-    private:
-        // Private member variable
-        CommandMessage::Commands responseCommand;
+        /*!
+         * \brief command, returns the command that this response is targeted towards
+         */
+        CommandMessage::Commands command;
+
+        /*!
+         * \brief response, returns the response code
+         */
         ResponseCodes response;
 };
 

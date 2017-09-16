@@ -6,47 +6,40 @@
 #include <algorithm>
 #include <iterator>
 // GCOM Includes
-#include "modules/uas_message/image_tagger_message.hpp"
+#include "modules/uas_message/image_message.hpp"
 #include "modules/uas_message/uas_message.hpp"
 
 //===================================================================
 // Class Definitions
 //===================================================================
-ImageTaggerMessage::ImageTaggerMessage(unsigned char sequenceNumber,
-                                       unsigned char imageData[], size_t dataSize)
+ImageMessage::ImageMessage(uint8_t sequenceNumber,
+                           uint8_t* imageData, size_t dataSize)
 {
     this->sequenceNumber = sequenceNumber;
     this->imageData.assign(imageData, imageData + dataSize / sizeof(char));
 }
 
-ImageTaggerMessage::ImageTaggerMessage(const std::vector<unsigned char> &serializedMessage)
+ImageMessage::ImageMessage(const std::vector<uint8_t> &serializedMessage)
 {
-    sequenceNumber = static_cast<unsigned char>(serializedMessage.front());
+    sequenceNumber = serializedMessage.front();
     imageData.assign(serializedMessage.begin() + 1, serializedMessage.end());
 }
 
-ImageTaggerMessage::~ImageTaggerMessage() { }
-
-UASMessage::MessageID ImageTaggerMessage::type()
+ImageMessage::~ImageMessage()
 {
-    return MessageID::IMAGE_DATA;
+
 }
 
-std::vector<unsigned char> ImageTaggerMessage::serialize()
+UASMessage::MessageID ImageMessage::type()
 {
-    std::vector<unsigned char> serializedMessage;
+    return MessageID::DATA_IMAGE;
+}
+
+std::vector<uint8_t> ImageMessage::serialize()
+{
+    std::vector<uint8_t> serializedMessage;
     serializedMessage.push_back(sequenceNumber);
     serializedMessage.insert(std::end(serializedMessage),
                              std::begin(imageData), std::end(imageData));
     return serializedMessage;
-}
-
-unsigned char ImageTaggerMessage::getSequenceNumber()
-{
-    return sequenceNumber;
-}
-
-std::vector<unsigned char> ImageTaggerMessage::getImageData()
-{
-    return imageData;
 }

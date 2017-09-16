@@ -106,7 +106,7 @@ void DCNC::handleClientConection()
 
     // Send system info request
     // TODO: that the message is successfully sent
-    RequestMessage request(UASMessage::MessageID::SYSTEM_INFO);
+    RequestMessage request(UASMessage::MessageID::DATA_SYSTEM_INFO);
     messageFramer.frameMessage(request);
     connectionDataStream << messageFramer;
 
@@ -186,7 +186,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     UASMessage *outgoingMessage = nullptr;
     switch (message->type())
     {
-        case UASMessage::MessageID::SYSTEM_INFO:
+        case UASMessage::MessageID::DATA_SYSTEM_INFO:
         {
             std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
             if (systemInfo->dropped && autoResume)
@@ -194,18 +194,18 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             else if (systemInfo->dropped)
                 outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
             else
-                outgoingMessage = new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+                outgoingMessage = new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
             break;
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
         }
 
-        case UASMessage::MessageID::MESG_CAPABILITIES:
+        case UASMessage::MessageID::DATA_CAPABILITIES:
         {
             std::shared_ptr<CapabilitiesMessage> systemCapabilities =
                     std::static_pointer_cast<CapabilitiesMessage>(message);
-            emit receivedGremlinCapabilities(systemCapabilities->getCapabilities());
+            emit receivedGremlinCapabilities(systemCapabilities->capabilities);
             break;
         }
 
@@ -213,15 +213,15 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         {
             std::shared_ptr<ResponseMessage> response =
                     std::static_pointer_cast<ResponseMessage>(message);
-            outgoingMessage = handleResponse(response->command(), response->responseCode());
-            emit receivedGremlinResponse(response->command(), response->responseCode());
+            outgoingMessage = handleResponse(response->command, response->response);
+            emit receivedGremlinResponse(response->command, response->response);
             break;
         }
 
-        case UASMessage::MessageID::IMAGE_DATA:
+        case UASMessage::MessageID::DATA_IMAGE:
         {
-            std::shared_ptr<ImageTaggerMessage> image =
-                    std::static_pointer_cast<ImageTaggerMessage>(message);
+            std::shared_ptr<ImageMessage> image =
+                    std::static_pointer_cast<ImageMessage>(message);
             emit receivedImageData(image);
         }
 
@@ -249,7 +249,7 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
         case CommandMessage::Commands::SYSTEM_RESUME:
         {
             if (responses == ResponseMessage::ResponseCodes::NO_ERROR)
-                return new RequestMessage(UASMessage::MessageID::MESG_CAPABILITIES);
+                return new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
             else
                  droppedConnection();
         }

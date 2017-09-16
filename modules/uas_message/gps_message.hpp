@@ -11,13 +11,13 @@
 
 class GPSMessage : public UASMessage
 {
-public:
-    GPSMessage(const std::vector<unsigned char> &serializedMessage);
-    MessageID type();
-    std::vector<unsigned char> serialize();
-    // Public Member Variables
-    float lat;
-    float lon;
+    public:
+        GPSMessage(const std::vector<uint8_t> &serializedMessage);
+        MessageID type();
+        std::vector<uint8_t> serialize();
+        // Public Member Variables
+        float lat;
+        float lon;
 };
 
 #endif // GPS_MESSAGE_HPP

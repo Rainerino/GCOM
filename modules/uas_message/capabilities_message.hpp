@@ -55,9 +55,8 @@ class CapabilitiesMessage : public UASMessage
         /*!
          * \brief getCapabilities returns the capabilities reported by the drone
          * \note  These can be several |ed capabilites.
-         * \return The drone's capabilities
          */
-        Capabilities getCapabilities();
+         Capabilities capabilities;
 
         /*!
          * \brief type returns the type of the message as a MeesageId
@@ -69,11 +68,8 @@ class CapabilitiesMessage : public UASMessage
          * \brief serialize serializes the message into a unsigned char vector
          * \return An standard unsigned vector containing the message's serialized contents
          */
-        std::vector<unsigned char> serialize();
+        std::vector<uint8_t> serialize();
 
-    private:
-        // Private Member Vriable
-        Capabilities capabilities;
 };
 
 //===================================================================

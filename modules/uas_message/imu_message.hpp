@@ -11,15 +11,17 @@
 
 class IMUMessage : public UASMessage
 {
-public:
-    IMUMessage(const std::vector<unsigned char> &serializedMessage);
-    MessageID type();
-    std::vector<unsigned char> serialize();
+    public:
 
-    // Public Member Variables
-    float x;
-    float y;
-    float z;
+        IMUMessage(const std::vector<uint8_t> &serializedMessage);
+        MessageID type();
+        std::vector<uint8_t> serialize();
+
+
+        // Public Member Variables
+        float x;
+        float y;
+        float z;
 };
 
 #endif // IMU_MESSAGE_HPP

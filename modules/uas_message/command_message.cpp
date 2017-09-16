@@ -15,7 +15,7 @@ CommandMessage::CommandMessage(Commands command)
     this->command = command;
 }
 
-CommandMessage::CommandMessage(const std::vector<unsigned char> &serializedMessage)
+CommandMessage::CommandMessage(const std::vector<uint8_t> &serializedMessage)
 {
     command = static_cast<Commands>(serializedMessage.front());
 }
@@ -25,17 +25,12 @@ CommandMessage::~CommandMessage()
 
 }
 
-CommandMessage::Commands CommandMessage::commandType()
-{
-    return command;
-}
-
 UASMessage::MessageID CommandMessage::type()
 {
     return MessageID::COMMAND;
 }
 
-std::vector<unsigned char> CommandMessage::serialize()
+std::vector<uint8_t> CommandMessage::serialize()
 {
     std::vector<unsigned char> serializedMessage;
     serializedMessage.push_back(static_cast<unsigned char>(command));

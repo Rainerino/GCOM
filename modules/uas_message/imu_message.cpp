@@ -18,7 +18,7 @@
 //===================================================================
 const int SIZE_FIELD_X_Y_Z = 4;
 
-IMUMessage::IMUMessage(const std::vector<unsigned char> &serializedMessage)
+IMUMessage::IMUMessage(const std::vector<uint8_t> &serializedMessage)
 {
     // Reconstruct the latitude and longitude
     int32_t packedX = 0;
@@ -41,9 +41,9 @@ UASMessage::MessageID IMUMessage::type()
     return UASMessage::MessageID::DATA_IMU;
 }
 
-std::vector<unsigned char> IMUMessage::serialize()
+std::vector<uint8_t> IMUMessage::serialize()
 {
-    std::vector<unsigned char> serializedMessage;
+    std::vector<uint8_t> serializedMessage;
     // TODO: FIX THIS!!
     return serializedMessage;
 }

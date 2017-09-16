@@ -13,24 +13,19 @@ CapabilitiesMessage::CapabilitiesMessage(const std::vector<unsigned char> &seria
     this->capabilities = static_cast<CapabilitiesMessage::Capabilities>(serializedCapabilities);
 }
 
+UASMessage::MessageID CapabilitiesMessage::type()
+{
+    return  UASMessage::MessageID::DATA_IMAGE;
+}
+
 CapabilitiesMessage::~CapabilitiesMessage()
 {
 
 }
 
-CapabilitiesMessage::Capabilities CapabilitiesMessage::getCapabilities()
+std::vector<uint8_t> CapabilitiesMessage::serialize()
 {
-    return this->capabilities;
-}
-
-UASMessage::MessageID CapabilitiesMessage::type()
-{
-    return UASMessage::MessageID::MESG_CAPABILITIES;
-}
-
-std::vector<unsigned char> CapabilitiesMessage::serialize()
-{
-    std::vector<unsigned char> serializedMessage;
+    std::vector<uint8_t> serializedMessage;
     serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 24) & 0xFF);
     serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 16) & 0xFF);
     serializedMessage.push_back(static_cast<uint8_t>(capabilities >> 8) & 0xFF);
