@@ -95,6 +95,7 @@ GcomController::GcomController(QWidget *parent) :
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
+    ui->startTrackButton->setEnabled(false);
     connect(tracker,
             SIGNAL(antennaTrackerPositionUpdate(float,float)),
             this,

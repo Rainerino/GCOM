@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>910</width>
-    <height>539</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -513,7 +513,7 @@
                 <rect>
                  <x>10</x>
                  <y>40</y>
-                 <width>81</width>
+                 <width>91</width>
                  <height>31</height>
                 </rect>
                </property>
@@ -552,7 +552,7 @@
                 <rect>
                  <x>10</x>
                  <y>70</y>
-                 <width>81</width>
+                 <width>91</width>
                  <height>16</height>
                 </rect>
                </property>
@@ -575,8 +575,6 @@
               </widget>
               <zorder>antennaTrackerCurrentLatitudeField</zorder>
               <zorder>antennaTrackerCurrentLongitudeField</zorder>
-              <zorder>antennaTrackerGPSOverrideGroup</zorder>
-              <zorder>antennaTrackerGPSOverrideGroup</zorder>
               <zorder>antennaTrackerCurrentLongitudeLabel</zorder>
               <zorder>antennaTrackerCurrentLatitudeLabel</zorder>
               <zorder>antennaTrackerCurrentElevationLabel</zorder>
@@ -650,7 +648,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>17</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
