@@ -29,6 +29,7 @@ const QString CONNECTED_LABEL("<font color='#05c400'> CONNECTED </font>"
 const QString SEARCHING_LABEL("<font color='#EED202'> SEARCHING </font>"
                                "<img src=':/connection/connecting.png'>");
 const QRegExp IP_REGEX("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
+const QRegExp LATLON_REGEX("^-?[0-9]*\\.[0-9]*$");
 
 // MAVLink Constants
 const QString CONNECT_BUTTON_TEXT("Connect");
@@ -60,6 +61,8 @@ GcomController::GcomController(QWidget *parent) :
     ui->mavlinkIPField->setValidator(new QRegExpValidator(IP_REGEX));
     ui->dcncServerPortField->setValidator(new QIntValidator(0,1000000));
     ui->dcncServerIPField->setValidator(new QRegExpValidator(IP_REGEX));
+    ui->antennaTrackerOverrideLongitudeField->setValidator(new QRegExpValidator(LATLON_REGEX));
+    ui->antennaTrackerOverrideLatitudeField->setValidator(new QRegExpValidator(LATLON_REGEX));
     restMavlinkGUI();
 
     // Mavlink Setup
@@ -488,8 +491,18 @@ void GcomController::resetOverrideGPSGUI()
 void GcomController::antennaTrackerPositionInterface(float latitude, float longitude)
 {
     // updates the GUI with the set latitude and longitude of the tracking station
-    ui->antennaTrackerCurrentLongitudeField->setText(QString::number(latitude));
-    ui->antennaTrackerCurrentLatitudeField->setText(QString::number(longitude));
+    ui->antennaTrackerCurrentLongitudeField->setText(QString::number(longitude));
+    ui->antennaTrackerCurrentLatitudeField->setText(QString::number(latitude));
+}
+
+void GcomController::on_antennaTrackerCalibrateNorthButton_clicked()
+{
+    // Calibrate Offset for true North
+}
+
+void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
+{
+    // Calibrate IMU (spin to all maximum directions)
 }
 
 //===================================================================

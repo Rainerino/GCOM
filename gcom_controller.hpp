@@ -60,6 +60,10 @@ private slots:
     void on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked);
     void antennaTrackerPositionInterface(float latitude, float longitude);
 
+    void on_antennaTrackerCalibrateNorthButton_clicked();
+
+    void on_antennaTrackerCalibrateIMUButton_clicked();
+
 private:
     // Private Member Variables
     Ui::GcomController *ui;
