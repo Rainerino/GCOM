@@ -483,9 +483,9 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="antennaTrackerGPSGroupVertical">
+           <layout class="QVBoxLayout" name="antennaTrackerOverrideGroupVertical">
             <item>
-             <widget class="QGroupBox" name="antennaTrackerGPSStatusGroup">
+             <widget class="QGroupBox" name="antennaTrackerCurrentStatusGroup">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -582,22 +582,15 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="antennaTrackerGPSOverrideGroup">
+             <widget class="QGroupBox" name="antennaTrackerOverrideSettingsGroup">
               <property name="title">
-               <string>GPS Override</string>
+               <string>Override Settings</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_3">
                <item row="4" column="0">
                 <widget class="QCheckBox" name="antennaTrackerGPSOverrideCheckBox">
                  <property name="text">
                   <string>Override GPS</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="antennaTrackerOverrideLatitudeField">
-                 <property name="text">
-                  <string>49.2623902</string>
                  </property>
                 </widget>
                </item>
@@ -608,6 +601,20 @@
                  </property>
                 </widget>
                </item>
+               <item row="0" column="2">
+                <widget class="QLineEdit" name="antennaTrackerOverrideLatitudeField">
+                 <property name="text">
+                  <string>49.2623902</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLineEdit" name="antennaTrackerOverrideLongitudeField">
+                 <property name="text">
+                  <string>-123.2482716</string>
+                 </property>
+                </widget>
+               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="antennaTrackerOverrideLongitudeLabel">
                  <property name="text">
@@ -615,10 +622,24 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="antennaTrackerOverrideLongitudeField">
+               <item row="2" column="0">
+                <widget class="QLabel" name="antennaTrackerOverrideElevationLabel">
                  <property name="text">
-                  <string>-123.2482716</string>
+                  <string>Elevation</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLineEdit" name="antennaTrackerOverrideElevationField">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="2">
+                <widget class="QCheckBox" name="antennaTrackerElevationOverrideCheckBox">
+                 <property name="text">
+                  <string>Override Elevation</string>
                  </property>
                 </widget>
                </item>
