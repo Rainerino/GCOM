@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 TARGET = gcom
 TEMPLATE = app
 
-INCLUDEPATH += Mavlink
+INCLUDEPATH += Mavlink auvsi_suas_interop
 
 CONFIG += c++14
 
@@ -30,7 +30,10 @@ SOURCES += main.cpp\
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
-    modules/uas_message/image_message.cpp
+    modules/uas_message/image_message.cpp \
+    modules/uas_interop_system/interop_interface.cpp \
+    modules/uas_interop_system/moving_obstacle.cpp \
+    modules/uas_interop_system/stationary_obstacle.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -49,6 +52,9 @@ HEADERS  += \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
-    modules/uas_message/image_message.hpp
+    modules/uas_message/image_message.hpp \
+    modules/uas_interop_system/interop_interface.hpp \
+    modules/uas_interop_system/moving_obstacle.hpp \
+    modules/uas_interop_system/stationary_obstacle.hpp
 
 FORMS    += gcomcontroller.ui
