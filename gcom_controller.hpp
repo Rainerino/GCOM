@@ -61,7 +61,6 @@ private slots:
     void antennaTrackerPositionInterface(float latitude, float longitude);
 
     void on_antennaTrackerCalibrateNorthButton_clicked();
-
     void on_antennaTrackerCalibrateIMUButton_clicked();
 
 private:

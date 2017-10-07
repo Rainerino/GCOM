@@ -23,7 +23,7 @@ class UASMessage
     public:
 
         /*!
-         * \brief The MeeageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
+         * \brief The MessageIds enum holds all the possible message IDs that UAS's G-COM should be able to handle
          */
         enum class MessageID : uint8_t
         {
@@ -38,6 +38,7 @@ class UASMessage
             DATA_GPS                = 0x12,
             ZEM_COMMAND             = 0x13,
             MESG_CAPABILITIES       = 0x14,
+            DATA_MAG                = 0x15,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };

@@ -8,6 +8,7 @@
 #include "modules/uas_message/request_message.hpp"
 #include "modules/uas_message/gps_message.hpp"
 #include "modules/uas_message/imu_message.hpp"
+#include "modules/uas_message/mag_message.hpp"
 #include "modules/uas_message/uas_message_serial_framer.hpp"
 #include "../Mavlink/ardupilotmega/mavlink.h"
 // QT Includes
@@ -68,6 +69,9 @@ AntennaTracker::AntennaTracker()
     //initialize base coordinates with arbitrary garbage value
     latBase = 0;
     lonBase = 0;
+
+    // initialize base heading
+    heading = 0;
 
     // Mavlink Relay
     mavlinkRelay = new MAVLinkRelay();
@@ -481,6 +485,93 @@ void AntennaTracker::setOverrideGPSToggle(bool toggled)
 bool AntennaTracker::getAntennaTrackerConnected()
 {
    return this->antennaTrackerConnected;
+}
+
+bool AntennaTracker::retrieveStationHeading() {
+    // Create the datastreams and framer
+    arduinoDataStream = new QDataStream(arduinoSerial);
+
+    // Retrieve the base's MAG data
+    RequestMessage magRequest = RequestMessage(UASMessage::MessageID::DATA_MAG);
+    arduinoFramer->frameMessage(magRequest);
+    (*arduinoDataStream) << (*arduinoFramer);
+
+    // Verify the connection
+    if (!arduinoSerial->waitForReadyRead(3000))
+        return false;
+
+    arduinoFramer->clearMessage();
+
+    // Attempt to read the MAG Message from the antenna tracker
+    while (true)
+    {
+        arduinoDataStream->startTransaction();
+        (*arduinoDataStream) >> (*arduinoFramer);
+        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+            break;
+        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
+            arduinoDataStream->rollbackTransaction();
+        else
+            return false;
+        arduinoSerial->waitForReadyRead(10);
+    }
+    arduinoDataStream->commitTransaction();
+
+    // Process the MAG data of the base station!
+    std::shared_ptr<UASMessage> magMessage = arduinoFramer->generateMessage();
+    if ((magMessage == nullptr) || (magMessage->type() != UASMessage::MessageID::DATA_MAG))
+        return false;
+
+    float hx = std::static_pointer_cast<MAGMessage>(magMessage)->x;
+    float hy = std::static_pointer_cast<MAGMessage>(magMessage)->y;
+
+    qDebug() << "hx: " << hx;
+    qDebug() << "hy: " << hy;
+
+    heading = calcHeading(hx, hy);
+    qDebug() << "Heading: " << heading;
+
+    return true;
+}
+
+float AntennaTracker::calcHeading(float hx, float hy) {
+    // ====================================================================
+    // Calculation from: https://aerocontent.honeywell.com/aero/common/documents/myaerospacecatalog-documents/Defense_Brochures-documents/Magnetic__Literature_Application_notes-documents/AN203_Compass_Heading_Using_Magnetometers.pdf
+    // ====================================================================
+
+    float calculatedHeading;
+    // heading in degrees
+    if (hy > 0) {
+        calculatedHeading = 90 - atan(hx/hy)*180/M_PI;
+    } else if (hy < 0) {
+        calculatedHeading = 270 - atan(hx/hy)*180/M_PI;
+    } else if ((hy == 0) && (hx < 0)) {
+        calculatedHeading = 180;
+    } else if ((hy == 0) && (hx > 0)) {
+        calculatedHeading = 0;
+    }
+
+    return calculatedHeading;
+}
+
+bool AntennaTracker::calibrateStationNorth() {
+
+    // make antenna tracker point flat (no z-axis)
+
+
+    // calibrate antenna tracking station's north
+    if(retrieveStationHeading()) {
+        if ((heading >= -1.50) && (heading <= 1.50)) { // do we need to have an offset?
+            // current heading is north, set offsets
+        } else {
+            // calculate horizontal movement to find offset
+        }
+    } else {
+        // unable to retrieve station's heading
+        return false;
+    }
+
+    return true;
 }
 
 //===================================================================

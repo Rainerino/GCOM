@@ -497,7 +497,7 @@ void GcomController::antennaTrackerPositionInterface(float latitude, float longi
 
 void GcomController::on_antennaTrackerCalibrateNorthButton_clicked()
 {
-    // Calibrate Offset for true North
+    tracker->retrieveStationHeading();
 }
 
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()

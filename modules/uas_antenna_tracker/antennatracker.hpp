@@ -96,6 +96,26 @@ public:
      */
     bool getAntennaTrackerConnected();
 
+    /*!
+     * \brief retrieveStationHeading calculates the heading of the antenna station base on the magnetometer data
+     * \return true if heading is sucessfully calculated, else false
+     */
+    bool retrieveStationHeading();
+
+    /*!
+     * \brief calcHeading calculates the antenna tracking station's heading (in degrees)
+     * \param hx x-axis reading from magnetometer
+     * \param hy y-axis reading from magnetometer
+     * \return heading in degrees
+     */
+    float calcHeading(float hx, float hy);
+
+    /*!
+     * \brief calibrateStationNorth points the antenna tracking station to north and sets the offsets for the IMU
+     * \return true if the calibration was successful
+     */
+    bool calibrateStationNorth();
+
 public slots:
     /*!
      * \brief receiveHandler handles getting serial data from the arduino once a set of
@@ -126,7 +146,7 @@ private:
 
     /*!
      * \brief retrieveStationPos sets the actual GPS coordinates of the antenna tracker station.
-     * \return false if the antenna tracker connection state has failed
+     * \return true if the antenna tracker connection state was successful, else false
      */
     bool retrieveStationPos();
 
@@ -141,6 +161,9 @@ private:
     // Base station GPS
     float latBase;
     float lonBase;
+
+    // Base station Heading
+    float heading;
 
     // State Variables
     bool antennaTrackerConnected;

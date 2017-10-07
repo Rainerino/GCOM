@@ -6,6 +6,7 @@
 #include "uas_message.hpp"
 #include "modules/uas_message/gps_message.hpp"
 #include "modules/uas_message/imu_message.hpp"
+#include "modules/uas_message/mag_message.hpp"
 #include "request_message.hpp"
 #include "system_info_message.hpp"
 // Qt Includes
@@ -93,6 +94,12 @@ std::shared_ptr<UASMessage> UASMessageSerialFramer::generateMessage()
         case UASMessage::MessageID::DATA_IMU:
         {
             std::shared_ptr<IMUMessage>returnMessage(new IMUMessage(serializedMessage));
+            return returnMessage;
+        }
+        break;
+        case UASMessage::MessageID::DATA_MAG:
+        {
+            std::shared_ptr<MAGMessage>returnMessage(new MAGMessage(serializedMessage));
             return returnMessage;
         }
         break;
