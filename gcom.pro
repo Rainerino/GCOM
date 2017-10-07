@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
-    modules/uas_message/image_message.cpp
+    modules/uas_message/image_message.cpp \
+    modules/uas_message/mag_message.cpp
     modules/uas_message/mag_message.cpp
 
 HEADERS  += \
@@ -50,7 +51,8 @@ HEADERS  += \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
-    modules/uas_message/image_message.hpp
+    modules/uas_message/image_message.hpp \
+    modules/uas_message/mag_message.hpp
     modules/uas_message/mag_message.hpp
 
 FORMS    += gcomcontroller.ui
