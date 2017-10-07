@@ -8,7 +8,7 @@
 #include "system_info_message.hpp"
 #include "capabilities_message.hpp"
 #include "command_message.hpp"
-#include "image_tagger_message.hpp"
+#include "image_message.hpp"
 #include "response_message.hpp"
 // Qt Includes
 #include <QDataStream>
@@ -89,12 +89,12 @@ std::shared_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
             std::shared_ptr<UASMessage> message(new ResponseMessage(serialMessagePayload));
             return message;
         }
-        case UASMessage::MessageID::SYSTEM_INFO:
+        case UASMessage::MessageID::DATA_SYSTEM_INFO:
         {
             std::shared_ptr<UASMessage> message(new SystemInfoMessage(serialMessagePayload));
             return message;
         }
-        case UASMessage::MessageID::MESG_CAPABILITIES:
+        case UASMessage::MessageID::DATA_CAPABILITIES:
         {
             std::shared_ptr<UASMessage> message(new CapabilitiesMessage(serialMessagePayload));
             return message;
@@ -104,9 +104,9 @@ std::shared_ptr<UASMessage> UASMessageTCPFramer::generateMessage()
             std::shared_ptr<UASMessage> message(new CommandMessage(serialMessagePayload));
             return message;
         }
-        case UASMessage::MessageID::IMAGE_DATA:
+        case UASMessage::MessageID::DATA_IMAGE:
         {
-            std::shared_ptr<UASMessage> message(new ImageTaggerMessage(serialMessagePayload));
+            std::shared_ptr<UASMessage> message(new ImageMessage(serialMessagePayload));
             return message;
         }
         default:

@@ -29,8 +29,8 @@ SOURCES += main.cpp\
     modules/uas_message/uas_message_serial_framer.cpp \
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
-    modules/uas_message/image_tagger_message.cpp \
     modules/uas_message/capabilities_message.cpp \
+    modules/uas_message/image_message.cpp
     modules/uas_message/mag_message.cpp
 
 HEADERS  += \
@@ -44,13 +44,13 @@ HEADERS  += \
     modules/uas_message/uas_message.hpp \
     modules/uas_message/uas_message_tcp_framer.hpp \
     modules/uas_dcnc/dcnc.hpp \
-    modules/uas_message/image_tagger_message.hpp \
     modules/uas_antenna_tracker/antennatracker.hpp \
     modules/uas_message/uas_message_serial_framer.hpp \
     modules/uas_message/request_message.hpp \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
+    modules/uas_message/image_message.hpp
     modules/uas_message/mag_message.hpp
 
 FORMS    += gcomcontroller.ui

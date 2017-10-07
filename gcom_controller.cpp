@@ -284,6 +284,9 @@ void GcomController::on_dcncConnectionButton_clicked()
             resetDCNCGUI();
         }
         break;
+
+        default:
+        break;
     }
 }
 

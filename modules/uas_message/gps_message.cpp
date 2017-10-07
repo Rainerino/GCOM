@@ -24,7 +24,7 @@ const int SIZE_LAT_LON = 4;
 //===================================================================
 // Class Definitions
 //===================================================================
-GPSMessage::GPSMessage(const std::vector<unsigned char> &serializedMessage)
+GPSMessage::GPSMessage(const std::vector<uint8_t> &serializedMessage)
 {
     // TODO Size Check
 
@@ -47,9 +47,9 @@ UASMessage::MessageID GPSMessage::type()
     return UASMessage::MessageID::DATA_GPS;
 }
 
-std::vector<unsigned char> GPSMessage::serialize()
+std::vector<uint8_t> GPSMessage::serialize()
 {
-    std::vector<unsigned char> serializedMessage;
+    std::vector<uint8_t> serializedMessage;
     serializedMessage.resize(SIZE_LAT_LON * 2);
     // Pack the latitude and longitude
     uint32_t packedLat = PACK_LAT_LON(lat);

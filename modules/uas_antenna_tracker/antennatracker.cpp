@@ -288,6 +288,7 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::getDeviceStatus(
 
 void AntennaTracker::arduinoDisconnected(QSerialPort::SerialPortError error)
 {
+    (void) error;
     if (antennaTrackerConnected)
         stopTracking();
 
@@ -296,6 +297,8 @@ void AntennaTracker::arduinoDisconnected(QSerialPort::SerialPortError error)
 
 void AntennaTracker::zaberControllerDisconnected(QSerialPort::SerialPortError error)
 {
+    (void) error;
+
     if (antennaTrackerConnected)
         stopTracking();
 

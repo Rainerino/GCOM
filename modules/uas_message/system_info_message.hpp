@@ -32,7 +32,7 @@ class SystemInfoMessage : public UASMessage
          * \brief SystemInfoMessage constructor designed to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        SystemInfoMessage(const std::vector<unsigned char> &serializedMessage);
+        SystemInfoMessage(const std::vector<uint8_t> &serializedMessage);
 
         /*!
          * \brief ~SystemInfoMessage destroys the message and frees all internally allocated memory
@@ -49,7 +49,7 @@ class SystemInfoMessage : public UASMessage
          * \brief serialize serializes the message into a unsigned char vector
          * \return An standard unsigned vector containing the message's serialized contents
          */
-        std::vector<unsigned char> serialize();
+        std::vector<uint8_t> serialize();
 
         // Member Variables
         std::string  systemId;
