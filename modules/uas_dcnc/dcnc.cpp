@@ -72,12 +72,15 @@ void DCNC::cancelConnection()
                    this, SLOT(handleClientData()));
         disconnect(clientConnection, SIGNAL(disconnected()),
                    this, SLOT(handleClientDisconnected()));
+        //Closes the I/O device for the socket and calls disconnectFromHost() to 
+        //close the socket's connection.
         clientConnection->close();
         clientConnection->deleteLater();
         clientConnection = nullptr;
+        // who will catch this signal 
         emit droppedConnection();
     }
-
+//Resumes accepting new connections
     server->resumeAccepting();
 }
 
@@ -85,12 +88,15 @@ DCNC::DCNCStatus DCNC::status()
 {
     return serverStatus;
 }
-
+//TODO
+//send  infomation message
 void DCNC::handleClientConection()
 {
     // While this connection is established stop accepting more connections
     server->pauseAccepting();
     // Setup the connection socket and the data stream
+    // put clientConnection to connectedState
+    // return a new TCP socket
     clientConnection = server->nextPendingConnection();
     // This is important due to the fact that after a disconnection this will be in an error state.
     connectionDataStream.resetStatus();
@@ -109,8 +115,11 @@ void DCNC::handleClientConection()
     RequestMessage request(UASMessage::MessageID::DATA_SYSTEM_INFO);
     messageFramer.frameMessage(request);
     connectionDataStream << messageFramer;
-
-    emit receivedConnection();
+    //check the << operation send status if send Failure dropped the conncection
+    if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
+        cancelConnection();
+    else
+        emit receivedConnection();
 }
 
 // TODO Link Directly to handleClientDisconnection
