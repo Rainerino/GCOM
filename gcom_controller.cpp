@@ -500,12 +500,13 @@ void GcomController::antennaTrackerPositionInterface(float latitude, float longi
 
 void GcomController::on_antennaTrackerCalibrateNorthButton_clicked()
 {
-    tracker->retrieveStationHeading();
+    tracker->levelVertical();
 }
 
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
     // Calibrate IMU (spin to all maximum directions)
+    tracker->retrieveStationHeading();
 }
 
 //===================================================================

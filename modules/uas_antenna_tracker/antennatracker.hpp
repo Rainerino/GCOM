@@ -116,6 +116,13 @@ public:
      */
     bool calibrateStationNorth();
 
+    /*!
+     * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0
+     * \return true if leveling was successful
+     */
+
+    bool levelVertical();
+
 public slots:
     /*!
      * \brief receiveHandler handles getting serial data from the arduino once a set of

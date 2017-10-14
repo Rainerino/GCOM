@@ -29,7 +29,7 @@
 #define HORIZ_DEGREE_TO_MICROSTEPS 1599.722
 #define HORIZ_ANGLE_TO_MICROSTEPS(x) (x * HORIZ_DEGREE_TO_MICROSTEPS)
 #define VERT_DEGREE_TO_MICROSTEPS 10630.55555555556
-#define VERT_ANGLE_TO_MICROSTEPS(x) (x * HORIZ_DEGREE_TO_MICROSTEPS)
+#define VERT_ANGLE_TO_MICROSTEPS(x) (x * VERT_DEGREE_TO_MICROSTEPS)
 #define UNPACK_LAT_LON(x)  (((float) x)/10000000)
 
 //===================================================================
@@ -557,10 +557,14 @@ float AntennaTracker::calcHeading(float hx, float hy) {
     return calculatedHeading;
 }
 
-bool AntennaTracker::calibrateStationNorth() {
-
-    // make antenna tracker point flat (no z-axis)
-
+bool AntennaTracker::calibrateStationNorth()
+{
+    // level the vertical
+    if(levelVertical()) {
+        qDebug() << "Leveling successful";
+    } else {
+        qDebug() << "Leveling failed (unable to retrieve base pitch)";
+    }
 
     // calibrate antenna tracking station's north
     if(retrieveStationHeading()) {
@@ -576,6 +580,64 @@ bool AntennaTracker::calibrateStationNorth() {
 
     return true;
 }
+
+bool AntennaTracker::levelVertical()
+{
+    // Create the datastreams and framer
+    arduinoDataStream = new QDataStream(arduinoSerial);
+
+    RequestMessage imuRequest(UASMessage::MessageID::DATA_IMU);
+    arduinoFramer->frameMessage(imuRequest);
+    (*arduinoDataStream) << (*arduinoFramer);
+
+    // Wait till we recieve data from the IMU
+    while (true)
+    {
+        arduinoDataStream->startTransaction();
+        (*arduinoDataStream) >> (*arduinoFramer);
+        if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::SUCCESS)
+        {
+            break;
+        }
+        else if (arduinoFramer->status() == UASMessageSerialFramer::SerialFramerStatus::INCOMPLETE_MESSAGE)
+        {
+            arduinoDataStream->rollbackTransaction();
+        }
+        else
+        {
+            arduinoDataStream->commitTransaction();
+            return false;
+        }
+        arduinoSerial->waitForReadyRead(3000);
+    }
+    arduinoDataStream->commitTransaction();
+
+
+    std::shared_ptr<UASMessage> imuMessage = arduinoFramer->generateMessage();
+    if ((imuMessage == nullptr) || (imuMessage->type() != UASMessage::MessageID::DATA_IMU))
+        return false;
+
+    //const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
+    const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
+
+    //qDebug() << "pitchBase: " << pitchBase << endl;
+
+    float vertAngleFlat = pitchBase * -1;
+
+    if(vertAngleFlat > -1 && vertAngleFlat < 1) {
+        // don't move if angle is too small to reduce drifting
+        vertAngleFlat = 0;
+    }
+
+    int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleFlat);
+
+    // send command to zaber
+    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
+    zaberSerial->write(vertZaberCommand.toStdString().c_str());
+
+    return true;
+}
+
 
 //===================================================================
 // Listing Functions
