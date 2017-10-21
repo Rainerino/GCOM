@@ -26,12 +26,13 @@ class ImageTagger : public QObject
 
 public:
     /*!
-     * \brief ImageTagger constructor that takes in the directory name
-     * \param dir QString path of directory
+     * \brief ImageTagger constructor that takes in the directory names for tagged images, untagged images and Tags
+     * \param TaggedDir QString path of directory for tagged images
+     * \param UntaggedDir QString path of directory for untagged images
+     * \param TagsDir QString path of directory for Tags text file
      * \param DCNC pointer to constant data indicating sender of signal
-     * \param MAVLink pointer to const data indicating if image is to be tagged or not
      */
-    ImageTagger(QString dir, const DCNC *sender, const MAVLinkRelay *toBeTagged);
+    ImageTagger(QString taggedDir, QString untaggedDir, QString TagsDir, const DCNC *sender);
 
     /*!
      *  \brief ImageTagger deconstructor
@@ -39,10 +40,20 @@ public:
     ~ImageTagger();
 
     /*!
-     * \brief setupDirectoryPath helper function to setup path name
-     * \param dir QString path of directory
+     * \brief setupTaggedDir helper function to setup path name for tagged images
+     * \param dir QString path of directory for tagged images
      */
-    void setupDirectoryPath(QString dir);
+    bool ImageTagger::setupTaggedDir(QString dir);
+    /*!
+     * \brief setupTaggedDir helper function to setup path name for tagged images
+     * \param dir QString path of directory for tagged images
+     */
+    bool ImageTagger::setupUntaggedDir(QString dir);
+    /*!
+     * \brief setupTaggedDir helper function to setup path name for tagged images
+     * \param dir QString path of directory for tagged images
+     */
+    bool ImageTagger::setupTagsDir(QString dir);
 
     /*!
      * \brief saveImageToDisc helper function that does the saving
@@ -51,31 +62,6 @@ public:
      * \param size size_t the number of bytes to write to the file
      */
     void saveImageToDisc(QString filePath, unsigned char *data, size_t size);
-
-    /*!
-     * \brief tagImage write to image metadata the GPS information
-     * \param filePath QString path to location of image file
-     * \param *tags mavlink_camera_feedback_t pointer to the EXIF tags
-     */
-    void tagImage(QString filePath, mavlink_camera_feedback_t *tags);
-
-    /*!
-     * \brief tagImage function overload for alternative to tagging
-     * \param filePath QString path to location of image file
-     * \param tags QStringList list of EXIF tags
-     */
-    void tagImage(QString filePath, QStringList tags);
-
-    /*!
-     * \brief tagAllImages goes through all images and GPS data and
-     *        tags them based on the EXIF tags (alternative tagging)
-     */
-    void tagAllImages();
-
-    /*!
-     * \brief getPathOfExifTags returns path to text file of EXIF tags
-     */
-    QString getPathOfExifTags();
 signals:
     // Data Signals
     void taggedImage(QString filePath);
@@ -85,19 +71,14 @@ private slots:
      *        the tagged image's file name
      */
     void handleImageMessage(std::shared_ptr<ImageTaggerMessage> message);
-
-    /*!
-     * \brief handleMavlinkRelay copies camera feedback info to private pointer gpsData
-     */
-    void handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t> cameraInfo);
 private:
-    QString pathOfDir;
-    QString pathOfDuplicates;
+    QString pathOfTagged;
+    QString pathOfUntagged;
+    QString pathOfTags;
     int numOfImages;
     int numOfDuplicates;
     int gpsDataAvailable;
     std::vector<unsigned char> seqNumArr;
-    QQueue<mavlink_camera_feedback_t *> gpsData;
 };
 
 #endif // IMAGETAGGER_HPP

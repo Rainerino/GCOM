@@ -17,17 +17,13 @@ const QString JPG = ".jpg";
 //===================================================================
 // Public Class Declaration
 //===================================================================
-ImageTagger::ImageTagger(QString taggedDir, QString untaggedDir, QString TagsDir, const DCNC *sender, const MAVLinkRelay *toBeTagged)
+ImageTagger::ImageTagger(QString taggedDir, QString untaggedDir, QString TagsDir, const DCNC *sender)
 {
     setupTaggedDir(taggedDir);
     setupUntaggedDir(untaggedDir);
     setupTagsDir(TagsDir);
     connect(sender, &DCNC::receivedImageData,
             this, &ImageTagger::handleImageMessage);
-    connect(toBeTagged, &MAVLinkRelay::mavlinkRelayCameraInfo,
-            this, &ImageTagger::handleMavlinkRelay);
-
-    gpsDataAvailable = toBeTagged != NULL ? 1 : 0;
 }
 
 ImageTagger::~ImageTagger() { }
