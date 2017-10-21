@@ -91,6 +91,9 @@ GcomController::GcomController(QWidget *parent) :
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
+
+    // Initially disable claw tab
+    ui->tabWidget->setTabEnabled(2, false);
 }
 
 GcomController::~GcomController()
@@ -222,6 +225,12 @@ void GcomController::resetDCNCGUI()
     ui->dcncStatusMovie->setText(" ");
     // Deactivate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(false);
+
+    // Disable claw tab
+    ui->tabWidget->setTabEnabled(2, false);
+
+    // Clear capabilities field
+    ui->dcncCapabilitiesField->clear();
 }
 
 void GcomController::on_dcncConnectionButton_clicked()
@@ -309,6 +318,7 @@ void GcomController::dcncDisconnected()
 {
     // Update the UI
     ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
+    ui->dcncStatusField->setText(SEARCHING_LABEL);
     ui->dcncConnectionStatusField->setText(DISCONNECT_LABEL);
     // Stop the connection timer
     dcncConnectionTimer->stop();
@@ -319,6 +329,12 @@ void GcomController::dcncDisconnected()
     ui->dcncDropGremlin->setDisabled(false);
     // Start the connection timeout timer.
     dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField->text().toULong() * 1000);
+
+    // Disable claw tab
+    ui->tabWidget->setTabEnabled(2, false);
+
+    // Clear capabilities field
+    ui->dcncCapabilitiesField->clear();
 }
 
 void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool dropped)
@@ -330,11 +346,21 @@ void GcomController::gremlinInfo(QString systemId, uint16_t versionNumber, bool 
 
 void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capabilities)
 {
-    if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::IMAGE_RELAY))
-    {
-        ui->dcncCapabilitiesField->addItem("Image Relay");
-        dcnc->startImageRelay();
-    }
+    // May have several capabilities, so loop through all of them
+    do {
+        if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::IMAGE_RELAY))
+        {
+            ui->dcncCapabilitiesField->addItem("Image Relay");
+            dcnc->startImageRelay();
+        }
+        if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::CLAW))
+        {
+            ui->dcncCapabilitiesField->addItem("Claw");
+            ui->tabWidget->setTabEnabled(2, true);
+        }
+
+        capabilities = capabilities >> 8;
+    } while (static_cast<uint32_t>(capabilities) > 0);
 }
 
 void GcomController::dcncTimerTimeout()

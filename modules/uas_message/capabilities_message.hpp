@@ -28,6 +28,9 @@ class CapabilitiesMessage : public UASMessage
         enum class Capabilities : uint32_t
         {
             IMAGE_RELAY             = 0x01,
+
+            // Test capability
+            CLAW                    = 0x02
         };
 
         //Public Methods
