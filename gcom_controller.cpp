@@ -14,6 +14,8 @@
 #include "ui_gcomcontroller.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_dcnc/dcnc.hpp"
+#include "modules/uas_antenna_tracker/antennatracker.hpp"
+#include "modules/uas_message/uas_message_serial_framer.hpp"
 
 //===================================================================
 // Constants
@@ -69,15 +71,14 @@ GcomController::GcomController(QWidget *parent) :
     mavlinkConnectingMovie = new QMovie (":/connection/mavlink_connecting.gif");
     mavlinkConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
 
-    // DCNC Setup     
+    // DCNC Setup
     dcnc = new DCNC();
     connect(dcnc, SIGNAL(receivedConnection()), this, SLOT(dcncConnected()));
     connect(dcnc, SIGNAL(droppedConnection()), this, SLOT(dcncDisconnected()));
     connect(dcnc, SIGNAL(receivedGremlinInfo(QString,uint16_t,bool)),
             this, SLOT(gremlinInfo(QString,uint16_t,bool)));
-    connect (dcnc, SIGNAL(receivedGremlinCapabilities(CapabilitiesMessage::Capabilities)),
-             this, SLOT(gremlinCapabilities(CapabilitiesMessage::Capabilities)));
-
+    connect(dcnc, SIGNAL(receivedGremlinCapabilities(CapabilitiesMessage::Capabilities)),
+            this, SLOT(gremlinCapabilities(CapabilitiesMessage::Capabilities)));
     dcncConnectingMovie = new QMovie (":/connection/dcnc_connecting.gif");
     dcncConnectedMovie = new QMovie (":/connection/mavlink_connected.gif");
     dcncConnectionTimer = new QTimer();
@@ -87,13 +88,9 @@ GcomController::GcomController(QWidget *parent) :
     connect(ui->dcncServerAutoResume, SIGNAL(clicked(bool)), dcnc, SLOT(changeAutoResume(bool)));
     resetDCNCGUI();
 
-    // Image Tagger Setup
-    imageTagger = new ImageTagger("/Home",dcnc,mavlinkRelay);
-    connect(dcnc, SIGNAL(receivedImageData(std::shared_ptr<ImageTaggerMessage>)),
-            imageTagger, SLOT(handleImageMessage(std::shared_ptr<ImageTaggerMessage>)));
-    connect(mavlinkRelay, SIGNAL(mavlinkRelayCameraInfo(std::shared_ptr<mavlink_camera_feedback_t>)),
-            imageTagger, SLOT(handleMavlinkRelay(std::shared_ptr<mavlink_camera_feedback_t>)));
-
+    // Antenna Tracker Setup
+    tracker = new AntennaTracker();
+    ui->antennaTrackerTab->setDisabled(true);
 }
 
 GcomController::~GcomController()
@@ -103,6 +100,7 @@ GcomController::~GcomController()
     delete mavlinkConnectionTimer;
     delete mavlinkConnectingMovie;
     delete dcnc;
+    delete tracker;
 }
 
 //===================================================================
@@ -162,12 +160,15 @@ void GcomController::mavlinkRelayConnected()
     ui->mavlinkStatusField->setText(CONNECTED_LABEL);
     ui->mavlinkConnectionStatusField->setText(CONNECTED_LABEL);
     ui->mavlinkConnectionButton->setText(DISCONNECT_BUTTON_TEXT);
-    // Stop the connection movie and start the connected movie
+    // Stop the connection movie
+    ui->mavlinkStatusMovie->setText(" ");
     mavlinkConnectingMovie->stop();
     ui->mavlinkStatusMovie->setMovie(mavlinkConnectedMovie);
     mavlinkConnectedMovie->start();
     // Start the timer
     mavlinkConnectionTimer->start(1000);
+    // Enable the antenna tracker
+    ui->antennaTrackerTab->setDisabled(false);
 }
 
 void GcomController::mavlinkRelayDisconnected()
@@ -186,6 +187,8 @@ void GcomController::mavlinkRelayDisconnected()
     mavlinkConnectingMovie->stop();
     // Stop the timer
     mavlinkConnectionTimer->stop();
+    // Stop the tracker if its on
+    ui->antennaTrackerTab->setDisabled(true);
     // Reset the button method
     mavlinkButtonDisconnect = false;
 }
@@ -242,7 +245,6 @@ void GcomController::on_dcncConnectionButton_clicked()
             if (status == false)
                 resetDCNCGUI();
 
-
             // Update UI text to indicate searching
             ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
             ui->dcncStatusField->setText(SEARCHING_LABEL);
@@ -269,6 +271,9 @@ void GcomController::on_dcncConnectionButton_clicked()
             dcnc->stopServer();
             resetDCNCGUI();
         }
+        break;
+
+        default:
         break;
     }
 }
@@ -337,7 +342,6 @@ void GcomController::dcncTimerTimeout()
     ui->dcncConnectionTime->display(formatDuration(++dcncConnectionTime));
 }
 
-
 void GcomController::dcncSearchTimeout()
 {
     if(dcnc->status() == DCNC::DCNCStatus::SEARCHING)
@@ -347,6 +351,98 @@ void GcomController::dcncSearchTimeout()
     }
 }
 
+//===================================================================
+// Antenna Tracker Methods
+//===================================================================
+void GcomController::on_arduinoRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getArduinoList();
+
+    ui->availableArduinoPorts->clear();
+    ui->availableArduinoPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_arduinoConnectButton_clicked()
+{
+    qDebug() << "hello";
+    if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
+            != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+    {
+        qDebug() << "hi";
+        QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
+        QString selectedPort = selectedIndex.data().toString();
+
+        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
+                             AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
+        if (status)
+        {
+            ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);
+            qDebug() << "Hey";
+        }
+    }
+    else
+    {
+        tracker->disconnectArduino();
+        ui->arduinoConnectButton->setText(CONNECT_BUTTON_TEXT);
+    }
+
+    updateStartTrackerButton();
+}
+
+void GcomController::on_zaberRefreshButton_clicked()
+{
+    QList<QString> portList = tracker->getZaberList();
+
+    ui->availableZaberPorts->clear();
+    ui->availableZaberPorts->addItems(QStringList(portList));
+}
+
+void GcomController::on_zaberConnectButton_clicked()
+{
+    if (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ZABER)
+            != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+    {
+        QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
+        QString selectedPort = selectedIndex.data().toString();
+
+        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
+                             AntennaTracker::AntennaTrackerSerialDevice::ZABER);
+        if (status)
+            ui->zaberConnectButton->setText(DISCONNECT_BUTTON_TEXT);
+    }
+    else
+    {
+        tracker->disconnectZaber();
+        ui->zaberConnectButton->setText(CONNECT_BUTTON_TEXT);
+    }
+
+    updateStartTrackerButton();
+}
+
+void GcomController::updateStartTrackerButton()
+{
+    if ((tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ZABER)
+         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS) ||
+        (tracker->getDeviceStatus(AntennaTracker::AntennaTrackerSerialDevice::ARDUINO)
+         != AntennaTracker::AntennaTrackerConnectionState::SUCCESS))
+        ui->startTrackButton->setEnabled(false);
+    else
+        ui->startTrackButton->setEnabled(true);
+}
+
+void GcomController::on_startTrackButton_clicked()
+{
+    AntennaTracker::AntennaTrackerConnectionState status = tracker->startTracking(mavlinkRelay);
+
+    if(status == AntennaTracker::AntennaTrackerConnectionState::SUCCESS)
+        qDebug() << "both devices started";
+    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED)
+        qDebug() << "arduino not initialized";
+    else if(status == AntennaTracker::AntennaTrackerConnectionState::ARDUINO_NOT_OPEN)
+        qDebug() << "arduino not open";
+    else
+        qDebug() << "wrong neighbourhood";
+}
 
 //===================================================================
 // Utility Methods
@@ -360,4 +456,13 @@ QString GcomController::formatDuration(unsigned long seconds)
     minutes = minutes % 60;
 
     return QString("%1:%2:%3").arg(hours).arg(minutes).arg(seconds);
+}
+
+void GcomController::on_tabWidget_tabBarClicked(int index)
+{
+    if (index == 1)
+    {
+        on_arduinoRefreshButton_clicked();
+        on_zaberRefreshButton_clicked();
+    }
 }

@@ -9,6 +9,11 @@
 #include "uas_message.hpp"
 
 //===================================================================
+// Constants
+//===================================================================
+const int SYSTEM_ID_OFFSET = 3;
+
+//===================================================================
 // Class Definitions
 //===================================================================
 SystemInfoMessage::SystemInfoMessage(std::string systemId, uint16_t versionNumber, bool dropped)
@@ -18,12 +23,12 @@ SystemInfoMessage::SystemInfoMessage(std::string systemId, uint16_t versionNumbe
     this->dropped = dropped;
 }
 
-SystemInfoMessage::SystemInfoMessage(const std::vector<unsigned char> &serializedMessage)
+SystemInfoMessage::SystemInfoMessage(const std::vector<uint8_t> &serializedMessage)
 {
 
     versionNumber = (serializedMessage[0] << 8) ||  serializedMessage[1];
     dropped = serializedMessage[2];
-    systemId = std::string(serializedMessage.begin()+3,serializedMessage.end());
+    systemId = std::string(serializedMessage.begin() + SYSTEM_ID_OFFSET,serializedMessage.end());
 
 }
 
@@ -34,12 +39,12 @@ SystemInfoMessage::~SystemInfoMessage()
 
 UASMessage::MessageID SystemInfoMessage::type()
 {
-    return MessageID::SYSTEM_INFO;
+    return MessageID::DATA_SYSTEM_INFO;
 }
 
-std::vector<unsigned char> SystemInfoMessage::serialize()
+std::vector<uint8_t> SystemInfoMessage::serialize()
 {
-    std::vector<unsigned char> serializedMessage;
+    std::vector<uint8_t> serializedMessage;
     serializedMessage.push_back(versionNumber >> 8);
     serializedMessage.push_back(versionNumber & 0xFF);
     serializedMessage.push_back(dropped);

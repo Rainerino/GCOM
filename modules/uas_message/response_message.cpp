@@ -19,13 +19,13 @@ const int RESPONSE_FIELD_INDEX = 1;
 //===================================================================
 ResponseMessage::ResponseMessage(CommandMessage::Commands command, ResponseCodes responseCode)
 {
-    responseCommand = command;
+    this->command = command;
     response = responseCode;
 }
 
-ResponseMessage::ResponseMessage(const std::vector<unsigned char> &serializedMessage)
+ResponseMessage::ResponseMessage(const std::vector<uint8_t> &serializedMessage)
 {
-    responseCommand = static_cast<CommandMessage::Commands>(serializedMessage[COMMAND_FILED_INDEX]);
+    command = static_cast<CommandMessage::Commands>(serializedMessage[COMMAND_FILED_INDEX]);
     response = static_cast<ResponseCodes>(serializedMessage[RESPONSE_FIELD_INDEX]);
 }
 
@@ -39,20 +39,10 @@ UASMessage::MessageID ResponseMessage::type()
     return MessageID::RESPONSE;
 }
 
-CommandMessage::Commands ResponseMessage::command()
+std::vector<uint8_t> ResponseMessage::serialize()
 {
-    return responseCommand;
-}
-
-ResponseMessage::ResponseCodes ResponseMessage::responseCode()
-{
-    return response;
-}
-
-std::vector<unsigned char> ResponseMessage::serialize()
-{
-    std::vector<unsigned char> serializedMessage;
-    serializedMessage.push_back(static_cast<unsigned char>(responseCommand));
-    serializedMessage.push_back(static_cast<unsigned char>(response));
+    std::vector<uint8_t> serializedMessage;
+    serializedMessage.push_back((uint8_t)command);
+    serializedMessage.push_back((uint8_t)command);
     return serializedMessage;
 }

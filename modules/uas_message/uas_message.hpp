@@ -30,11 +30,11 @@ class UASMessage
             REQUEST                 = 0x0A,
             COMMAND                 = 0x0B,
             RESPONSE                = 0x0C,
-            SYSTEM_INFO             = 0x0D,
-            SYSTEM_CONTROL          = 0x0E,
-            IMAGE_DATA              = 0x0F,
-            CLAW_IMAGE_DATA         = 0x10,
-            MESG_CAPABILITIES       = 0x14,
+            DATA_SYSTEM_INFO        = 0x10,
+            DATA_IMU                = 0x11,
+            DATA_GPS                = 0x12,
+            DATA_IMAGE              = 0x13,
+            DATA_CAPABILITIES       = 0x14,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };
@@ -54,6 +54,6 @@ class UASMessage
          * \brief Pure virtual function that serializes the message into a unsigned char vector
          * \return An standard unsigned vector containing the message's serialized contents
          */
-        virtual std::vector<unsigned char> serialize()=0;
+        virtual std::vector<uint8_t> serialize()=0;
 };
 #endif // UAS_MESSAGE_HPP

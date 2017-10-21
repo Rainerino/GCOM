@@ -21,7 +21,7 @@ class CommandMessage : public UASMessage
          * \brief The Commands enum describes all possible commands that can be sent to the Gremlin.
          *        The meanings of the commands can be found in the relavent confluence pages
          */
-        enum class Commands : unsigned char
+        enum class Commands : uint8_t
         {
             SYSTEM_RESET            = 0x01,
             SYSTEM_PAUSE            = 0x02,
@@ -43,18 +43,13 @@ class CommandMessage : public UASMessage
          * \brief CommandMessage constructor designed to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        CommandMessage(const std::vector<unsigned char> &serializedMessage);
+        CommandMessage(const std::vector<uint8_t> &serializedMessage);
 
         /*!
          * \brief ~CommandMessage destroys the message and frees all internally allocated memory
          */
         ~CommandMessage();
 
-        /*!
-         * \brief commandType returns the type of command that was requested
-         * \return The type of command that was requested
-         */
-        Commands commandType();
 
         /*!
          * \brief type returns the type of the message as a MeesageId
@@ -66,10 +61,11 @@ class CommandMessage : public UASMessage
          * \brief serialize serializes the message into a unsigned char vector
          * \return An standard unsigned vector containing the message's serialized contents
          */
-        std::vector<unsigned char> serialize();
+        std::vector<uint8_t> serialize();
 
-    private:
-        // Private Member Vriable
+        /*!
+         * \brief The type of command that was requested
+         */
         Commands command;
 };
 
