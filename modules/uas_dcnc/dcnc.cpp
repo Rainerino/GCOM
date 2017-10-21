@@ -117,7 +117,10 @@ void DCNC::handleClientConection()
     connectionDataStream << messageFramer;
     //check the << operation send status if send Failure dropped the conncection
     if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
-        cancelConnection();
+        //TBD
+        //droppedConnection ->simply send out a signal
+        //or cancel connection  -> bring the server to searching state
+        droppedConnection();
     else
         emit receivedConnection();
 }
@@ -190,6 +193,8 @@ void DCNC::stopImageRelay()
 //===================================================================
 // Receive Handler
 //===================================================================
+//need to double check with the confluence
+//response determine NO_ERROR, INVALID_DATA.....
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
     UASMessage *outgoingMessage = nullptr;
@@ -198,16 +203,11 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         case UASMessage::MessageID::DATA_SYSTEM_INFO:
         {
             std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
-            if (systemInfo->dropped && autoResume)
-                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
-            else if (systemInfo->dropped)
-                outgoingMessage = new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
-            else
-                outgoingMessage = new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
-            break;
+            outgoingMessage =  handleInfo(systemInfo->systemId, systemInfo->dropped,autoResume, &preSysID);
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
+               break;
         }
 
         case UASMessage::MessageID::DATA_CAPABILITIES:
@@ -248,17 +248,25 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     delete outgoingMessage;
 }
 
-
+//need to update?
+//case INVALID_REQUEST
+//case INVALID_COMMAND
 UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
                            ResponseMessage::ResponseCodes responses)
 {
     switch(command)
     {
+        // if reset then ask for the info messgae again
         case CommandMessage::Commands::SYSTEM_RESET:
+        {
+            // simply drop the connection for a reset doesn't depend on the reset
+            droppedConnection();
+        }
+        // return nullptr if resume succeed
         case CommandMessage::Commands::SYSTEM_RESUME:
         {
             if (responses == ResponseMessage::ResponseCodes::NO_ERROR)
-                return new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
+                return nullptr;
             else
                  droppedConnection();
         }
@@ -270,3 +278,21 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
 
     return nullptr;
 }
+
+UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume, std::string* preSysId ){
+    if(*preSysId == systemId && dropped&& autoResume){
+        return new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
+    }
+    else if(dropped && *preSysId == systemId){
+        return new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
+    }
+    else{
+        *preSysId = systemId;
+        return new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
+    }
+}
+
+
+
+
+

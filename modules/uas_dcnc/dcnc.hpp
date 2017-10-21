@@ -150,6 +150,8 @@ private slots:
 
     UASMessage* handleResponse(CommandMessage::Commands command,
                                ResponseMessage::ResponseCodes responses);
+    UASMessage* handleInfo(std::string systemId, bool dropped, bool autoResume, std::string* preSysId);
+
 
 private:
     // Private Member Variables
@@ -163,6 +165,7 @@ private:
     std::unique_ptr<UASMessage> message;
     DCNCStatus serverStatus;
     bool autoResume;
+    std::string preSysID; // store previous id to check when resume
 };
 
 #endif // DCNC_HPP
