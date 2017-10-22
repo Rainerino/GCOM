@@ -1,5 +1,5 @@
-#ifndef __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP
-#define __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP
+#ifndef IMAGE_UNTAGGED_MESSAGE_HPP
+#define IMAGE_UNTAGGED_MESSAGE_HPP
 
 //===================================================================
 // Includes
@@ -20,27 +20,32 @@
  *          serialization method
  *
  */
-class ImageMessage: public UASMessage {
+class ImageUntaggedMessage: public UASMessage {
     public:
         // Public Member Methods
         /*!
-         * \brief ImageMessage constructor
+         * \brief ImageUntaggedMessage constructor
          * \param [in] sequenceNumber a byte indicating the current image
          * \param [in] imageData[] a byte array holding the data of the current image
          * \param [in] dataSize size_t indicating the size of the array
          */
-        ImageMessage(uint8_t sequenceNumber, uint8_t* imageData, size_t dataSize);
+        ImageUntaggedMessage(uint8_t sequenceNumber, uint8_t* imageData, size_t dataSize);
 
         /*!
-         * ~ImageMessage deconstructor
+         * ~ImageUntaggedMessage deconstructor
          */
-        ~ImageMessage();
+        ~ImageUntaggedMessage();
 
         /*!
-         * \brief ImageMessage constructor to initialize a message using a serialized payload
+         * \brief ImageUntaggedMessage constructor to initialize a message using a serialized payload
          * \param [in] serializedMessage a byte vector containing the object's serialized contents
          */
-        ImageMessage(const std::vector<uint8_t> &serializedMessage);
+        ImageUntaggedMessage(const std::vector<uint8_t> &serializedMessage);
+
+        /*!
+         * \brief ImageUntaggedMessage default constructor for ImageTaggedMessage to call
+         */
+        ImageUntaggedMessage();
 
         /*!
          * \brief type returns the type of the message as a MeesageId
@@ -65,4 +70,4 @@ class ImageMessage: public UASMessage {
         std::vector<uint8_t> imageData;
 };
 
-#endif // __UAS_MESSAGE_IMAGE_TAGGER_MESAGE_HPP
+#endif // IMAGE_UNTAGGED_MESSAGE_HPP
