@@ -229,14 +229,6 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         {
             std::shared_ptr<ImageTaggedMessage> image =
                     std::static_pointer_cast<ImageTaggedMessage>(message);
-            ImageTaggedMessage imgObj(*image);
-            qDebug() << "asdf";
-            qDebug() << imgObj.sequenceNumber;
-            qDebug() << imgObj.latitude;
-            qDebug() << imgObj.longitude;
-            for (int i = 0; i < imgObj.imageData.size(); i++) {
-                qDebug() << imgObj.imageData[i];
-            }
             emit receivedImageTaggedData(image);
         }
 

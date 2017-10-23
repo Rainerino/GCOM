@@ -33,7 +33,7 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
          * \param [in] imageData[] a byte array holding the data of the current image
          * \param [in] dataSize size_t indicating the size of the array
          */
-        ImageTaggedMessage(uint8_t sequenceNumber, float latitude, float longitude,
+        ImageTaggedMessage(uint8_t sequenceNumber, double latitude, double longitude,
                            uint8_t* imageData, size_t dataSize);
 
         /*!
@@ -73,7 +73,7 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         /*!
          * \brief latitude returns the latitude of the image
          */
-        float latitude;
+        double latitude;
 
         /*!
          * \brief latitude returns the latitude of the image as a converted uint32_t
@@ -83,7 +83,7 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         /*!
          * \brief longitude returns the longitude of the image
          */
-        float longitude;
+        double longitude;
 
         /*!
          * \brief latitude returns the longitude of the image as a converted uint32_t
