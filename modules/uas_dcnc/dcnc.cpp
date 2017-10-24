@@ -197,6 +197,7 @@ void DCNC::stopImageRelay()
 //response determine NO_ERROR, INVALID_DATA.....
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
+//    preSysID.assign("04");
     UASMessage *outgoingMessage = nullptr;
     switch (message->type())
     {
@@ -280,10 +281,12 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
 }
 
 UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume, std::string* preSysId ){
-    if(*preSysId == systemId && dropped&& autoResume){
+
+    if(systemId.compare(*preSysId)==0 && dropped&& autoResume){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
+
     }
-    else if(dropped && *preSysId == systemId){
+    else if(dropped && systemId.compare(*preSysId)==0){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
     }
     else{
