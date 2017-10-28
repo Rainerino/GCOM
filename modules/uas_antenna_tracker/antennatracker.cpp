@@ -47,12 +47,6 @@ const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 // Zaber Command Templates
 const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
-// Zaber Idle Status
-const QString ZABER_HORIZ_MOTOR_IDLE = "!01 2 IDLE --";
-const QString ZABER_VERT_MOTOR_IDLE = "!01 1 IDLE --";
-// Zaber Busy Status
-const QString ZABER_HORIZ_MOTOR_BUSY = "@01 2 OK BUSY WR 0";
-const QString ZABER_VERT_MOTOR_BUSY = "@01 1 OK BUSY WR 0";
 // Zaber Setup
 const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000";
 // Constant
@@ -356,7 +350,7 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     float moveHorizAngle = calcHorizontal(droneGPSData, yawBase);
 
     // Calculate vertical angle
-    float moveVertAngle = calcVertical (droneGPSData, pitchBase);
+    float moveVertAngle = calcVertical(droneGPSData, pitchBase);
 
     // do tracking
     moveZaber(moveHorizAngle, moveVertAngle);
@@ -597,12 +591,15 @@ bool AntennaTracker::levelVertical()
 
 bool AntennaTracker::calibrateIMU()
 {
-    if(levelVertical()) {
-        moveZaber(90,0);
-        moveZaber(-90,0);
-    } else {
-        return false;
-    }
+//    if(levelVertical()) {
+//        moveZaber(90,0);
+//        moveZaber(-90,0);
+//    } else {
+//        return false;
+//    }
+
+    // send / command
+    // read the line and check for IDLE
     return true;
 }
 
