@@ -20,6 +20,7 @@
  * \details ImageTaggedMessage includes GPS coordinates of the image
  * \details Curent implementation only consists of constructors and
  *          serialization method
+ * \details GPS coordinates as int32_t are converted from doubles by a factor of 1e7
  *
  */
 class ImageTaggedMessage : public ImageUntaggedMessage {
@@ -39,8 +40,8 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         /*!
          * \brief ImageTaggedMessage constructor
          * \param [in] sequenceNumber a byte indicating the current image
-         * \param [in] latitude of the current image as a converted uint32_t
-         * \param [in] longitude of the current image as a converted uint32_t
+         * \param [in] latitude of the current image as a converted int32_t
+         * \param [in] longitude of the current image as a converted int32_t
          * \param [in] imageData[] a byte array holding the data of the current image
          * \param [in] dataSize size_t indicating the size of the array
          */
@@ -71,24 +72,39 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         std::vector<uint8_t> serialize();
 
         /*!
-         * \brief latitude returns the latitude of the image
+         * \brief Returns latitude as int32_t
+         * \return latitude
          */
-        double latitude;
+        int32_t raw_lat();
 
         /*!
-         * \brief latitude returns the latitude of the image as a converted uint32_t
+         * \brief Returns longitude as int32_t
+         * \return longitude
          */
-        int32_t latitudeInt;
+        int32_t raw_lon();
 
         /*!
-         * \brief longitude returns the longitude of the image
+         * \brief Converts latitude to double
+         * \return latitude as a double
          */
-        double longitude;
+        double lat();
 
         /*!
-         * \brief latitude returns the longitude of the image as a converted uint32_t
+         * \brief Returns longitude as double
+         * \return longitude as a double
          */
-        int32_t longitudeInt;
+        double lon();
+
+    private:
+        /*!
+         * \brief latitude of the image
+         */
+        int32_t latitude;
+
+        /*!
+         * \brief longitude of the image
+         */
+        int32_t longitude;
 };
 
 #endif // IMAGE_TAGGED_MESSAGE_HPP

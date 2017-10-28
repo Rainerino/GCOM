@@ -43,11 +43,6 @@ class ImageUntaggedMessage: public UASMessage {
         ImageUntaggedMessage(const std::vector<uint8_t> &serializedMessage);
 
         /*!
-         * \brief ImageUntaggedMessage default constructor for ImageTaggedMessage to call
-         */
-        ImageUntaggedMessage();
-
-        /*!
          * \brief type returns the type of the message as a MeesageId
          * \return The type of the enclosed message as a MeeageId enum value
          */
@@ -68,6 +63,12 @@ class ImageUntaggedMessage: public UASMessage {
          * \brief imageData returns the image data as a byte vector
          */
         std::vector<uint8_t> imageData;
+
+    protected:
+        /*!
+         * \brief ImageUntaggedMessage default constructor for ImageTaggedMessage to call
+         */
+        ImageUntaggedMessage();
 };
 
 #endif // IMAGE_UNTAGGED_MESSAGE_HPP

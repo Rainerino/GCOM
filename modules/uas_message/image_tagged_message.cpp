@@ -20,7 +20,6 @@
 const int SIZE_LAT_LON = 4;
 const int COORD_OFFSET = 1;
 const int IMAGE_DATA_OFFSET = COORD_OFFSET + SIZE_LAT_LON * 2;
-const int LAT_INVALID = 100;
 const int LAT_RANGE = 90;
 const int LON_RANGE = 180;
 
@@ -31,20 +30,16 @@ ImageTaggedMessage::ImageTaggedMessage(uint8_t sequenceNumber, double latitude,
                            double longitude, uint8_t* imageData, size_t dataSize) :
                            ImageUntaggedMessage(sequenceNumber, imageData, dataSize)
 {
-    this->latitude = latitude;
-    this->longitude = longitude;
+    this->latitude = PACK_LAT_LON(latitude);
+    this->longitude = PACK_LAT_LON(longitude);
 }
 
 ImageTaggedMessage::ImageTaggedMessage(uint8_t sequenceNumber, int32_t latitude,
                            int32_t longitude, uint8_t* imageData, size_t dataSize) :
                            ImageUntaggedMessage(sequenceNumber, imageData, dataSize)
 {
-    this->latitudeInt = latitude;
-    this->longitudeInt = longitude;
-
-    // Set an invalid value for the double latitude if latitude has been converted already, to distinguish for serialize()
-    // Latitude has to be between -90 and 90 and Longitude has to be between -180 and 180
-    this->latitude = LAT_INVALID;
+    this->latitude = latitude;
+    this->longitude = longitude;
 }
 
 ImageTaggedMessage::ImageTaggedMessage(const std::vector<uint8_t> &serializedMessage)
@@ -66,11 +61,9 @@ ImageTaggedMessage::ImageTaggedMessage(const std::vector<uint8_t> &serializedMes
         packedLon |= (serializedCoords[SIZE_LAT_LON + byte_index] << (8*(SIZE_LAT_LON - byte_index - 1)));
     }
 
-    // Convert values back by shifting values back and converting to doubles
-    latitude = UNPACK_LAT_LON(packedLat);
-    longitude = UNPACK_LAT_LON(packedLon);
-    latitude -= LAT_RANGE;
-    longitude -= LON_RANGE;
+    // Convert values back by shifting values back
+    latitude = packedLat - PACK_LAT_LON(LAT_RANGE);
+    longitude = packedLon - PACK_LAT_LON(LON_RANGE);
 
     imageData.assign(serializedMessage.begin() + IMAGE_DATA_OFFSET, serializedMessage.end());
 }
@@ -92,16 +85,9 @@ std::vector<uint8_t> ImageTaggedMessage::serialize()
     uint32_t packedLat;
     uint32_t packedLon;
 
-    // Pack the latitude and longitude if they are doubles
-    if (latitude != LAT_INVALID) {
-        packedLat = round(PACK_LAT_LON((latitude + LAT_RANGE)));
-        packedLon = round(PACK_LAT_LON((longitude + LON_RANGE)));
-    }
-    // Skip if they are ints
-    else {
-        packedLat = latitudeInt + PACK_LAT_LON(LAT_RANGE);
-        packedLon = longitudeInt + PACK_LAT_LON(LON_RANGE);
-    }
+    // Pack coordinates by shifting values so they are unsigned
+    packedLat = latitude + PACK_LAT_LON(LAT_RANGE);
+    packedLon = longitude + PACK_LAT_LON(LON_RANGE);
 
     // Serialize the coordinates
     std::vector<uint8_t> serializedCoords;
@@ -118,4 +104,24 @@ std::vector<uint8_t> ImageTaggedMessage::serialize()
                              std::begin(serializedCoords), std::end(serializedCoords));
 
     return serializedMessage;
+}
+
+//===================================================================
+// Coordinate Methods
+//===================================================================
+
+int32_t ImageTaggedMessage::raw_lat() {
+    return latitude;
+}
+
+int32_t ImageTaggedMessage::raw_lon() {
+    return longitude;
+}
+
+double ImageTaggedMessage::lat() {
+    return UNPACK_LAT_LON(latitude);
+}
+
+double ImageTaggedMessage::lon() {
+    return UNPACK_LAT_LON(longitude);
 }
