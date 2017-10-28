@@ -352,18 +352,17 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
     const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
 
-    // Do horizontal tracking.
-    QString horzZaberCommand = calcHorizontal(droneGPSData, yawBase);
-    zaberSerial->write(horzZaberCommand.toStdString().c_str());
+    // Calculate horizontal angle
+    float moveHorizAngle = calcHorizontal(droneGPSData, yawBase);
 
-    // Do vertical tracking.
-    QString vertZaberCommand = calcVertical (droneGPSData, pitchBase);
-    zaberSerial->write(vertZaberCommand.toStdString().c_str());
+    // Calculate vertical angle
+    float moveVertAngle = calcVertical (droneGPSData, pitchBase);
 
-    zaberSerial->flush();
+    // do tracking
+    moveZaber(moveHorizAngle, moveVertAngle);
 }
 
-QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU)
+float AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU)
 {
     // ====================================================================
     // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
@@ -394,12 +393,10 @@ QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_i
         horzAngleDiff = 0;
     }
 
-    const int microSteps = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horzAngleDiff);
-
-    return QString(zaberMoveCommandTemplate).arg(2).arg(microSteps);
+    return horzAngleDiff;
 }
 
-QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float pitchIMU)
+float AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float pitchIMU)
 {
     // ====================================================================
     // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
@@ -426,9 +423,7 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
         vertAngleDiff = 0;
     }
 
-    int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff);
-
-    return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
+    return vertAngleDiff;
 }
 
 bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)

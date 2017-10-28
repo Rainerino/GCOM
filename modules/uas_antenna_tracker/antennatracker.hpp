@@ -148,14 +148,14 @@ private:
      * The calculation is based on positional data form the drone.
      * \return command in the form of a string
      */
-    QString calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU);
+    float calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> gpsData, float yawIMU);
 
     /*!
      * \brief calcVertical returns a string command indicating the vertical movement required to point at the drone.
      * The calculation is based on positional data form the drone.
      * \return command in the form of a string
      */
-    QString calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
+    float calcVertical(std::shared_ptr<mavlink_global_position_int_t> gpsData, float pitchIMU);
 
     /*!
      * \brief retrieveStationPos sets the actual GPS coordinates of the antenna tracker station.
