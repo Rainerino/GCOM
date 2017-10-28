@@ -97,24 +97,10 @@ public:
     bool getAntennaTrackerConnected();
 
     /*!
-     * \brief retrieveStationHeading calculates the heading of the antenna station base on the magnetometer data
-     * \return true if heading is sucessfully calculated, else false
+     * \brief overrideStationHeading overrides the stations heading with the user defined value
+     * \return true if the override was successful
      */
-    bool retrieveStationHeading();
-
-    /*!
-     * \brief calcHeading calculates the antenna tracking station's heading (in degrees)
-     * \param hx x-axis reading from magnetometer
-     * \param hy y-axis reading from magnetometer
-     * \return heading in degrees
-     */
-    float calcHeading(float hx, float hy);
-
-    /*!
-     * \brief calibrateStationNorth points the antenna tracking station to north and sets the offsets for the IMU
-     * \return true if the calibration was successful
-     */
-    bool calibrateStationNorth();
+    bool overrideStationHeading(int16_t heading);
 
     /*!
      * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0
