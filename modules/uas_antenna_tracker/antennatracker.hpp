@@ -120,8 +120,22 @@ public:
      * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0
      * \return true if leveling was successful
      */
-
     bool levelVertical();
+
+    /*!
+     * \brief calibrateIMU rotates the antenna tracker and maximizes the IMU readings
+     * \return true if calibration was successful, else false
+     */
+    bool calibrateIMU();
+
+    /*!
+     * \brief moveZaber recieves a horizontal and vertical angle, calculates the motor steps and then sends the
+     * command to the Zaber Controller.
+     * \param horizAngle is the angle to move the horizontal motor.
+     * \param vertAngle is the angle to move the vertical motor.
+     * \return true if movement command was successful, else false
+     */
+    bool moveZaber(int16_t horizAngle, int16_t vertAngle);
 
 public slots:
     /*!

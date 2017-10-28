@@ -579,6 +579,7 @@
               <zorder>antennaTrackerCurrentLatitudeLabel</zorder>
               <zorder>antennaTrackerCurrentElevationLabel</zorder>
               <zorder>antennaTrackerCurrentElevationField</zorder>
+              <zorder>antennaTrackerOverrideSettingsGroup</zorder>
              </widget>
             </item>
             <item>
@@ -587,17 +588,17 @@
                <string>Override Settings</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_3">
-               <item row="4" column="0">
-                <widget class="QCheckBox" name="antennaTrackerGPSOverrideCheckBox">
-                 <property name="text">
-                  <string>Override GPS</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="antennaTrackerOverrideLatitudeLabel">
                  <property name="text">
                   <string>Latitude</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QCheckBox" name="antennaTrackerGPSOverrideCheckBox">
+                 <property name="text">
+                  <string>Override GPS</string>
                  </property>
                 </widget>
                </item>
@@ -622,13 +623,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="antennaTrackerOverrideElevationLabel">
-                 <property name="text">
-                  <string>Elevation</string>
-                 </property>
-                </widget>
-               </item>
                <item row="2" column="2">
                 <widget class="QLineEdit" name="antennaTrackerOverrideElevationField">
                  <property name="text">
@@ -636,10 +630,38 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="2">
+               <item row="2" column="0">
+                <widget class="QLabel" name="antennaTrackerOverrideElevationLabel">
+                 <property name="text">
+                  <string>Elevation</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="antennaTrackerOverrideHeadingLabel">
+                 <property name="text">
+                  <string>Heading</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
                 <widget class="QCheckBox" name="antennaTrackerElevationOverrideCheckBox">
                  <property name="text">
                   <string>Override Elevation</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLineEdit" name="antennaTrackerOverrideHeadingField">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QCheckBox" name="antennaTrackerOverrideHeadingCheckBox">
+                 <property name="text">
+                  <string>Override Heading</string>
                  </property>
                 </widget>
                </item>
@@ -649,52 +671,13 @@
             <item>
              <widget class="QGroupBox" name="antennaTrackerCalibrationGroup">
               <property name="title">
-               <string>Calibration</string>
+               <string>IMU Calibration</string>
               </property>
-              <widget class="QLabel" name="antennaTrackerCalibrateNorthLabel">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>30</y>
-                 <width>121</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Calibrate North</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="antennaTrackerCalibrateIMULabel">
-               <property name="geometry">
-                <rect>
-                 <x>150</x>
-                 <y>30</y>
-                 <width>111</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Calibrate IMU</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="antennaTrackerCalibrateNorthButton">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>60</y>
-                 <width>80</width>
-                 <height>22</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Calibrate</string>
-               </property>
-              </widget>
               <widget class="QPushButton" name="antennaTrackerCalibrateIMUButton">
                <property name="geometry">
                 <rect>
-                 <x>150</x>
-                 <y>60</y>
+                 <x>10</x>
+                 <y>30</y>
                  <width>80</width>
                  <height>22</height>
                 </rect>
@@ -703,6 +686,8 @@
                 <string>Calibrate</string>
                </property>
               </widget>
+              <zorder>antennaTrackerCalibrateIMUButton</zorder>
+              <zorder>antennaTrackerOverrideSettingsGroup</zorder>
              </widget>
             </item>
            </layout>
@@ -728,7 +713,7 @@
      <x>0</x>
      <y>0</y>
      <width>910</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

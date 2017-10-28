@@ -9,6 +9,7 @@
 #include <QRegExp>
 #include <QTimer>
 #include <QDebug>
+#include <QThread>
 // GCOM Includes
 #include "gcom_controller.hpp"
 #include "ui_gcomcontroller.h"
@@ -506,7 +507,35 @@ void GcomController::on_antennaTrackerCalibrateNorthButton_clicked()
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
     // Calibrate IMU (spin to all maximum directions)
-    tracker->retrieveStationHeading();
+    //tracker->calibrateIMU();
+
+    for(int i = 0; i < 180; i++) {
+        tracker->moveZaber(1,0);
+    }
+
+//    for(int i = 0; i < 180; i++) {
+//        tracker->moveZaber(1,0);
+//    }
+
+//    for(int i = 0; i < 180; i++) {
+//        tracker->moveZaber(-1,0);
+//    }
+
+//    for(int i = 0; i < 180; i++) {
+//        tracker->moveZaber(-1,0);
+//    }
+
+//    qDebug() << "move 1" << endl;
+//    tracker->moveZaber(90,0);
+//    qDebug() << "move 2" << endl;
+//    tracker->moveZaber(-90,0);
+//    qDebug() << "move 3" << endl;
+//    tracker->moveZaber(90,0);
+
+//    qDebug() << "move 4" << endl;
+//    tracker->moveZaber(-90,0);
+    // get current station heading... to be removed
+    //tracker->retrieveStationHeading();
 }
 
 //===================================================================

@@ -19,6 +19,7 @@
 #include <QtMath>
 #include <QElapsedTimer>
 #include <QDebug>
+#include <QThread>
 // System Includes
 #include <vector>
 #include <math.h>
@@ -47,6 +48,12 @@ const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 // Zaber Command Templates
 const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
+// Zaber Idle Status
+const QString ZABER_HORIZ_MOTOR_IDLE = "!01 2 IDLE --";
+const QString ZABER_VERT_MOTOR_IDLE = "!01 1 IDLE --";
+// Zaber Busy Status
+const QString ZABER_HORIZ_MOTOR_BUSY = "@01 2 OK BUSY WR 0";
+const QString ZABER_VERT_MOTOR_BUSY = "@01 1 OK BUSY WR 0";
 // Zaber Setup
 const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000";
 // Constant
@@ -490,12 +497,16 @@ bool AntennaTracker::getAntennaTrackerConnected()
    return this->antennaTrackerConnected;
 }
 
+//===================================================================
+// Calibration Functions
+//===================================================================
+
 bool AntennaTracker::retrieveStationHeading() {
     // Create the datastreams and framer
     arduinoDataStream = new QDataStream(arduinoSerial);
 
     // Retrieve the base's MAG data
-    RequestMessage magRequest = RequestMessage(UASMessage::MessageID::DATA_MAG);
+    RequestMessage magRequest(UASMessage::MessageID::DATA_MAG);
     arduinoFramer->frameMessage(magRequest);
     (*arduinoDataStream) << (*arduinoFramer);
 
@@ -525,11 +536,13 @@ bool AntennaTracker::retrieveStationHeading() {
     if ((magMessage == nullptr) || (magMessage->type() != UASMessage::MessageID::DATA_MAG))
         return false;
 
-    float hx = std::static_pointer_cast<MAGMessage>(magMessage)->x;
-    float hy = std::static_pointer_cast<MAGMessage>(magMessage)->y;
+    const float hx = std::static_pointer_cast<MAGMessage>(magMessage)->x;
+    const float hy = std::static_pointer_cast<MAGMessage>(magMessage)->y;
+    const float hz = std::static_pointer_cast<MAGMessage>(magMessage)->z;
 
     qDebug() << "hx: " << hx;
     qDebug() << "hy: " << hy;
+    qDebug() << "hz: " << hz;
 
     heading = calcHeading(hx, hy);
     qDebug() << "Heading: " << heading;
@@ -545,14 +558,16 @@ float AntennaTracker::calcHeading(float hx, float hy) {
     float calculatedHeading;
     // heading in degrees
     if (hy > 0) {
-        calculatedHeading = 90 - atan(hx/hy)*180/M_PI;
+        calculatedHeading = 90 - qRadiansToDegrees( atan(hx/hy) );
     } else if (hy < 0) {
-        calculatedHeading = 270 - atan(hx/hy)*180/M_PI;
+        calculatedHeading = 270 - qRadiansToDegrees( atan(hx/hy) );
     } else if ((hy == 0) && (hx < 0)) {
         calculatedHeading = 180;
     } else if ((hy == 0) && (hx > 0)) {
         calculatedHeading = 0;
     }
+
+    //calculatedHeading = qRadiansToDegrees( atan2(hy,hx) );
 
     return calculatedHeading;
 }
@@ -569,9 +584,10 @@ bool AntennaTracker::calibrateStationNorth()
     // calibrate antenna tracking station's north
     if(retrieveStationHeading()) {
         if ((heading >= -1.50) && (heading <= 1.50)) { // do we need to have an offset?
-            // current heading is north, set offsets
+            // current heading is north, setting heading is not required
         } else {
-            // calculate horizontal movement to find offset
+            // set the offset based on the heading
+            // then calculate horizontal movement and verify heading is correct
         }
     } else {
         // unable to retrieve station's heading
@@ -634,10 +650,45 @@ bool AntennaTracker::levelVertical()
     // send command to zaber
     QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
     zaberSerial->write(vertZaberCommand.toStdString().c_str());
+    zaberSerial->flush();
 
+    qDebug() << "Leveled tracker" << endl;
     return true;
 }
 
+bool AntennaTracker::calibrateIMU()
+{
+    if(levelVertical()) {
+        moveZaber(90,0);
+        moveZaber(-90,0);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+// method that sends a horizontal or vertical command to zaber
+bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
+{
+    if (!zaberSerial->isOpen())
+        return false;
+
+    // convert angle to microsteps
+    int microStepsHoriz = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horizAngle);
+    int microStepsVert = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngle);
+
+    // move vertical
+    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microStepsVert);
+    zaberSerial->write(vertZaberCommand.toStdString().c_str());
+
+    // move horizontal
+    QString horizZaberCommand = QString(zaberMoveCommandTemplate).arg(2).arg(microStepsHoriz);
+    zaberSerial->write(horizZaberCommand.toStdString().c_str());
+
+    zaberSerial->flush();
+
+    return true;
+}
 
 //===================================================================
 // Listing Functions

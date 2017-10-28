@@ -18,7 +18,7 @@
 //===================================================================
 const int SIZE_FIELD_X_Y_Z = 4;
 
-MAGMessage::MAGMessage(const std::vector<unsigned char> &serializedMessage)
+MAGMessage::MAGMessage(const std::vector<uint8_t> &serializedMessage)
 {
     // Reconstruct the x y z
     int32_t packedX = 0;
@@ -41,9 +41,9 @@ UASMessage::MessageID MAGMessage::type()
     return UASMessage::MessageID::DATA_MAG;
 }
 
-std::vector<unsigned char> MAGMessage::serialize()
+std::vector<uint8_t> MAGMessage::serialize()
 {
-    std::vector<unsigned char> serializedMessage;
+    std::vector<uint8_t> serializedMessage;
     // TODO: FIX THIS!!
     return serializedMessage;
 }
