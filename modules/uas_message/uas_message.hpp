@@ -35,7 +35,6 @@ class UASMessage
             DATA_GPS                = 0x12,
             DATA_IMAGE              = 0x13,
             DATA_CAPABILITIES       = 0x14,
-			DATA_MAG                = 0x15,
             DEBUG                   = 0xFF,
             UNSPECIFIED             = 0xFF
         };
