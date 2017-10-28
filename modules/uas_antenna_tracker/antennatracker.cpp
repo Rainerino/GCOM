@@ -8,7 +8,6 @@
 #include "modules/uas_message/request_message.hpp"
 #include "modules/uas_message/gps_message.hpp"
 #include "modules/uas_message/imu_message.hpp"
-#include "modules/uas_message/mag_message.hpp"
 #include "modules/uas_message/uas_message_serial_framer.hpp"
 #include "../Mavlink/ardupilotmega/mavlink.h"
 // QT Includes
@@ -79,6 +78,9 @@ AntennaTracker::AntennaTracker()
 
     // initialize base heading
     heading = 0;
+
+    // initialize base elevation
+    elevation = 0;
 
     // Mavlink Relay
     mavlinkRelay = new MAVLinkRelay();
@@ -379,7 +381,7 @@ QString AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_i
     const float horizAngle = fmod((qRadiansToDegrees(atan2(y,x)) + 360), 360);
 
     // Find the quickest angle to reach the point
-    float horzAngleDiff = horizAngle - (yawIMU);
+    float horzAngleDiff = horizAngle - (yawIMU - heading);
 
     if(horzAngleDiff > 180) {
         horzAngleDiff -= 360;
@@ -415,7 +417,7 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
     const float d = 2 * atan2(sqrt(a), sqrt(1-a));
     const float distance = RADIUS_EARTH * d;
 
-    const float vertAngle = atan((droneRelativeAlt)/distance)*180/M_PI;
+    const float vertAngle = atan((droneRelativeAlt-elevation)/distance)*180/M_PI;
 
     float vertAngleDiff = vertAngle - pitchIMU;
 
@@ -427,6 +429,29 @@ QString AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_in
     int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleDiff);
 
     return QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
+}
+
+bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
+{
+    // checks if serial connection is made
+    if (!zaberSerial->isOpen())
+        return false;
+
+    // converts user defined angles to microsteps
+    int microStepsHoriz = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horizAngle);
+    int microStepsVert = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngle);
+
+    // move vertical command
+    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microStepsVert);
+    zaberSerial->write(vertZaberCommand.toStdString().c_str());
+
+    // move horizontal command
+    QString horizZaberCommand = QString(zaberMoveCommandTemplate).arg(2).arg(microStepsHoriz);
+    zaberSerial->write(horizZaberCommand.toStdString().c_str());
+
+    zaberSerial->flush();
+
+    return true;
 }
 
 bool AntennaTracker::retrieveStationPos()
@@ -487,26 +512,35 @@ bool AntennaTracker::setStationPos(float lon, float lat)
     return true;
 }
 
-void AntennaTracker::setOverrideGPSToggle(bool toggled)
-{
-    overrideGPSToggle = toggled;
-}
-
 bool AntennaTracker::getAntennaTrackerConnected()
 {
    return this->antennaTrackerConnected;
 }
 
-//===================================================================
-// Calibration Functions
-//===================================================================
 
-bool AntennaTracker::overrideStationHeading(int16_t heading)
+//===================================================================
+// Override Functions
+//===================================================================
+bool AntennaTracker::setOverrideStationHeading(int16_t heading)
 {
-
+    this->heading = heading;
     return true;
 }
 
+bool AntennaTracker::setOverrideStationElevation(int16_t elevation)
+{
+    this->elevation = elevation;
+    return true;
+}
+
+void AntennaTracker::setOverrideGPSToggle(bool toggled)
+{
+    overrideGPSToggle = toggled;
+}
+
+//===================================================================
+// Calibration Functions
+//===================================================================
 bool AntennaTracker::levelVertical()
 {
     // Create the datastreams and framer
@@ -574,29 +608,6 @@ bool AntennaTracker::calibrateIMU()
     } else {
         return false;
     }
-    return true;
-}
-
-// method that sends a horizontal or vertical command to zaber
-bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
-{
-    if (!zaberSerial->isOpen())
-        return false;
-
-    // convert angle to microsteps
-    int microStepsHoriz = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horizAngle);
-    int microStepsVert = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngle);
-
-    // move vertical
-    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microStepsVert);
-    zaberSerial->write(vertZaberCommand.toStdString().c_str());
-
-    // move horizontal
-    QString horizZaberCommand = QString(zaberMoveCommandTemplate).arg(2).arg(microStepsHoriz);
-    zaberSerial->write(horizZaberCommand.toStdString().c_str());
-
-    zaberSerial->flush();
-
     return true;
 }
 

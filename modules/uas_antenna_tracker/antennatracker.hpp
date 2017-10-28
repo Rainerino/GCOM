@@ -100,7 +100,13 @@ public:
      * \brief overrideStationHeading overrides the stations heading with the user defined value
      * \return true if the override was successful
      */
-    bool overrideStationHeading(int16_t heading);
+    bool setOverrideStationHeading(int16_t heading);
+
+    /*!
+     * \brief setOverrideStationElevation overrides the stations elevation with the user defined value
+     * \return true if the override was successful
+     */
+    bool setOverrideStationElevation(int16_t elevation);
 
     /*!
      * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0
@@ -171,6 +177,9 @@ private:
 
     // Base station Heading
     float heading;
+
+    // Base station Elevation
+    float elevation;
 
     // State Variables
     bool antennaTrackerConnected;

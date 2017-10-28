@@ -480,18 +480,6 @@ void GcomController::on_startTrackButton_clicked()
     }
 }
 
-void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
-{
-    tracker->setOverrideGPSToggle(checked);
-}
-
-void GcomController::resetOverrideGPSGUI()
-{
-    ui->antennaTrackerOverrideLatitudeField->setDisabled(false);
-    ui->antennaTrackerOverrideLongitudeField->setDisabled(false);
-    ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
-}
-
 void GcomController::antennaTrackerPositionInterface(float latitude, float longitude)
 {
     // updates the GUI with the set latitude and longitude of the tracking station
@@ -499,43 +487,50 @@ void GcomController::antennaTrackerPositionInterface(float latitude, float longi
     ui->antennaTrackerCurrentLatitudeField->setText(QString::number(latitude));
 }
 
-void GcomController::on_antennaTrackerCalibrateNorthButton_clicked()
+//===================================================================
+// Override Antenna Tracker Methods
+//===================================================================
+void GcomController::resetOverrideGPSGUI()
 {
-    tracker->levelVertical();
+    ui->antennaTrackerOverrideLatitudeField->setDisabled(false);
+    ui->antennaTrackerOverrideLongitudeField->setDisabled(false);
+    ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
 }
+
+void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
+{
+    tracker->setOverrideGPSToggle(checked);
+}
+
+void GcomController::on_antennaTrackerOverrideHeadingCheckBox_toggled(bool checked)
+{
+    // checked: set heading to user defined value
+    if(checked) {
+        tracker->setOverrideStationHeading(ui->antennaTrackerOverrideHeadingField->text().toLong());
+    } else {
+    // unchecked: set heading back to 0
+        tracker->setOverrideStationHeading(0);
+    }
+}
+
+void GcomController::on_antennaTrackerElevationOverrideCheckBox_toggled(bool checked)
+{
+    // checked: set elevation to user defined value
+    if(checked) {
+        tracker->setOverrideStationHeading(ui->antennaTrackerOverrideElevationField->text().toLong());
+    } else {
+    // unchecked: set elevation back to 0
+        tracker->setOverrideStationHeading(0);
+    }
+}
+
+//===================================================================
+// Antenna Tracker Calibration Methods
+//===================================================================
 
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
-    // Calibrate IMU (spin to all maximum directions)
-    //tracker->calibrateIMU();
 
-    for(int i = 0; i < 180; i++) {
-        tracker->moveZaber(1,0);
-    }
-
-//    for(int i = 0; i < 180; i++) {
-//        tracker->moveZaber(1,0);
-//    }
-
-//    for(int i = 0; i < 180; i++) {
-//        tracker->moveZaber(-1,0);
-//    }
-
-//    for(int i = 0; i < 180; i++) {
-//        tracker->moveZaber(-1,0);
-//    }
-
-//    qDebug() << "move 1" << endl;
-//    tracker->moveZaber(90,0);
-//    qDebug() << "move 2" << endl;
-//    tracker->moveZaber(-90,0);
-//    qDebug() << "move 3" << endl;
-//    tracker->moveZaber(90,0);
-
-//    qDebug() << "move 4" << endl;
-//    tracker->moveZaber(-90,0);
-    // get current station heading... to be removed
-    //tracker->retrieveStationHeading();
 }
 
 //===================================================================

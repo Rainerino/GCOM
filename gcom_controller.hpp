@@ -60,8 +60,11 @@ private slots:
     void on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked);
     void antennaTrackerPositionInterface(float latitude, float longitude);
 
-    void on_antennaTrackerCalibrateNorthButton_clicked();
     void on_antennaTrackerCalibrateIMUButton_clicked();
+
+    void on_antennaTrackerOverrideHeadingCheckBox_toggled(bool checked);
+
+    void on_antennaTrackerElevationOverrideCheckBox_toggled(bool checked);
 
 private:
     // Private Member Variables
