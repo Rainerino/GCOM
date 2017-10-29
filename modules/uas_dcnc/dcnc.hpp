@@ -150,7 +150,7 @@ private slots:
 
     UASMessage* handleResponse(CommandMessage::Commands command,
                                ResponseMessage::ResponseCodes responses);
-    UASMessage* handleInfo(std::string systemId, bool dropped, bool autoResume, std::string* preSysId);
+    UASMessage* handleInfo(std::string systemId, bool dropped, bool autoResume);
 
 
 private:

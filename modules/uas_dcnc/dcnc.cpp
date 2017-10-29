@@ -30,11 +30,18 @@ DCNC::DCNC()
     connect(server, SIGNAL(newConnection()),
             this, SLOT(handleClientConection()));
 }
-
+//TODO
 DCNC::~DCNC()
 {
-    //stopServer();
-    //delete(server);
+    //first disconnect the newConnection to handleClientConection
+    disconnect(server, SIGNAL(newConnection()),
+               this,SLOT(handleClientConection()));
+    // put the status offline
+    serverStatus = DCNCStatus::OFFLINE;
+    clientConnection = nullptr;
+    //The server will no longer listen for incoming connections.
+    server->close();
+
 }
 
 bool DCNC::startServer(QString address, int port)
@@ -88,7 +95,7 @@ DCNC::DCNCStatus DCNC::status()
 {
     return serverStatus;
 }
-//TODO
+
 //send  infomation message
 void DCNC::handleClientConection()
 {
@@ -117,9 +124,7 @@ void DCNC::handleClientConection()
     connectionDataStream << messageFramer;
     //check the << operation send status if send Failure dropped the conncection
     if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
-        //TBD
         //droppedConnection ->simply send out a signal
-        //or cancel connection  -> bring the server to searching state
         droppedConnection();
     else
         emit receivedConnection();
@@ -193,18 +198,15 @@ void DCNC::stopImageRelay()
 //===================================================================
 // Receive Handler
 //===================================================================
-//need to double check with the confluence
-//response determine NO_ERROR, INVALID_DATA.....
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
-//    preSysID.assign("04");
     UASMessage *outgoingMessage = nullptr;
     switch (message->type())
     {
         case UASMessage::MessageID::DATA_SYSTEM_INFO:
         {
             std::shared_ptr<SystemInfoMessage> systemInfo = std::static_pointer_cast<SystemInfoMessage>(message);
-            outgoingMessage =  handleInfo(systemInfo->systemId, systemInfo->dropped,autoResume, &preSysID);
+            outgoingMessage =  handleInfo(systemInfo->systemId, systemInfo->dropped,autoResume);
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
@@ -280,17 +282,17 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
     return nullptr;
 }
 
-UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume, std::string* preSysId ){
+UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume){
 
-    if(systemId.compare(*preSysId)==0 && dropped&& autoResume){
+    if(preSysID.compare(systemId)==0 && dropped&& autoResume){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
 
     }
-    else if(dropped && systemId.compare(*preSysId)==0){
+    else if(dropped && preSysID.compare(systemId)==0){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
     }
     else{
-        *preSysId = systemId;
+        preSysID.assign(systemId);
         return new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
     }
 }
