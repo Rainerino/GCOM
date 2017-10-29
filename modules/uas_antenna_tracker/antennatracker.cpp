@@ -597,20 +597,55 @@ bool AntennaTracker::levelVertical()
 
 bool AntennaTracker::calibrateIMU()
 {
+    // horizontal, vertical commands for calibration
+    int16_t calibrationArray[9][2] =
+    {
+        {0,75},     // 75 deg UP vertical
+        {90, 0},    // 90 deg CW horizontal
+        {0,-75},    // 75 deg DOWN vertical
+        {90,0},     // 90 deg CW horizontal
+        {0,75},     // 75 deg UP vertical
+        {90,0},     // 90 deg CW horizontal
+        {0,-75},    // 75 deg DOWN vertical
+        {90,0},     // 90 deg CW horizontal
+        {-360,0}    // 360 deg CCW horizontal
+    };
+
+    // number of commands
+    uint8_t rowCountCalibrationArr = sizeof(calibrationArray) / sizeof(calibrationArray[0]);
+
     // checks if serial connection is made
     if (!zaberSerial->isOpen())
         return false;
 
-    // check status command
-    const QString checkZaberStatusCommand = "/";
+    // iterate through each command in the calibration array and check for idle
+    //for(int i = 0; i < rowCountCalibrationArr; i++) {
+        // while loop to check for IDLE here
+       // moveZaber(calibrationArray[i][0],calibrationArray[i][1]);
+    //}
 
-    zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
-    if(zaberSerial->waitForReadyRead(3000)) {
-        qDebug() << "Output 2: " << zaberSerial->readLine() << endl;
-    } else {
-        qDebug() << "Error: No line read. " << endl;
+    // START WHILE LOOP IDLE CHECK
+    // TODO: move to for loop above, after verification
+
+    while(true) {
+        // check status command
+        const QString checkZaberStatusCommand = "/";
+        QString outputLine = "";
+
+        zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+        if(zaberSerial->waitForReadyRead(3000)) {
+            outputLine = zaberSerial->readLine();
+            qDebug() << "Output: " << outputLine << endl;
+        } else {
+            qDebug() << "Error: No line read. " << endl;
+        }
+        zaberSerial->flush();
+
+        if(outputLine.contains("IDLE", Qt::CaseInsensitive))
+            break;
     }
-    zaberSerial->flush();
+
+    // END OF WHILE LOOP IDLE CHECK
 
     return true;
 }
