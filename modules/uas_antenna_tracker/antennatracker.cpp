@@ -258,31 +258,24 @@ void AntennaTracker::disconnectZaber()
     emit antennaTrackerDeviceDisconnected(AntennaTrackerSerialDevice::ZABER);
 }
 
+AntennaTracker::AntennaTrackerConnectionState AntennaTracker::getArduinoStatus() {
+    // check arduino serial
+    if (arduinoSerial == nullptr)
+        return AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED;
+    else if (!arduinoSerial->isOpen())
+        return AntennaTrackerConnectionState::ARDUINO_NOT_OPEN;
+    else
+        return AntennaTrackerConnectionState::SUCCESS;
+}
 
-AntennaTracker::AntennaTrackerConnectionState AntennaTracker::getDeviceStatus(
-        AntennaTracker::AntennaTrackerSerialDevice device)
-{
-    switch (device)
-    {
-        case AntennaTrackerSerialDevice::ARDUINO:
-            if (arduinoSerial == nullptr)
-                return AntennaTrackerConnectionState::ARDUINO_UNINITIALIZED;
-            else if (!arduinoSerial->isOpen())
-                return AntennaTrackerConnectionState::ARDUINO_NOT_OPEN;
-            else
-                return AntennaTrackerConnectionState::SUCCESS;
-
-        case AntennaTrackerSerialDevice::ZABER:
-            if (zaberSerial == nullptr)
-                return AntennaTrackerConnectionState::ZABER_UNITIALIZED;
-            else if (!zaberSerial->isOpen())
-                return AntennaTrackerConnectionState::ZABER_NOT_OPEN;
-            else
-                return AntennaTrackerConnectionState::SUCCESS;
-
-        default:
-            return AntennaTrackerConnectionState::FAILED;
-    }
+AntennaTracker::AntennaTrackerConnectionState AntennaTracker::getZaberStatus() {
+    // check zaber serial
+    if (zaberSerial == nullptr)
+        return AntennaTrackerConnectionState::ZABER_UNITIALIZED;
+    else if (!zaberSerial->isOpen())
+        return AntennaTrackerConnectionState::ZABER_NOT_OPEN;
+    else
+        return AntennaTrackerConnectionState::SUCCESS;
 }
 
 void AntennaTracker::arduinoDisconnected(QSerialPort::SerialPortError error)

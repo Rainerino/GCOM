@@ -80,7 +80,8 @@ public:
      */
     bool setupZaber(QString port, QSerialPort::BaudRate baud);
 
-    AntennaTrackerConnectionState getDeviceStatus(AntennaTrackerSerialDevice device);
+    AntennaTrackerConnectionState getArduinoStatus();
+    AntennaTrackerConnectionState getZaberStatus();
     void disconnectArduino();
     void disconnectZaber();
     AntennaTrackerConnectionState startTracking(MAVLinkRelay * const relay);
