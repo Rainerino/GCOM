@@ -30,16 +30,16 @@ ImageTaggedMessage::ImageTaggedMessage(uint8_t sequenceNumber, double latitude,
                            double longitude, uint8_t* imageData, size_t dataSize) :
                            ImageUntaggedMessage(sequenceNumber, imageData, dataSize)
 {
-    this->latitude = PACK_LAT_LON(latitude);
-    this->longitude = PACK_LAT_LON(longitude);
+    this->latitudeRaw = PACK_LAT_LON(latitude);
+    this->longitudeRaw = PACK_LAT_LON(longitude);
 }
 
 ImageTaggedMessage::ImageTaggedMessage(uint8_t sequenceNumber, int32_t latitude,
                            int32_t longitude, uint8_t* imageData, size_t dataSize) :
                            ImageUntaggedMessage(sequenceNumber, imageData, dataSize)
 {
-    this->latitude = latitude;
-    this->longitude = longitude;
+    this->latitudeRaw = latitude;
+    this->longitudeRaw = longitude;
 }
 
 ImageTaggedMessage::ImageTaggedMessage(const std::vector<uint8_t> &serializedMessage)
@@ -62,8 +62,8 @@ ImageTaggedMessage::ImageTaggedMessage(const std::vector<uint8_t> &serializedMes
     }
 
     // Convert values back by shifting values back
-    latitude = packedLat - PACK_LAT_LON(LAT_RANGE);
-    longitude = packedLon - PACK_LAT_LON(LON_RANGE);
+    latitudeRaw = packedLat - PACK_LAT_LON(LAT_RANGE);
+    longitudeRaw = packedLon - PACK_LAT_LON(LON_RANGE);
 
     imageData.assign(serializedMessage.begin() + IMAGE_DATA_OFFSET, serializedMessage.end());
 }
@@ -86,8 +86,8 @@ std::vector<uint8_t> ImageTaggedMessage::serialize()
     uint32_t packedLon;
 
     // Pack coordinates by shifting values so they are unsigned
-    packedLat = latitude + PACK_LAT_LON(LAT_RANGE);
-    packedLon = longitude + PACK_LAT_LON(LON_RANGE);
+    packedLat = latitudeRaw + PACK_LAT_LON(LAT_RANGE);
+    packedLon = longitudeRaw + PACK_LAT_LON(LON_RANGE);
 
     // Serialize the coordinates
     std::vector<uint8_t> serializedCoords;
@@ -110,18 +110,10 @@ std::vector<uint8_t> ImageTaggedMessage::serialize()
 // Coordinate Methods
 //===================================================================
 
-int32_t ImageTaggedMessage::raw_lat() {
-    return latitude;
+double ImageTaggedMessage::latitude() {
+    return UNPACK_LAT_LON(latitudeRaw);
 }
 
-int32_t ImageTaggedMessage::raw_lon() {
-    return longitude;
-}
-
-double ImageTaggedMessage::lat() {
-    return UNPACK_LAT_LON(latitude);
-}
-
-double ImageTaggedMessage::lon() {
-    return UNPACK_LAT_LON(longitude);
+double ImageTaggedMessage::longitude() {
+    return UNPACK_LAT_LON(longitudeRaw);
 }

@@ -72,39 +72,28 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         std::vector<uint8_t> serialize();
 
         /*!
-         * \brief Returns latitude as int32_t
-         * \return latitude
-         */
-        int32_t raw_lat();
-
-        /*!
-         * \brief Returns longitude as int32_t
-         * \return longitude
-         */
-        int32_t raw_lon();
-
-        /*!
          * \brief Converts latitude to double
          * \return latitude as a double
          */
-        double lat();
+        double latitude();
 
         /*!
          * \brief Returns longitude as double
          * \return longitude as a double
          */
-        double lon();
+        double longitude();
 
-    private:
-        /*!
-         * \brief latitude of the image
-         */
-        int32_t latitude;
+        // Public member variables
 
         /*!
-         * \brief longitude of the image
+         * \brief The latitude of the image as int32_t packed using 1e7
          */
-        int32_t longitude;
+        int32_t latitudeRaw;
+
+        /*!
+         * \brief The longitude of the image as int32_t packed using 1e7
+         */
+        int32_t longitudeRaw;
 };
 
 #endif // IMAGE_TAGGED_MESSAGE_HPP
