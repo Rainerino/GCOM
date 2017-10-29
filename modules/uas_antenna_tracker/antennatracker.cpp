@@ -24,6 +24,15 @@
 #include <math.h>
 
 //===================================================================
+// Device Detection
+//===================================================================
+#ifdef __linux__
+   const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
+#elif __WIN32
+   const QString ZABER_DEVICE_NAME = "Microsoft";
+#endif
+
+//===================================================================
 // Defines
 //===================================================================
 #define HORIZ_DEGREE_TO_MICROSTEPS 1599.722
@@ -36,11 +45,6 @@
 // Constants
 //===================================================================
 // Strings
-#ifdef __linux__
-   const QString ZABER_DEVICE_NAME = "Zaber Technologies Inc.";
-#elif __WIN32
-   const QString ZABER_DEVICE_NAME = "Microsoft";
-#endif
 const QString TEXT_ZABER_NO_CONTROLLER = "NO ZABER CONTROLLER CONNECTED";
 const QString ARDUINO_DEVICE_NAME = "Arduino";
 const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
@@ -484,6 +488,9 @@ bool AntennaTracker::retrieveStationPos()
     return true;
 }
 
+//===================================================================
+// Setters and Getters
+//===================================================================
 bool AntennaTracker::setStationPos(float lon, float lat)
 {
     // check inputs in range
@@ -505,7 +512,6 @@ bool AntennaTracker::getAntennaTrackerConnected()
 {
    return this->antennaTrackerConnected;
 }
-
 
 //===================================================================
 // Override Functions
