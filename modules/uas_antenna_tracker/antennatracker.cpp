@@ -591,15 +591,21 @@ bool AntennaTracker::levelVertical()
 
 bool AntennaTracker::calibrateIMU()
 {
-//    if(levelVertical()) {
-//        moveZaber(90,0);
-//        moveZaber(-90,0);
-//    } else {
-//        return false;
-//    }
+    // checks if serial connection is made
+    if (!zaberSerial->isOpen())
+        return false;
 
-    // send / command
-    // read the line and check for IDLE
+    // check status command
+    const QString checkZaberStatusCommand = "/";
+
+    zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+    if(zaberSerial->waitForReadyRead(3000)) {
+        qDebug() << "Output 2: " << zaberSerial->readLine() << endl;
+    } else {
+        qDebug() << "Error: No line read. " << endl;
+    }
+    zaberSerial->flush();
+
     return true;
 }
 
