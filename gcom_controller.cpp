@@ -383,8 +383,8 @@ void GcomController::on_arduinoConnectButton_clicked()
         QModelIndex selectedIndex = ui->availableArduinoPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
-        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
-                             AntennaTracker::AntennaTrackerSerialDevice::ARDUINO);
+        bool status = tracker->setupArduino(selectedPort, QSerialPort::Baud9600);
+
         if (status)
             ui->arduinoConnectButton->setText(DISCONNECT_BUTTON_TEXT);
     }
@@ -414,8 +414,8 @@ void GcomController::on_zaberConnectButton_clicked()
         QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
-        bool status = tracker->setupDevice(selectedPort, QSerialPort::Baud9600,
-                             AntennaTracker::AntennaTrackerSerialDevice::ZABER);
+        bool status = tracker->setupZaber(selectedPort, QSerialPort::Baud9600);
+
         if (status)
             ui->zaberConnectButton->setText(DISCONNECT_BUTTON_TEXT);
     }

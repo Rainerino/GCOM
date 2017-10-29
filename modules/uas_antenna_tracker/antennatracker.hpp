@@ -65,58 +65,67 @@ public:
     static QList<QString> getZaberList();
 
     /*!
-     * \brief setupDevice initializes devices indicated by arduino_port and zaber_port, and initializes the devices
-     * \param arduino_port is the serial port for the arduino
-     * \param zaber_port is the serial port for the zaber controller
+     * \brief setupArduino initializes the arduino
+     * \param port is the serial port for the arduino
+     * \param baud is the baud rate for the arduino
+     * \return true if set up was successful, else false
      */
-    bool setupDevice(QString port, QSerialPort::BaudRate baud, AntennaTrackerSerialDevice devType);
+    bool setupArduino(QString port, QSerialPort::BaudRate baud);
+
+    /*!
+     * \brief setupZaber initializes the zaber
+     * \param port is the serial port for the zaber controller
+     * \param baud is the baud rate for the zaber controller
+     * \return true if set up was successful, else false
+     */
+    bool setupZaber(QString port, QSerialPort::BaudRate baud);
+
     AntennaTrackerConnectionState getDeviceStatus(AntennaTrackerSerialDevice device);
     void disconnectArduino();
     void disconnectZaber();
-
     AntennaTrackerConnectionState startTracking(MAVLinkRelay * const relay);
     void stopTracking();
 
     /*!
      * \brief setStationPos overrides the GPS coordinates of the antenna tracker station with the inputted parameters.
-     * \param lon is the longitude
-     * \param lat is the latitude
-     * \return whether the position has been set
+     * \param lon is the longitude value in degrees.
+     * \param lat is the latitude value in degrees.
+     * \return whether the position has been set.
      */
     bool setStationPos(float lon, float lat);
 
     /*!
-     * \brief overrideGPSToggle sets overrideGPSToggle to the given state
+     * \brief overrideGPSToggle sets overrideGPSToggle to the given state.
      */
     void setOverrideGPSToggle(bool toggled);
 
     /*!
-     * \brief AntennaTracker::getAntennaTrackerConnected returns the tracking state of the antenna tracker
-     * \return true if antenna tracker is tracking, else false
+     * \brief AntennaTracker::getAntennaTrackerConnected returns the tracking state of the antenna tracker.
+     * \return true if antenna tracker is tracking, else false.
      */
     bool getAntennaTrackerConnected();
 
     /*!
-     * \brief overrideStationHeading overrides the stations heading with the user defined value
-     * \return true if the override was successful
+     * \brief overrideStationHeading overrides the stations heading with the user defined value.
+     * \return true if the override was successful.
      */
     bool setOverrideStationHeading(int16_t heading);
 
     /*!
-     * \brief setOverrideStationElevation overrides the stations elevation with the user defined value
-     * \return true if the override was successful
+     * \brief setOverrideStationElevation overrides the stations elevation with the user defined value.
+     * \return true if the override was successful.
      */
     bool setOverrideStationElevation(int16_t elevation);
 
     /*!
-     * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0
-     * \return true if leveling was successful
+     * \brief levelVertical retrieves the antenna trackering station's pitch and levels it to 0.
+     * \return true if leveling was successful.
      */
     bool levelVertical();
 
     /*!
-     * \brief calibrateIMU rotates the antenna tracker and maximizes the IMU readings
-     * \return true if calibration was successful, else false
+     * \brief calibrateIMU sends motor commands to the zaber to calibrate IMU onboard.
+     * \return true if calibration was successful, else false.
      */
     bool calibrateIMU();
 
@@ -125,7 +134,7 @@ public:
      * command to the Zaber Controller.
      * \param horizAngle is the angle to move the horizontal motor.
      * \param vertAngle is the angle to move the vertical motor.
-     * \return true if movement command was successful, else false
+     * \return true if movement command was successful, else false.
      */
     bool moveZaber(int16_t horizAngle, int16_t vertAngle);
 

@@ -107,70 +107,62 @@ AntennaTracker::~AntennaTracker()
     delete arduinoFramer;
 }
 
-bool AntennaTracker::setupDevice(QString port, QSerialPort::BaudRate baud,
-                                 AntennaTrackerSerialDevice devType)
-{
+bool AntennaTracker::setupArduino(QString port, QSerialPort::BaudRate baud) {
+
     if (antennaTrackerConnected)
         stopTracking();
 
-    bool success = false;
+    // Create the object if its not already initialized
+    if (arduinoSerial == nullptr)
+        arduinoSerial = new QSerialPort(port);
 
-    switch(devType)
-    {
-        case AntennaTrackerSerialDevice::ARDUINO:
-            // Create the object if its not already initialized
-            if (arduinoSerial == nullptr)
-                arduinoSerial = new QSerialPort(port);
+    // Close the port if its open
+    if (arduinoSerial->isOpen())
+        disconnectArduino();
 
-            // Close the port if its open
-            if (arduinoSerial->isOpen())
-                disconnectArduino();
+    if(!arduinoSerial->open(QIODevice::ReadWrite))
+        return false;
 
-            if(!arduinoSerial->open(QIODevice::ReadWrite))
-                return false;
+    // Initialize arduino serial port
+    arduinoSerial->setBaudRate(baud);
+    arduinoSerial->setDataBits(QSerialPort::Data8);
+    arduinoSerial->setParity(QSerialPort::NoParity);
+    arduinoSerial->setStopBits(QSerialPort::OneStop);
+    arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
 
-            // Initialize arduino serial port
-            arduinoSerial->setBaudRate(QSerialPort::BaudRate::Baud9600);
-            arduinoSerial->setDataBits(QSerialPort::Data8);
-            arduinoSerial->setParity(QSerialPort::NoParity);
-            arduinoSerial->setStopBits(QSerialPort::OneStop);
-            arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
+    connect(arduinoSerial,
+            SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
+            SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
 
-            connect(arduinoSerial,
-                    SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this,
-                    SLOT(arduinoDisconnected(QSerialPort::SerialPortError)));
-            success = true;
-            break;
+    return true;
+}
 
-        case AntennaTrackerSerialDevice::ZABER:
-            if (zaberSerial == nullptr)
-                zaberSerial = new QSerialPort(port);
+bool AntennaTracker::setupZaber(QString port, QSerialPort::BaudRate baud) {
+    if (antennaTrackerConnected)
+        stopTracking();
 
-            if (zaberSerial->isOpen())
-                disconnectZaber();
+    // Create the object if its not already initialized
+    if (zaberSerial == nullptr)
+        zaberSerial = new QSerialPort(port);
 
-            // Init the  zaber serial port
-            zaberSerial = new QSerialPort(port);
-            zaberSerial->setBaudRate(baud);
-            zaberSerial->setDataBits(QSerialPort::Data8);
-            zaberSerial->setParity(QSerialPort::NoParity);
-            zaberSerial->setStopBits(QSerialPort::OneStop);
-            zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
-            if (!zaberSerial->open(QIODevice::ReadWrite))
-                return false;
+    // Close the port if its open
+    if (zaberSerial->isOpen())
+        disconnectZaber();
 
-            connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
-                    this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
+    // Initialize the zaber serial port
+    zaberSerial = new QSerialPort(port);
+    zaberSerial->setBaudRate(baud);
+    zaberSerial->setDataBits(QSerialPort::Data8);
+    zaberSerial->setParity(QSerialPort::NoParity);
+    zaberSerial->setStopBits(QSerialPort::OneStop);
+    zaberSerial->setFlowControl(QSerialPort::NoFlowControl);
+    if (!zaberSerial->open(QIODevice::ReadWrite))
+        return false;
 
-            success = true;
-            break;
+    connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
+            this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
 
-        default:
-            success = false;
-            break;
-    }
-
-    return success;
+    return true;
 }
 
 AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVLinkRelay * const relay)
