@@ -286,7 +286,6 @@ UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume)
 
     if(preSysID.compare(systemId)==0 && dropped&& autoResume){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
-
     }
     else if(dropped && preSysID.compare(systemId)==0){
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
