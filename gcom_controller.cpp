@@ -513,8 +513,8 @@ void GcomController::resetOverrideGPSGUI()
 
     // reset the checkboxes
     ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
-    ui->antennaTrackerOverrideHeadingCheckBox->setDisabled(true);
-    ui->antennaTrackerOverrideElevationCheckBox->setDisabled(true);
+    ui->antennaTrackerOverrideHeadingCheckBox->setDisabled(false);
+    ui->antennaTrackerOverrideElevationCheckBox->setDisabled(false);
 }
 
 void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
@@ -534,14 +534,14 @@ void GcomController::on_antennaTrackerOverrideHeadingCheckBox_toggled(bool check
     }
 }
 
-void GcomController::on_antennaTrackerElevationOverrideCheckBox_toggled(bool checked)
+void GcomController::on_antennaTrackerOverrideElevationCheckBox_toggled(bool checked)
 {
     // checked: set elevation to user defined value
     if(checked) {
-        tracker->setOverrideStationHeading(ui->antennaTrackerOverrideElevationField->text().toLong());
+        tracker->setOverrideStationElevation(ui->antennaTrackerOverrideElevationField->text().toLong());
     } else {
     // unchecked: set elevation back to 0
-        tracker->setOverrideStationHeading(0);
+        tracker->setOverrideStationElevation(0);
     }
 }
 

@@ -92,7 +92,7 @@ AntennaTracker::~AntennaTracker()
     if(arduinoSerial != nullptr && arduinoSerial->isOpen())
     {
         arduinoSerial->close();
-        delete zaberSerial;
+        delete arduinoSerial;
     }
 
     //close serial connection to zaber if it's open
@@ -560,7 +560,7 @@ bool AntennaTracker::levelVertical()
     //const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
     const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
 
-    //qDebug() << "pitchBase: " << pitchBase << endl;
+    qDebug() << "pitchBase: " << pitchBase << endl;
 
     float vertAngleFlat = pitchBase * -1;
 
@@ -618,13 +618,15 @@ bool AntennaTracker::calibrateIMU()
         QString outputLine = "";
 
         zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+        zaberSerial->flush();
+        zaberSerial->waitForBytesWritten(1000);
         if(zaberSerial->waitForReadyRead(3000)) {
             outputLine = zaberSerial->readLine();
             qDebug() << "Output: " << outputLine << endl;
         } else {
             qDebug() << "Error: No line read. " << endl;
         }
-        zaberSerial->flush();
+
 
         if(outputLine.contains("IDLE", Qt::CaseInsensitive))
             break;
