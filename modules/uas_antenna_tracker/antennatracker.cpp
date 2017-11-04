@@ -586,6 +586,9 @@ bool AntennaTracker::levelVertical()
 
 bool AntennaTracker::calibrateIMU()
 {
+    // level vertical upon start up
+    levelVertical();
+
     // horizontal, vertical commands for calibration
     int16_t calibrationArray[9][2] =
     {
@@ -613,6 +616,7 @@ bool AntennaTracker::calibrateIMU()
 
     // iterate through each command in the calibration array and check for idle
     for(int i = 0; i < rowCountCalibrationArr; i++) {
+        // checks for IDLE, and executes move command once found
         while(true) {
             // send check status command
             zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
