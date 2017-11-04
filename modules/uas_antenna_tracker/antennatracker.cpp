@@ -10,6 +10,7 @@
 #include "modules/uas_message/imu_message.hpp"
 #include "modules/uas_message/uas_message_serial_framer.hpp"
 #include "../Mavlink/ardupilotmega/mavlink.h"
+#include "modules/uas_utility/uas_utility.h"
 // QT Includes
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
@@ -54,8 +55,6 @@ const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
 const QString zaberCheckStatusCommand = "/\n";
 // Zaber Setup
 const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000\n";
-// Constant
-const float RADIUS_EARTH = 6378137;
 
 //===================================================================
 // Class Definitions
@@ -337,77 +336,13 @@ void AntennaTracker::receiveHandler(std::shared_ptr<mavlink_global_position_int_
     const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
 
     // Calculate horizontal angle
-    float moveHorizAngle = calcHorizontal(droneGPSData, yawBase);
+    float moveHorizAngle = Utility::calcHorizontal(droneGPSData, yawBase, latBase, lonBase, heading);
 
     // Calculate vertical angle
-    float moveVertAngle = calcVertical(droneGPSData, pitchBase);
+    float moveVertAngle = Utility::calcVertical(droneGPSData, pitchBase, latBase, lonBase, elevation);
 
     // do tracking
     moveZaber(moveHorizAngle, moveVertAngle);
-}
-
-float AntennaTracker::calcHorizontal(std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float yawIMU)
-{
-    // ====================================================================
-    // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
-    // ====================================================================
-
-    //Grabbing individual pieces of data from gpsData
-    const float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
-    const float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
-
-    const float yDiff = (droneLon-lonBase);
-
-    const float y = sin(yDiff) * cos(droneLat);
-    const float x = (cos(latBase) * sin(droneLat)) - (sin(latBase) * cos(droneLat) * cos(yDiff));
-
-    const float horizAngle = fmod((qRadiansToDegrees(atan2(y,x)) + 360), 360);
-
-    // Find the quickest angle to reach the point
-    float horzAngleDiff = horizAngle - (yawIMU - heading);
-
-    if(horzAngleDiff > 180) {
-        horzAngleDiff -= 360;
-    }
-    else if(horzAngleDiff < -180) {
-        horzAngleDiff += 360;
-    }
-    else if(horzAngleDiff > -1 && horzAngleDiff < 1) {
-        // don't move if angle is too small to reduce drifting
-        horzAngleDiff = 0;
-    }
-
-    return horzAngleDiff;
-}
-
-float AntennaTracker::calcVertical (std::shared_ptr<mavlink_global_position_int_t> droneGPSData, float pitchIMU)
-{
-    // ====================================================================
-    // Calculations from http://www.movable-type.co.uk/scripts/latlong.html
-    // ====================================================================
-
-    const float droneLat = qDegreesToRadians(((float) droneGPSData->lat)/ 10000000);
-    const float droneLon = qDegreesToRadians(((float) droneGPSData->lon)/ 10000000);
-
-    const float droneRelativeAlt = ((float)droneGPSData->relative_alt / 1000);
-
-    const float xDiff = (droneLat-latBase);
-    const float yDiff = (droneLon-lonBase);
-
-    const float a = pow(sin(xDiff/2),2)+cos(latBase) * cos(droneLat)*pow(sin(yDiff/2),2);
-    const float d = 2 * atan2(sqrt(a), sqrt(1-a));
-    const float distance = RADIUS_EARTH * d;
-
-    const float vertAngle = atan((droneRelativeAlt-elevation)/distance)*180/M_PI;
-
-    float vertAngleDiff = vertAngle - pitchIMU;
-
-    if(vertAngleDiff > -1 && vertAngleDiff < 1) {
-        // don't move if angle is too small to reduce drifting
-        vertAngleDiff = 0;
-    }
-
-    return vertAngleDiff;
 }
 
 bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
