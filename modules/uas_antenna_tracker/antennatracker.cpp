@@ -51,6 +51,7 @@ const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 // Zaber Command Templates
 const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
+const QString zaberCheckStatusCommand = "/\n";
 // Zaber Setup
 const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000\n";
 // Constant
@@ -430,8 +431,8 @@ bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
         zaberSerial->write(horizZaberCommand.toStdString().c_str());
     }
 
-    zaberSerial->flush();
-    zaberSerial->waitForBytesWritten(1000);
+    if((vertAngle != 0 && horizAngle != 0))
+        zaberSerial->flush();
 
     return true;
 }
@@ -530,6 +531,7 @@ bool AntennaTracker::levelVertical()
     // Create the datastreams and framer
     arduinoDataStream = new QDataStream(arduinoSerial);
 
+    // Send request data request to arduino/IMU
     RequestMessage imuRequest(UASMessage::MessageID::DATA_IMU);
     arduinoFramer->frameMessage(imuRequest);
     (*arduinoDataStream) << (*arduinoFramer);
@@ -556,16 +558,14 @@ bool AntennaTracker::levelVertical()
     }
     arduinoDataStream->commitTransaction();
 
-
     std::shared_ptr<UASMessage> imuMessage = arduinoFramer->generateMessage();
     if ((imuMessage == nullptr) || (imuMessage->type() != UASMessage::MessageID::DATA_IMU))
         return false;
 
-    //const float yawBase= std::static_pointer_cast<IMUMessage>(imuMessage)->x;
+    // store pitch angle
     const float pitchBase = std::static_pointer_cast<IMUMessage>(imuMessage)->y;
 
-    qDebug() << "pitchBase: " << pitchBase << endl;
-
+    // negate pitch angle for leveling
     float vertAngleFlat = pitchBase * -1;
 
     if(vertAngleFlat > -1 && vertAngleFlat < 1) {
@@ -573,64 +573,60 @@ bool AntennaTracker::levelVertical()
         vertAngleFlat = 0;
     }
 
-    int microSteps = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngleFlat);
+    // level zaber vertically
+    moveZaber(0,vertAngleFlat);
 
-    // send command to zaber
-    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microSteps);
-    zaberSerial->write(vertZaberCommand.toStdString().c_str());
-    zaberSerial->flush();
-
-    qDebug() << "Leveled tracker" << endl;
     return true;
 }
 
 bool AntennaTracker::calibrateIMU()
 {
-    // level vertical upon start up
-    levelVertical();
-
     // horizontal, vertical commands for calibration
-    int16_t calibrationArray[9][2] =
+    int16_t calibrationArray[11][2] =
     {
-        {0,60},     // 60 deg UP vertical
-        {90, 0},    // 90 deg CW horizontal
-        {0,-60},    // 60 deg DOWN vertical
-        {90,0},     // 90 deg CW horizontal
-        {0,60},     // 60 deg UP vertical
-        {90,0},     // 90 deg CW horizontal
-        {0,-60},    // 60 deg DOWN vertical
-        {90,0},     // 90 deg CW horizontal
-        {-360,0}    // 360 deg CCW horizontal
+        {0,60},     // 60   deg
+        {90,0},     // 90   deg CW horizontal
+        {0,-120},   // -120 deg
+        {90,0},     // 90   deg CW horizontal
+        {0,120},    // 120  deg
+        {90,0},     // 90   deg CW horizontal
+        {0,-120},   // -120 deg
+        {90,0},     // 90   deg CW horizontal
+        {0,120},    // 120  deg
+        {-360,0},   // 360  deg CCW horizontal
+        {0,-60}     // -60  deg
     };
 
     // number of commands
     uint8_t rowCountCalibrationArr = sizeof(calibrationArray) / sizeof(calibrationArray[0]);
 
+    // check status output
+    QString outputLine = "";
+
     // checks if serial connection is made
     if (!zaberSerial->isOpen())
         return false;
 
-    // check status command
-    const QString checkZaberStatusCommand = "/\n";
-    QString outputLine = "";
+    // level vertical upon start up
+    levelVertical();
 
     // iterate through each command in the calibration array and check for idle
     for(int i = 0; i < rowCountCalibrationArr; i++) {
         // checks for IDLE, and executes move command once found
         while(true) {
             // send check status command
-            zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+            zaberSerial->write(zaberCheckStatusCommand.toStdString().c_str());
             zaberSerial->flush();
 
             // delay to wait for bytes written
-            zaberSerial->waitForBytesWritten(3000);
+            zaberSerial->waitForBytesWritten(500);
+            zaberSerial->waitForReadyRead(500);
 
             // read data
             QByteArray datas = zaberSerial->readAll();
             outputLine = datas; // convert to QString
 
-            // output status (debugging)
-            qDebug() << "read: " << outputLine;
+            //qDebug() << "Status: " << datas << endl;
 
             // check for IDLE
             if(outputLine.contains("IDLE", Qt::CaseInsensitive))
