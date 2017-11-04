@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>910</width>
-    <height>539</height>
+    <width>1238</width>
+    <height>1088</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,108 +118,135 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="connectionTab">
        <attribute name="title">
         <string>Connections</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="2">
-         <widget class="QGroupBox" name="missionPlannerConnectionGroup">
-          <property name="title">
-           <string>MAVLink Connection</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="6" column="0">
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="5" column="0" colspan="2">
-            <widget class="QPushButton" name="mavlinkConnectionButton">
-             <property name="text">
-              <string>Connect</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="mavlinkConnectionStatusField">
-             <property name="text">
-              <string>N/A</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="mavlinkIPLabel">
-             <property name="text">
-              <string>Mission Planner IP</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QCheckBox" name="mavlinkAutoReconnect">
-             <property name="text">
-              <string>Auto Reconnect</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="mavlinkPortLabel">
-             <property name="text">
-              <string>Mission Planner Port</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="mavlinkPortField">
-             <property name="text">
-              <string>14550</string>
-             </property>
-             <property name="clearButtonEnabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="mavlinkIPField">
-             <property name="text">
-              <string>127.0.0.1</string>
-             </property>
-             <property name="dragEnabled">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-             <property name="clearButtonEnabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="mavlinkConnectionStatusLabel">
-             <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+        <item row="0" column="2" colspan="2">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QGroupBox" name="missionPlannerConnectionGroup">
+            <property name="title">
+             <string>MAVLink Connection</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="5" column="0" colspan="2">
+              <widget class="QPushButton" name="mavlinkConnectionButton">
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="mavlinkConnectionStatusField">
+               <property name="text">
+                <string>N/A</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="mavlinkIPLabel">
+               <property name="text">
+                <string>Mission Planner IP</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QCheckBox" name="mavlinkAutoReconnect">
+               <property name="text">
+                <string>Auto Reconnect</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="tristate">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="mavlinkPortLabel">
+               <property name="text">
+                <string>Mission Planner Port</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="mavlinkPortField">
+               <property name="text">
+                <string>14550</string>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="mavlinkIPField">
+               <property name="text">
+                <string>127.0.0.1</string>
+               </property>
+               <property name="dragEnabled">
+                <bool>false</bool>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="mavlinkConnectionStatusLabel">
+               <property name="text">
+                <string>Status</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="auvsiInteropGroup">
+            <property name="title">
+             <string> AUVSI Interop</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="interopIPField"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QPushButton" name="interopConnectButton">
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="interopIPLabel">
+               <property name="text">
+                <string>Interop IP</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="interopPortField"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="interopPortLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="0" column="1">
          <spacer name="verticalSpacer_2">
@@ -544,8 +571,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>910</width>
-     <height>19</height>
+     <width>1238</width>
+     <height>35</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
