@@ -205,9 +205,15 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
             SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
             this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
 
+    // update internal state
     antennaTrackerConnected = true;
 
-    emit antennaTrackerPositionUpdate(qRadiansToDegrees(latBase), qRadiansToDegrees(lonBase));
+    // update antenna tracker status params
+    emit antennaTrackerStatusUpdate(qRadiansToDegrees(latBase), qRadiansToDegrees(lonBase), elevation, heading);
+
+    // update antenna tracker currently tracking
+    emit antennaTrackerCurrentlyTracking(true);
+
     return AntennaTrackerConnectionState::SUCCESS;
 }
 
@@ -220,8 +226,12 @@ void AntennaTracker::stopTracking()
     disconnect(this->mavlinkRelay,
             SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
             this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+
+    // update internal state
     antennaTrackerConnected = false;
-    emit antennaTrackerDisconnected();
+
+    // update antenna tracker stopped tracking
+    emit antennaTrackerCurrentlyTracking(false);
 }
 
 void AntennaTracker::disconnectArduino()

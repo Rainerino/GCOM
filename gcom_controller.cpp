@@ -100,10 +100,18 @@ GcomController::GcomController(QWidget *parent) :
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
     ui->startTrackButton->setEnabled(false);
+
+    // updates UI with station lat and lon
     connect(tracker,
-            SIGNAL(antennaTrackerPositionUpdate(float,float)),
+            SIGNAL(antennaTrackerStatusUpdate(float,float,float,float)),
             this,
-            SLOT(antennaTrackerPositionInterface(float,float)));
+            SLOT(antennaTrackerUpdateStatusGUI(float,float,float,float)));
+
+    // disables UI when tracking
+    connect(tracker,
+            SIGNAL(antennaTrackerCurrentlyTracking(bool)),
+            this,
+            SLOT(disableAntennaTrackingGUI(bool)));
 }
 
 GcomController::~GcomController()
@@ -391,7 +399,6 @@ void GcomController::on_arduinoConnectButton_clicked()
     {
         tracker->disconnectArduino();
         ui->arduinoConnectButton->setText(CONNECT_BUTTON_TEXT);
-        resetOverrideGPSGUI();
     }
 
     updateStartTrackerButton();
@@ -421,7 +428,6 @@ void GcomController::on_zaberConnectButton_clicked()
     {
         tracker->disconnectZaber();
         ui->zaberConnectButton->setText(CONNECT_BUTTON_TEXT);
-        resetOverrideGPSGUI();
     }
 
     updateStartTrackerButton();
@@ -454,11 +460,6 @@ void GcomController::on_startTrackButton_clicked()
                 qDebug() << "Override GPS failed";
                 return;
             }
-
-            // when override is successful, disable fields
-            ui->antennaTrackerOverrideLatitudeField->setDisabled(true);
-            ui->antennaTrackerOverrideLongitudeField->setDisabled(true);
-            ui->antennaTrackerGPSOverrideCheckBox->setDisabled(true);
         }
 
         // initiate tracking and update button
@@ -474,47 +475,32 @@ void GcomController::on_startTrackButton_clicked()
             qDebug() << "arduino not open";
         else
             qDebug() << "wrong neighbourhood";
-
-        // if other override fields are being overridden, disable during tracking
-        if(ui->antennaTrackerOverrideHeadingCheckBox->isChecked()) {
-            ui->antennaTrackerOverrideHeadingCheckBox->setDisabled(true);
-            ui->antennaTrackerOverrideHeadingField->setDisabled(true);
-        }
-        if(ui->antennaTrackerOverrideElevationCheckBox->isChecked()) {
-            ui->antennaTrackerOverrideElevationCheckBox->setDisabled(true);
-            ui->antennaTrackerOverrideElevationField->setDisabled(true);
-        }
-
     } else {
         // station is currently tracking, stop it and enable fields
         tracker->stopTracking();
         ui->startTrackButton->setText(START_TRACKING_BUTTON_TEXT);
-        resetOverrideGPSGUI();
     }
 }
 
-void GcomController::antennaTrackerPositionInterface(float latitude, float longitude)
+void GcomController::antennaTrackerUpdateStatusGUI(float latitude, float longitude, float elevation, float heading)
 {
-    // updates the GUI with the set latitude and longitude of the tracking station
+    // update antenna tracking status params
     ui->antennaTrackerCurrentLongitudeField->setText(QString::number(longitude));
     ui->antennaTrackerCurrentLatitudeField->setText(QString::number(latitude));
+    ui->antennaTrackerCurrentElevationField->setText(QString::number(elevation));
+    ui->antennaTrackerCurrentHeadingField->setText(QString::number(heading));
 }
 
 //===================================================================
 // Override Antenna Tracker Methods
 //===================================================================
-void GcomController::resetOverrideGPSGUI()
+void GcomController::disableAntennaTrackingGUI(bool toggle)
 {
-    // reset the fields
-    ui->antennaTrackerOverrideLatitudeField->setDisabled(false);
-    ui->antennaTrackerOverrideLongitudeField->setDisabled(false);
-    ui->antennaTrackerOverrideHeadingField->setDisabled(false);
-    ui->antennaTrackerOverrideElevationField->setDisabled(false);
+    // toggle override methods
+    ui->antennaTrackerOverrideSettingsGroup->setDisabled(toggle);
 
-    // reset the checkboxes
-    ui->antennaTrackerGPSOverrideCheckBox->setDisabled(false);
-    ui->antennaTrackerOverrideHeadingCheckBox->setDisabled(false);
-    ui->antennaTrackerOverrideElevationCheckBox->setDisabled(false);
+    // toggle calibration methods
+    ui->antennaTrackerCalibrationGroup->setDisabled(toggle);
 }
 
 void GcomController::on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked)
@@ -545,14 +531,37 @@ void GcomController::on_antennaTrackerOverrideElevationCheckBox_toggled(bool che
     }
 }
 
+void GcomController::on_antennaTrackerOverrideElevationField_editingFinished()
+{
+    // if override is checked, and field is modified, update param
+    if(ui->antennaTrackerOverrideElevationCheckBox->isChecked()) {
+        tracker->setOverrideStationElevation(ui->antennaTrackerOverrideElevationField->text().toLong());
+    }
+}
+
+void GcomController::on_antennaTrackerOverrideHeadingField_editingFinished()
+{
+    // if override is checked, and field is modified, update param
+    if(ui->antennaTrackerOverrideHeadingCheckBox->isChecked()) {
+        tracker->setOverrideStationHeading(ui->antennaTrackerOverrideHeadingField->text().toLong());
+    }
+}
+
+
 //===================================================================
 // Antenna Tracker Calibration Methods
 //===================================================================
 
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
+    // disable tracking, starting calib
+    ui->startTrackButton->setDisabled(true);
+
     // start IMU calibration method
     tracker->calibrateIMU();
+
+    // enable tracking, finished calib
+    ui->startTrackButton->setDisabled(false);
 }
 
 //===================================================================

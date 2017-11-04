@@ -149,8 +149,8 @@ public slots:
 
 signals:
     void antennaTrackerDeviceDisconnected(AntennaTrackerSerialDevice device);
-    void antennaTrackerDisconnected();
-    void antennaTrackerPositionUpdate(float latitude, float longitude);
+    void antennaTrackerStatusUpdate(float latitude, float longitude, float elevation, float heading);
+    void antennaTrackerCurrentlyTracking(bool state);
 
 private:
     /*!
