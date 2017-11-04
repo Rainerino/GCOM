@@ -162,14 +162,6 @@ bool AntennaTracker::setupZaber(QString port, QSerialPort::BaudRate baud) {
     connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
             this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
 
-    // monitors zaberSerial for readyRead signal (TESTING)
-    connect(zaberSerial, &QSerialPort::readyRead, [this] {
-        //qDebug() << "New data available: " << zaberSerial->bytesAvailable();
-        QByteArray datas = zaberSerial->readAll();
-
-        qDebug() << "read: " << datas;
-    });
-
     return true;
 }
 
@@ -427,15 +419,19 @@ bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
     int microStepsHoriz = -1 * HORIZ_ANGLE_TO_MICROSTEPS(horizAngle);
     int microStepsVert = -1 * VERT_ANGLE_TO_MICROSTEPS(vertAngle);
 
-    // move vertical command
-    QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microStepsVert);
-    zaberSerial->write(vertZaberCommand.toStdString().c_str());
-
-    // move horizontal command
-    QString horizZaberCommand = QString(zaberMoveCommandTemplate).arg(2).arg(microStepsHoriz);
-    zaberSerial->write(horizZaberCommand.toStdString().c_str());
+    if(vertAngle != 0) {
+        // move vertical command
+        QString vertZaberCommand = QString(zaberMoveCommandTemplate).arg(1).arg(microStepsVert);
+        zaberSerial->write(vertZaberCommand.toStdString().c_str());
+    }
+    if(horizAngle != 0) {
+        // move horizontal command
+        QString horizZaberCommand = QString(zaberMoveCommandTemplate).arg(2).arg(microStepsHoriz);
+        zaberSerial->write(horizZaberCommand.toStdString().c_str());
+    }
 
     zaberSerial->flush();
+    zaberSerial->waitForBytesWritten(1000);
 
     return true;
 }
@@ -593,13 +589,13 @@ bool AntennaTracker::calibrateIMU()
     // horizontal, vertical commands for calibration
     int16_t calibrationArray[9][2] =
     {
-        {0,75},     // 75 deg UP vertical
+        {0,60},     // 75 deg UP vertical
         {90, 0},    // 90 deg CW horizontal
-        {0,-75},    // 75 deg DOWN vertical
+        {0,-60},    // 75 deg DOWN vertical
         {90,0},     // 90 deg CW horizontal
-        {0,75},     // 75 deg UP vertical
+        {0,60},     // 75 deg UP vertical
         {90,0},     // 90 deg CW horizontal
-        {0,-75},    // 75 deg DOWN vertical
+        {0,-60},    // 75 deg DOWN vertical
         {90,0},     // 90 deg CW horizontal
         {-360,0}    // 360 deg CCW horizontal
     };
@@ -611,31 +607,35 @@ bool AntennaTracker::calibrateIMU()
     if (!zaberSerial->isOpen())
         return false;
 
-    // iterate through each command in the calibration array and check for idle
-    //for(int i = 0; i < rowCountCalibrationArr; i++) {
-        // while loop to check for IDLE here
-       // moveZaber(calibrationArray[i][0],calibrationArray[i][1]);
-    //}
-
-    // data stream test...
-    zaberDataStream = new QDataStream(zaberSerial);
-
     // check status command
     const QString checkZaberStatusCommand = "/\n";
     QString outputLine = "";
 
-    // START WHILE LOOP IDLE CHECK
-    // TODO: move to for loop above, after verification
+    // iterate through each command in the calibration array and check for idle
+    for(int i = 0; i < rowCountCalibrationArr; i++) {
+        while(true) {
+            // send check status command
+            zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+            zaberSerial->flush();
 
-    zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
-    zaberSerial->flush();
+            // delay to wait for bytes written
+            zaberSerial->waitForBytesWritten(3000);
 
-    qDebug() << "Sent: " << checkZaberStatusCommand << endl;
+            // read data
+            QByteArray datas = zaberSerial->readAll();
+            outputLine = datas; // convert to QString
 
-//    if(outputLine.contains("IDLE", Qt::CaseInsensitive))
-//        break;
+            // output status (debugging)
+            qDebug() << "read: " << outputLine;
 
-    // END OF WHILE LOOP IDLE CHECK
+            // check for IDLE
+            if(outputLine.contains("IDLE", Qt::CaseInsensitive))
+                break;
+        }
+
+        // move next command
+        moveZaber(calibrationArray[i][0],calibrationArray[i][1]);
+    }
 
     return true;
 }
