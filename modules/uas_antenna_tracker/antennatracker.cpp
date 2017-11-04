@@ -52,7 +52,7 @@ const QString TEXT_ARDUINO_NOT_CONNECTED = "NO ARDUINO CONNECTED";
 const QString zaberStopCommandTemplate= "/1 %1 stop\n";
 const QString zaberMoveCommandTemplate= "/1 %1 move rel %2\n";
 // Zaber Setup
-const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000";
+const QString zaberSetVerticalMoveSpeed = "/1 1 set maxspeed 120000\n";
 // Constant
 const float RADIUS_EARTH = 6378137;
 
@@ -161,6 +161,14 @@ bool AntennaTracker::setupZaber(QString port, QSerialPort::BaudRate baud) {
 
     connect(zaberSerial, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
             this, SLOT(zaberControllerDisconnected(QSerialPort::SerialPortError)));
+
+    // monitors zaberSerial for readyRead signal (TESTING)
+    connect(zaberSerial, &QSerialPort::readyRead, [this] {
+        //qDebug() << "New data available: " << zaberSerial->bytesAvailable();
+        QByteArray datas = zaberSerial->readAll();
+
+        qDebug() << "read: " << datas;
+    });
 
     return true;
 }
@@ -609,28 +617,23 @@ bool AntennaTracker::calibrateIMU()
        // moveZaber(calibrationArray[i][0],calibrationArray[i][1]);
     //}
 
+    // data stream test...
+    zaberDataStream = new QDataStream(zaberSerial);
+
+    // check status command
+    const QString checkZaberStatusCommand = "/\n";
+    QString outputLine = "";
+
     // START WHILE LOOP IDLE CHECK
     // TODO: move to for loop above, after verification
 
-    while(true) {
-        // check status command
-        const QString checkZaberStatusCommand = "/";
-        QString outputLine = "";
+    zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
+    zaberSerial->flush();
 
-        zaberSerial->write(checkZaberStatusCommand.toStdString().c_str());
-        zaberSerial->flush();
-        zaberSerial->waitForBytesWritten(1000);
-        if(zaberSerial->waitForReadyRead(3000)) {
-            outputLine = zaberSerial->readLine();
-            qDebug() << "Output: " << outputLine << endl;
-        } else {
-            qDebug() << "Error: No line read. " << endl;
-        }
+    qDebug() << "Sent: " << checkZaberStatusCommand << endl;
 
-
-        if(outputLine.contains("IDLE", Qt::CaseInsensitive))
-            break;
-    }
+//    if(outputLine.contains("IDLE", Qt::CaseInsensitive))
+//        break;
 
     // END OF WHILE LOOP IDLE CHECK
 

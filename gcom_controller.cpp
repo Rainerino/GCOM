@@ -412,7 +412,7 @@ void GcomController::on_zaberConnectButton_clicked()
         QModelIndex selectedIndex = ui->availableZaberPorts->currentIndex();
         QString selectedPort = selectedIndex.data().toString();
 
-        bool status = tracker->setupZaber(selectedPort, QSerialPort::Baud9600);
+        bool status = tracker->setupZaber(selectedPort, QSerialPort::Baud115200);
 
         if (status)
             ui->zaberConnectButton->setText(DISCONNECT_BUTTON_TEXT);

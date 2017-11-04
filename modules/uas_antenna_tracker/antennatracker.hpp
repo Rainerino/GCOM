@@ -179,6 +179,7 @@ private:
     QSerialPort *arduinoSerial;
     QSerialPort *zaberSerial;
     QDataStream *arduinoDataStream;
+    QDataStream *zaberDataStream;
     UASMessageSerialFramer *arduinoFramer;
 
     // Base station GPS
