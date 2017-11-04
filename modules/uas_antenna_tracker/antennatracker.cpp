@@ -589,13 +589,13 @@ bool AntennaTracker::calibrateIMU()
     // horizontal, vertical commands for calibration
     int16_t calibrationArray[9][2] =
     {
-        {0,60},     // 75 deg UP vertical
+        {0,60},     // 60 deg UP vertical
         {90, 0},    // 90 deg CW horizontal
-        {0,-60},    // 75 deg DOWN vertical
+        {0,-60},    // 60 deg DOWN vertical
         {90,0},     // 90 deg CW horizontal
-        {0,60},     // 75 deg UP vertical
+        {0,60},     // 60 deg UP vertical
         {90,0},     // 90 deg CW horizontal
-        {0,-60},    // 75 deg DOWN vertical
+        {0,-60},    // 60 deg DOWN vertical
         {90,0},     // 90 deg CW horizontal
         {-360,0}    // 360 deg CCW horizontal
     };
