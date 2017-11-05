@@ -124,7 +124,8 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
         int32_t longitudeRaw;
 
         /*!
-         * \brief The altitude of the image above sea level in metres as int32_t packed using 1e3
+         * \brief The altitude of the image above mean sea level in metres
+         *        as int32_t packed using 1e3
          */
         int32_t altitudeAbsRaw;
 
@@ -135,7 +136,7 @@ class ImageTaggedMessage : public ImageUntaggedMessage {
 
         /*!
          * \brief The heading (yaw angle) in degrees (0.0-359.99) as uint16_t packed using 1e2
-         * \details If unknown, will be set to UINT16_MAX * 1e2
+         * \details If unknown, will be set to UINT16_MAX
          */
         uint16_t headingRaw;
 };

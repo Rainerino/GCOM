@@ -187,7 +187,7 @@ std::vector<uint8_t> ImageTaggedMessage::serialize()
 }
 
 //===================================================================
-// Coordinate Methods
+// Tag Methods
 //===================================================================
 
 double ImageTaggedMessage::latitude() {
