@@ -1,13 +1,13 @@
 #ifndef MOVING_OBSTACLE_H
 #define MOVING_OBSTACLE_H
-
+/*
 class MovingObstacle : QObject
 {
     Q_OBJECT
 
 public:
 
-    MovingObstacle(const latitude, const longitude, const altitudeMsl, const sphereRadius);
+    MovingObstacle(const double latitude, const double longitude, const double altitudeMsl, const double sphereRadius);
     ~MovingObstacle();
 
     const double getLatitude();
@@ -23,6 +23,6 @@ private:
     double longitude;
     double altitudeMsl;
     double sphereRadius;
-};
+};*/
 
 #endif // MOVING_OBSTACLE_H

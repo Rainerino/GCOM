@@ -1,6 +1,7 @@
 #include "stationary_obstacle.hpp"
 
-StationaryObstacle::StationaryObstacle(const latitude, const longitude, const cylinderHeight, const cylinderRadius)
+/*
+StationaryObstacle::StationaryObstacle(const double latitude, const double longitude, const double cylinderHeight, const double cylinderRadius)
 {
     this->latitude = latitude;
     this->longitude = longitude;
@@ -32,3 +33,4 @@ StationaryObstacle::cylinderRadius()
 {
     return this->cylinderRadius;
 }
+*/

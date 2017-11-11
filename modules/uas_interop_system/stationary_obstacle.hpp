@@ -1,13 +1,13 @@
 #ifndef STATIONARY_OBSTACLE_H
 #define STATIONARY_OBSTACLE_H
 
-class StationaryObstacle : QObject
+/*)
+class StationaryObstacle
 {
-    Q_OBJECT
 
 public:
 
-    StationaryObstacle(const latitude, const longitude, const cylinderHeight, const cylinderRadius);
+    StationaryObstacle(const double latitude, const double longitude, const double cylinderHeight, const double cylinderRadius);
     ~StationaryObstacle();
 
     const double getLatitude();
@@ -24,6 +24,6 @@ private:
     double cylinderHeight;
     double cylinderRadius;
 
-};
+};*/
 
 #endif // STATIONARY_OBSTACLE_H
