@@ -91,9 +91,6 @@ GcomController::GcomController(QWidget *parent) :
     // Antenna Tracker Setup
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
-
-    // Initially disable claw tab
-    ui->tabWidget->setTabEnabled(2, false);
 }
 
 GcomController::~GcomController()
@@ -226,9 +223,6 @@ void GcomController::resetDCNCGUI()
     // Deactivate the drop gremlin button
     ui->dcncDropGremlin->setDisabled(false);
 
-    // Disable claw tab
-    ui->tabWidget->setTabEnabled(2, false);
-
     // Clear capabilities field
     ui->dcncCapabilitiesField->clear();
 }
@@ -330,9 +324,6 @@ void GcomController::dcncDisconnected()
     // Start the connection timeout timer.
     dcncSearchTimeoutTimer->start(ui->dcncServerTimeoutField->text().toULong() * 1000);
 
-    // Disable claw tab
-    ui->tabWidget->setTabEnabled(2, false);
-
     // Clear capabilities field
     ui->dcncCapabilitiesField->clear();
 }
@@ -352,11 +343,6 @@ void GcomController::gremlinCapabilities(CapabilitiesMessage::Capabilities capab
         {
             ui->dcncCapabilitiesField->addItem("Image Relay");
             dcnc->startImageRelay();
-        }
-        if (static_cast<uint32_t>(capabilities & CapabilitiesMessage::Capabilities::CLAW))
-        {
-            ui->dcncCapabilitiesField->addItem("Claw");
-            ui->tabWidget->setTabEnabled(2, true);
         }
 
         capabilities = capabilities >> 8;

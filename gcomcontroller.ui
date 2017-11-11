@@ -535,11 +535,6 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Claw</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>

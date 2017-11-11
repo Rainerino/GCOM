@@ -53,7 +53,8 @@ HEADERS  += \
     modules/uas_message/image_untagged_message.hpp \
     modules/uas_message/image_tagged_message.hpp
 
-   
+FORMS += \
+    gcomcontroller.ui
 
 INCLUDEPATH += Mavlink
 
