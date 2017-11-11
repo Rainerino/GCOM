@@ -148,7 +148,7 @@ private slots:
      */
     void handleClientMessage(std::shared_ptr<UASMessage> message);
 
-    UASMessage* handleResponse(CommandMessage::Commands command,
+    void handleResponse(CommandMessage::Commands command,
                                ResponseMessage::ResponseCodes responses);
     UASMessage* handleInfo(std::string systemId, bool dropped, bool autoResume);
 

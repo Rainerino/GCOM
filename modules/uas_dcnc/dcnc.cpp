@@ -4,6 +4,7 @@
 // System Includes
 #include <QString>
 #include <QDebug>
+
 // GCOM Includes
 #include "dcnc.hpp"
 #include "modules/uas_message/uas_message.hpp"
@@ -30,7 +31,9 @@ DCNC::DCNC()
     connect(server, SIGNAL(newConnection()),
             this, SLOT(handleClientConection()));
 }
-//TODO
+
+
+// TODO Finish tearing down everything, delete sockets since they are dynamicly allocated!
 DCNC::~DCNC()
 {
     //first disconnect the newConnection to handleClientConection
@@ -79,15 +82,15 @@ void DCNC::cancelConnection()
                    this, SLOT(handleClientData()));
         disconnect(clientConnection, SIGNAL(disconnected()),
                    this, SLOT(handleClientDisconnected()));
-        //Closes the I/O device for the socket and calls disconnectFromHost() to 
-        //close the socket's connection.
+
+        // Closes the I/O device for the socket and calls disconnectFromHost() to
+        // close the socket's connection.
         clientConnection->close();
         clientConnection->deleteLater();
         clientConnection = nullptr;
-        // who will catch this signal 
         emit droppedConnection();
     }
-//Resumes accepting new connections
+
     server->resumeAccepting();
 }
 
@@ -117,14 +120,11 @@ void DCNC::handleClientConection()
     // Update the DCNC's state and notify listners
     serverStatus = DCNCStatus::CONNECTED;
 
-    // Send system info request
-    // TODO: that the message is successfully sent
+    // Send system info request and check that the message was successfully sent
     RequestMessage request(UASMessage::MessageID::DATA_SYSTEM_INFO);
     messageFramer.frameMessage(request);
     connectionDataStream << messageFramer;
-    //check the << operation send status if send Failure dropped the conncection
     if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
-        //droppedConnection ->simply send out a signal
         droppedConnection();
     else
         emit receivedConnection();
@@ -136,28 +136,6 @@ void DCNC::handleClientDisconnected()
     cancelConnection();
 }
 
-void DCNC::handleClientData()
-{
-    messageFramer.clearMessage();
-    while (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
-    {
-        connectionDataStream.startTransaction();
-        connectionDataStream >> messageFramer;
-        if (messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SUCCESS)
-        {
-            handleClientMessage(messageFramer.generateMessage());
-            connectionDataStream.commitTransaction();
-        }
-        else if (messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
-        {
-            connectionDataStream.rollbackTransaction();
-        }
-        else
-        {
-            connectionDataStream.abortTransaction();
-        }
-    }
-}
 
 void DCNC::changeAutoResume(bool autoResume)
 {
@@ -167,7 +145,6 @@ void DCNC::changeAutoResume(bool autoResume)
 //===================================================================
 // Outgoing message methods
 //===================================================================
-
 bool DCNC::sendUASMessage(std::shared_ptr<UASMessage> outgoingMessage)
 {
     if (clientConnection == nullptr || clientConnection->state() != QTcpSocket::ConnectedState)
@@ -198,6 +175,30 @@ void DCNC::stopImageRelay()
 //===================================================================
 // Receive Handler
 //===================================================================
+void DCNC::handleClientData()
+{
+    messageFramer.clearMessage();
+    while (messageFramer.status() != UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
+    {
+        connectionDataStream.startTransaction();
+        connectionDataStream >> messageFramer;
+        if (messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SUCCESS)
+        {
+            handleClientMessage(messageFramer.generateMessage());
+            connectionDataStream.commitTransaction();
+        }
+        else if (messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::INCOMPLETE_MESSAGE)
+        {
+            connectionDataStream.rollbackTransaction();
+        }
+        else
+        {
+            connectionDataStream.abortTransaction();
+        }
+    }
+}
+
+
 void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
 {
     UASMessage *outgoingMessage = nullptr;
@@ -210,7 +211,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             emit receivedGremlinInfo(QString(systemInfo->systemId.c_str()),
                                      systemInfo->versionNumber,
                                      systemInfo->dropped);
-               break;
+            break;
         }
 
         case UASMessage::MessageID::DATA_CAPABILITIES:
@@ -225,7 +226,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
         {
             std::shared_ptr<ResponseMessage> response =
                     std::static_pointer_cast<ResponseMessage>(message);
-            outgoingMessage = handleResponse(response->command, response->response);
+            handleResponse(response->command, response->response);
             emit receivedGremlinResponse(response->command, response->response);
             break;
         }
@@ -235,10 +236,12 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             std::shared_ptr<ImageMessage> image =
                     std::static_pointer_cast<ImageMessage>(message);
             emit receivedImageData(image);
+            break;
         }
 
         default:
             outgoingMessage = nullptr;
+        break;
     }
 
     if (outgoingMessage == nullptr)
@@ -251,11 +254,10 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     delete outgoingMessage;
 }
 
-//need to update?
-//case INVALID_REQUEST
-//case INVALID_COMMAND
-UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
-                           ResponseMessage::ResponseCodes responses)
+// TODO Relay all other responses to an external signal, so that modules that care about them can
+// get them
+void DCNC::handleResponse(CommandMessage::Commands command,
+                          ResponseMessage::ResponseCodes responses)
 {
     switch(command)
     {
@@ -264,13 +266,13 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
         {
             // simply drop the connection for a reset doesn't depend on the reset
             droppedConnection();
+
         }
+        break;
         // return nullptr if resume succeed
         case CommandMessage::Commands::SYSTEM_RESUME:
         {
-            if (responses == ResponseMessage::ResponseCodes::NO_ERROR)
-                return nullptr;
-            else
+            if (responses != ResponseMessage::ResponseCodes::NO_ERROR)
                  droppedConnection();
         }
         break;
@@ -278,19 +280,21 @@ UASMessage* DCNC::handleResponse(CommandMessage::Commands command,
         default:
         break;
     }
-
-    return nullptr;
 }
 
-UASMessage* DCNC::handleInfo(std::string systemId, bool dropped,bool autoResume){
-
-    if(preSysID.compare(systemId)==0 && dropped&& autoResume){
+// TODO Handle Connection Status
+UASMessage* DCNC::handleInfo(std::string systemId, bool dropped, bool autoResume)
+{
+    if(preSysID.compare(systemId)==0 && dropped && autoResume)
+    {
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESUME);
     }
-    else if(dropped && preSysID.compare(systemId)==0){
+    else if(dropped && preSysID.compare(systemId)==0)
+    {
         return new CommandMessage(CommandMessage::Commands::SYSTEM_RESET);
     }
-    else{
+    else
+    {
         preSysID.assign(systemId);
         return new RequestMessage(UASMessage::MessageID::DATA_CAPABILITIES);
     }
