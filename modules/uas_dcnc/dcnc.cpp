@@ -223,6 +223,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             std::shared_ptr<ImageUntaggedMessage> image =
                     std::static_pointer_cast<ImageUntaggedMessage>(message);
             emit receivedImageUntaggedData(image);
+            break;
         }
 
         case UASMessage::MessageID::DATA_IMAGE_TAGGED:
@@ -230,6 +231,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
             std::shared_ptr<ImageTaggedMessage> image =
                     std::static_pointer_cast<ImageTaggedMessage>(message);
             emit receivedImageTaggedData(image);
+            break;
         }
 
         default:
