@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     modules/uas_message/gps_message.cpp \
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
-    modules/uas_message/image_message.cpp \
+    modules/uas_message/image_untagged_message.cpp \
+    modules/uas_message/image_message.cpp
     modules/uas_utility/uas_utility.cpp
 
 HEADERS  += \
@@ -50,7 +51,15 @@ HEADERS  += \
     modules/uas_message/gps_message.hpp \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
-    modules/uas_message/image_message.hpp \
-    modules/uas_utility/uas_utility.h
+    modules/uas_message/image_untagged_message.hpp \
+    modules/uas_message/image_tagged_message.hpp
+    modules/uas_utility/uas_utility.h	
 
-FORMS    += gcomcontroller.ui
+FORMS += \
+    gcomcontroller.ui
+
+INCLUDEPATH += Mavlink
+
+CONFIG += c++14
+
+RESOURCES = resources.qrc
