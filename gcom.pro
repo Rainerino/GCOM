@@ -31,7 +31,7 @@ SOURCES += main.cpp\
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
     modules/uas_message/image_untagged_message.cpp \
-    modules/uas_message/image_tagged_message.cpp
+    modules/uas_message/image_tagged_message.cpp \
     modules/uas_utility/uas_utility.cpp
 
 HEADERS  += \
