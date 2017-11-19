@@ -4,6 +4,8 @@
 // System Includes
 #include <QString>
 #include <QFile>
+#include <QSignalSpy>
+#include <QtTest/QtTest>
 // GCOM Includes
 #include "test_image_tagged_message.hpp"
 
@@ -12,24 +14,27 @@ const int PORT = 4206;
 
 const int TEST_START_INDEX = 0;
 const int TEST_END_INDEX = 6;
-const QString SEQ_ARRAY[] = {"1", "10", "34", "100", "178", "201", "255"};
-const QString LAT_ARRAY[] = {"0", "1", "-1", "12345678", "700000001", "-900000000", "900000000"};
-const QString LON_ARRAY[] = {"0", "1", "-1", "987654321", "1299999999" "-1800000000", "1800000000"};
-const QString ALT_ABS_ARRAY[] = {"0", "1", "-1", "293843", "400001", "-500000", "500000"};
-const QString ALT_REL_ARRAY[] = {"0", "1", "-1", "192723", "399999", "-500000", "500000"};
-const QString HDG_ARRAY[] = {"0", "1", "10001", "23456", "30492", "32111", "36000"};
-const QString IMG_PATH_ARRAY[] = {"images/connected.png", "images/kingfisher.jpg",
-                                  "images/flower.jpeg", "images/marbles.bmp",
-                                  "images/walle.jpg", "images/planet.jpg",
-                                  "images/nebula.tif"};
+const QString SEQ_TEST[] = {"0", "1", "34", "100", "178", "201", "255"};
+const QString LAT_TEST[] = {"0", "1", "-1", "700001", "12345678", "-900000000", "900000000"};
+const QString LON_TEST[] = {"0", "1", "-1", "129999", "87654321", "-1800000000", "1800000000"};
+const QString ALT_ABS_TEST[] = {"0", "1", "-1", "401", "29383", "-500000", "500000"};
+const QString ALT_REL_TEST[] = {"0", "1", "-1", "399", "19273", "-500000", "500000"};
+const QString HDG_TEST[] = {"0", "1", "101", "2345", "10492", "32111", "36000"};
+const QString IMG_PATH_TEST[] = {
+                    IMAGE_PATH + QString("connected.png"), IMAGE_PATH + QString("kingfisher.jpg"),
+                    IMAGE_PATH + QString("flower.jpeg"), IMAGE_PATH + QString("marbles.bmp"),
+                    IMAGE_PATH + QString("walle.jpg"), IMAGE_PATH + QString("planet.jpg"),
+                    IMAGE_PATH + QString("nebula.tif")};
 
-const int WAIT_DURATION = 60000;
+// In milliseconds
+const int SOCKET_TIMEOUT_DURATION = 5000;
+const int SIGNAL_TIMEOUT_DURATION = 180000;
 
 QTEST_MAIN(TestImageTaggedMessage)
 
 void TestImageTaggedMessage::initTestCase()
 {
-    // Allow shared ptr to be used in signal
+    // Register shared ptr to allow being used in signal
     qRegisterMetaType<std::shared_ptr<ImageTaggedMessage>>();
 
     dcnc = new DCNC();
@@ -37,14 +42,14 @@ void TestImageTaggedMessage::initTestCase()
 
     socket = new QTcpSocket(this);
 
-    connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
     connect(dcnc, SIGNAL(receivedImageTaggedData(std::shared_ptr<ImageTaggedMessage>)),
-           this, SLOT(compareImageTaggedData(std::shared_ptr<ImageTaggedMessage>)));
+            this, SLOT(compareImageTaggedData(std::shared_ptr<ImageTaggedMessage>)));
 
     socket->connectToHost(IP_ADDRESS, PORT);
-    // Make sure socket connects
-    QVERIFY(socket->waitForConnected(5000));
+    // Verify socket connects
+    QVERIFY(socket->waitForConnected(SOCKET_TIMEOUT_DURATION));
 
 }
 
@@ -53,8 +58,8 @@ void TestImageTaggedMessage::cleanupTestCase()
     socket->disconnectFromHost();
     dcnc->stopServer();
 
-    disconnect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    disconnect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    disconnect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+    disconnect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
     disconnect(dcnc, SIGNAL(receivedImageTaggedData(std::shared_ptr<ImageTaggedMessage>)),
            this, SLOT(compareImageTaggedData(std::shared_ptr<ImageTaggedMessage>)));
 
@@ -63,14 +68,14 @@ void TestImageTaggedMessage::cleanupTestCase()
     delete sentImageData;
 }
 
-void TestImageTaggedMessage::connected()
+void TestImageTaggedMessage::socketConnected()
 {
     qInfo() << "Socket Connected";
     connectionDataStream.resetStatus();
     connectionDataStream.setDevice(socket);
 }
 
-void TestImageTaggedMessage::disconnected()
+void TestImageTaggedMessage::socketDisconnected()
 {
     qInfo() << "Socket Disconnected";
     connectionDataStream.resetStatus();
@@ -91,14 +96,15 @@ void TestImageTaggedMessage::sendTaggedImage_data() {
 
     // Add rows
     for (int i = TEST_START_INDEX; i <= TEST_END_INDEX; i++) {
-        QTest::newRow(QString::number(i).toStdString().c_str())
-                << SEQ_ARRAY[i] << LAT_ARRAY[i] << LON_ARRAY[i] << ALT_ABS_ARRAY[i]
-                << ALT_REL_ARRAY[i] << HDG_ARRAY[i] << IMG_PATH_ARRAY[i];
+        QTest::newRow(qPrintable(QString::number(i)))
+                << SEQ_TEST[i] << LAT_TEST[i] << LON_TEST[i] << ALT_ABS_TEST[i]
+                << ALT_REL_TEST[i] << HDG_TEST[i] << IMG_PATH_TEST[i];
     }
 }
 
 void TestImageTaggedMessage::sendTaggedImage()
 {
+    // Retrieve all the data from a row in the data table to test
     QFETCH(QString, sequence);
     QFETCH(QString, latitude);
     QFETCH(QString, longitude);
@@ -106,6 +112,13 @@ void TestImageTaggedMessage::sendTaggedImage()
     QFETCH(QString, altitudeRel);
     QFETCH(QString, heading);
     QFETCH(QString, imagePath);
+
+    seq = sequence.toInt();
+    lat = latitude.toInt();
+    lon = longitude.toInt();
+    altAbs = altitudeAbs.toInt();
+    altRel = altitudeRel.toInt();
+    hdg = heading.toInt();
 
     QFile image(imagePath);
     // Verify image opened correctly
@@ -119,26 +132,20 @@ void TestImageTaggedMessage::sendTaggedImage()
     QByteArray imageByteArray = image.readAll();
     std::copy(imageByteArray.begin(), imageByteArray.end(), sentImageData);
 
-    seq = sequence.toInt();
-    lat = latitude.toInt();
-    lon = longitude.toInt();
-    altAbs = altitudeAbs.toInt();
-    altRel = altitudeRel.toInt();
-    hdg = heading.toInt();
-
     ImageTaggedMessage outgoingMessage(seq, lat, lon, altAbs, altRel, hdg, sentImageData, imageSize);
     messageFramer.frameMessage(outgoingMessage);
     connectionDataStream << messageFramer;
 
     image.close();
 
-    // Create a signal spy to check when signal will be emitted
+    // Create a signal spy to keep track of the signal
     QSignalSpy taggedImageMessageSpy(dcnc,
                SIGNAL(receivedImageTaggedData(std::shared_ptr<ImageTaggedMessage>)));
     QVERIFY(taggedImageMessageSpy.isValid());
 
     // Create an event loop that waits until signal is emitted
-    QVERIFY(taggedImageMessageSpy.wait(WAIT_DURATION));
+    // If the signal has not been emitted by the time SIGNAL_TIMEOUT_DURATION ends, wait returns false
+    QVERIFY(taggedImageMessageSpy.wait(SIGNAL_TIMEOUT_DURATION));
 }
 
 void TestImageTaggedMessage::compareImageTaggedData(std::shared_ptr<ImageTaggedMessage> image)
@@ -152,9 +159,10 @@ void TestImageTaggedMessage::compareImageTaggedData(std::shared_ptr<ImageTaggedM
     QCOMPARE(image->headingRaw, hdg);
 
     // Compare the images byte by byte
-    int numBytes;
+    unsigned int numBytes;
     for (numBytes = 0; numBytes < image->imageData.size(); numBytes++) {
         QCOMPARE(image->imageData[numBytes], *(sentImageData + numBytes));
     }
+    QCOMPARE(image->imageData.size(), imageSize);
     qInfo() << "Number of bytes checked: " << numBytes;
 }

@@ -6,13 +6,11 @@
 //===================================================================
 // System Includes
 #include <QObject>
-#include <QtTest/QtTest>
 #include <QTcpSocket>
 #include <QDataStream>
-#include <QSignalSpy>
 // GCOM Includes
-#include <modules/uas_dcnc/dcnc.hpp>
-#include <modules/uas_message/uas_message_tcp_framer.hpp>
+#include "modules/uas_dcnc/dcnc.hpp"
+#include "modules/uas_message/uas_message_tcp_framer.hpp"
 
 Q_DECLARE_METATYPE(std::shared_ptr<ImageTaggedMessage>)
 
@@ -22,12 +20,13 @@ class TestImageTaggedMessage : public QObject
 
 public slots:
     // Socket slots
-    void connected();
-    void disconnected();
+    void socketConnected();
+    void socketDisconnected();
 
-    void compareImageTaggedData(std::shared_ptr<ImageTaggedMessage>);
+    void compareImageTaggedData(std::shared_ptr<ImageTaggedMessage> message);
 
 private slots:
+    // Function to be tested
     void sendTaggedImage();
     void sendTaggedImage_data();
 
