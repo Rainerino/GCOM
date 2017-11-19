@@ -1,19 +1,9 @@
 #ifndef UAS_UTILITY_H
 #define UAS_UTILITY_H
 
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
-#include <QString>
-#include <QDebug>
-#include <QList>
-#include <vector>
-#include <math.h>
-#include <atomic>
+// GCOM Includes
 #include "../Mavlink/ardupilotmega/mavlink.h"
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
-#include "modules/uas_message/uas_message.hpp"
-#include "modules/uas_message/request_message.hpp"
-#include "modules/uas_message/uas_message_serial_framer.hpp"
 
 namespace Utility
 {

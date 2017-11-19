@@ -3,14 +3,12 @@
 //===================================================================
 // Includes
 //===================================================================
-// GCOM Includes
-#include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
-#include "../Mavlink/ardupilotmega/mavlink.h"
 // QT Includes
 #include <QString>
 #include <QList>
 #include <QtMath>
 #include <QDebug>
+
 // System Includes
 #include <vector>
 #include <math.h>

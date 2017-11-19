@@ -81,7 +81,7 @@ AntennaTracker::AntennaTracker()
     elevation = 0;
 
     // Mavlink Relay
-    mavlinkRelay = new MAVLinkRelay();
+    mavlinkRelay = nullptr;
 
     sentRequest = false;
 }
@@ -103,8 +103,8 @@ AntennaTracker::~AntennaTracker()
     }
 
     delete arduinoDataStream;
-
     delete arduinoFramer;
+    delete mavlinkRelay;
 }
 
 bool AntennaTracker::setupArduino(QString port, QSerialPort::BaudRate baud) {
@@ -167,9 +167,11 @@ bool AntennaTracker::setupZaber(QString port, QSerialPort::BaudRate baud) {
 
 AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVLinkRelay * const relay)
 {
-    QElapsedTimer timer;
-    timer.start();
     this->mavlinkRelay = relay;
+
+    // Connect the Mavlink Relay
+    if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
+        return AntennaTrackerConnectionState::RELAY_NOT_OPEN;
 
     // Double check that the conditions required for the connection is correct
     if (arduinoSerial == nullptr)
@@ -193,10 +195,6 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
             return AntennaTrackerConnectionState::FAILED;
     }
 
-    // Connect the Mavlink Relay
-    if(relay->status() != MAVLinkRelay::MAVLinkRelayStatus::CONNECTED)
-        return AntennaTrackerConnectionState::RELAY_NOT_OPEN;
-
     // Setup desired speed for Zaber vertical movement
     zaberSerial->write(zaberSetVerticalMoveSpeed.toStdString().c_str());
     zaberSerial->flush();
@@ -209,7 +207,8 @@ AntennaTracker::AntennaTrackerConnectionState AntennaTracker::startTracking(MAVL
     antennaTrackerConnected = true;
 
     // update antenna tracker status params
-    emit antennaTrackerStatusUpdate(qRadiansToDegrees(latBase), qRadiansToDegrees(lonBase), elevation, heading);
+    emit antennaTrackerStatusUpdate(qRadiansToDegrees(latBase), qRadiansToDegrees(lonBase),
+                                    elevation, heading);
 
     // update antenna tracker currently tracking
     emit antennaTrackerCurrentlyTracking(true);
@@ -224,8 +223,8 @@ void AntennaTracker::stopTracking()
 
     // Disconnect the mavlink relay
     disconnect(this->mavlinkRelay,
-            SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
-            this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
+               SIGNAL(mavlinkRelayGPSInfo(std::shared_ptr<mavlink_global_position_int_t>)),
+               this, SLOT(receiveHandler(std::shared_ptr<mavlink_global_position_int_t>)));
 
     // update internal state
     antennaTrackerConnected = false;
@@ -300,7 +299,6 @@ void AntennaTracker::arduinoDisconnected(QSerialPort::SerialPortError error)
 void AntennaTracker::zaberControllerDisconnected(QSerialPort::SerialPortError error)
 {
     (void) error;
-
     if (antennaTrackerConnected)
         stopTracking();
 
@@ -376,7 +374,7 @@ bool AntennaTracker::moveZaber(int16_t horizAngle, int16_t vertAngle)
         zaberSerial->write(horizZaberCommand.toStdString().c_str());
     }
 
-    if((vertAngle != 0 && horizAngle != 0))
+    if(vertAngle != 0 && horizAngle != 0)
         zaberSerial->flush();
 
     return true;
@@ -417,7 +415,7 @@ bool AntennaTracker::retrieveStationPos()
     if ((gpsMessage == nullptr) || (gpsMessage->type() != UASMessage::MessageID::DATA_GPS))
         return false;
 
-    lonBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lon * -1);
+    lonBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lon);
     latBase = qDegreesToRadians(std::static_pointer_cast<GPSMessage>(gpsMessage)->lat);
 
     return true;
@@ -526,60 +524,57 @@ bool AntennaTracker::levelVertical()
 
 bool AntennaTracker::calibrateIMU()
 {
-    // horizontal, vertical commands for calibration
-    int16_t calibrationArray[11][2] =
-    {
-        {0,60},     // 60   deg
-        {90,0},     // 90   deg CW horizontal
-        {0,-120},   // -120 deg
-        {90,0},     // 90   deg CW horizontal
-        {0,120},    // 120  deg
-        {90,0},     // 90   deg CW horizontal
-        {0,-120},   // -120 deg
-        {90,0},     // 90   deg CW horizontal
-        {0,120},    // 120  deg
-        {-360,0},   // 360  deg CCW horizontal
-        {0,-60}     // -60  deg
-    };
+    // checks if serial connection is made
+    if (!zaberSerial->isOpen()) {
+        qDebug() << "zaber is not connected" << endl;
+        return false;
+    }
 
-    // number of commands
-    uint8_t rowCountCalibrationArr = sizeof(calibrationArray) / sizeof(calibrationArray[0]);
+    // horizontal, vertical commands for calibration
+    int numberOfTests = 11;
+    int calibrationArray[numberOfTests][2] =
+    {
+        {0,50},     // 60   deg
+        {90,0},     // 90   deg CW horizontal
+        {0,-100},   // -120 deg
+        {90,0},     // 90   deg CW horizontal
+        {0,100},    // 120  deg
+        {90,0},     // 90   deg CW horizontal
+        {0,-100},   // -120 deg
+        {90,0},     // 90   deg CW horizontal
+        {0,100},    // 120  deg
+        {-360,0},   // 360  deg CCW horizontal
+        {0,-50}     // -60  deg
+    };
 
     // check status output
     QString outputLine = "";
-
-    // checks if serial connection is made
-    if (!zaberSerial->isOpen())
-        return false;
 
     // level vertical upon start up
     levelVertical();
 
     // iterate through each command in the calibration array and check for idle
-    for(int i = 0; i < rowCountCalibrationArr; i++) {
+    for(int testIndex = 0; testIndex < numberOfTests; testIndex++) {
         // checks for IDLE, and executes move command once found
         while(true) {
             // send check status command
             zaberSerial->write(zaberCheckStatusCommand.toStdString().c_str());
             zaberSerial->flush();
 
-            // delay to wait for bytes written
-            zaberSerial->waitForBytesWritten(500);
-            zaberSerial->waitForReadyRead(500);
+            // check bytes written before reading
+            if(zaberSerial->waitForBytesWritten(500) && zaberSerial->waitForReadyRead(500)) {
+                // read data
+                QByteArray datas = zaberSerial->readAll();
+                outputLine = datas; // convert to QString
 
-            // read data
-            QByteArray datas = zaberSerial->readAll();
-            outputLine = datas; // convert to QString
-
-            //qDebug() << "Status: " << datas << endl;
-
-            // check for IDLE
-            if(outputLine.contains("IDLE", Qt::CaseInsensitive))
-                break;
+                // check for IDLE
+                if(outputLine.contains("IDLE", Qt::CaseInsensitive))
+                    break;
+            }
         }
 
         // move next command
-        moveZaber(calibrationArray[i][0],calibrationArray[i][1]);
+        moveZaber(calibrationArray[testIndex][0],calibrationArray[testIndex][1]);
     }
 
     return true;
