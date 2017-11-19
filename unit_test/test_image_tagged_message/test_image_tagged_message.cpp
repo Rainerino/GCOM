@@ -21,14 +21,14 @@ const QString ALT_ABS_TEST[] = {"0", "1", "-1", "401", "29383", "-500000", "5000
 const QString ALT_REL_TEST[] = {"0", "1", "-1", "399", "19273", "-500000", "500000"};
 const QString HDG_TEST[] = {"0", "1", "101", "2345", "10492", "32111", "36000"};
 const QString IMG_PATH_TEST[] = {
-                    IMAGE_PATH + QString("connected.png"), IMAGE_PATH + QString("kingfisher.jpg"),
-                    IMAGE_PATH + QString("flower.jpeg"), IMAGE_PATH + QString("marbles.bmp"),
-                    IMAGE_PATH + QString("walle.jpg"), IMAGE_PATH + QString("planet.jpg"),
-                    IMAGE_PATH + QString("nebula.tif")};
+                    IMAGE_PATH + QString("connected.png"),  IMAGE_PATH + QString("mavlink_connected.gif"),
+                    IMAGE_PATH + QString("kingfisher.jpg"), IMAGE_PATH + QString("flower.jpeg"),
+                    IMAGE_PATH + QString("marbles.bmp"),    IMAGE_PATH + QString("walle.jpg"),
+                    IMAGE_PATH + QString("planet.jpg")};
 
 // In milliseconds
 const int SOCKET_TIMEOUT_DURATION = 5000;
-const int SIGNAL_TIMEOUT_DURATION = 180000;
+const int SIGNAL_TIMEOUT_DURATION = 120000;
 
 QTEST_MAIN(TestImageTaggedMessage)
 
