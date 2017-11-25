@@ -29,8 +29,11 @@ const QString CONNECTED_LABEL("<font color='#05c400'> CONNECTED </font>"
                                "<img src=':/connection/connected.png'>");
 const QString SEARCHING_LABEL("<font color='#EED202'> SEARCHING </font>"
                                "<img src=':/connection/connecting.png'>");
+
+// Regex Field Validation
 const QRegExp IP_REGEX("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 const QRegExp LATLON_REGEX("^-?[0-9]*\\.[0-9]*$");
+const QRegExp ELEV_HEADING_REGEX("^-?[0-9]*(\\.[0-9]*)?$");
 
 // MAVLink Constants
 const QString CONNECT_BUTTON_TEXT("Connect");
@@ -64,6 +67,8 @@ GcomController::GcomController(QWidget *parent) :
     ui->dcncServerIPField->setValidator(new QRegExpValidator(IP_REGEX));
     ui->antennaTrackerOverrideLongitudeField->setValidator(new QRegExpValidator(LATLON_REGEX));
     ui->antennaTrackerOverrideLatitudeField->setValidator(new QRegExpValidator(LATLON_REGEX));
+    ui->antennaTrackerOverrideHeadingField->setValidator(new QRegExpValidator(ELEV_HEADING_REGEX));
+    ui->antennaTrackerOverrideElevationField->setValidator(new QRegExpValidator(ELEV_HEADING_REGEX));
     restMavlinkGUI();
 
     // Mavlink Setup
@@ -100,6 +105,7 @@ GcomController::GcomController(QWidget *parent) :
     tracker = new AntennaTracker();
     ui->antennaTrackerTab->setDisabled(true);
     ui->startTrackButton->setEnabled(false);
+    ui->antennaTrackerCalibrateIMUButton->setEnabled(false);
 
     // updates UI with station lat and lon
     connect(tracker,
@@ -450,10 +456,16 @@ void GcomController::updateStartTrackerButton()
     if ((tracker->getZaberStatus() != AntennaTracker::AntennaTrackerConnectionState::SUCCESS) ||
         (tracker->getArduinoStatus() != AntennaTracker::AntennaTrackerConnectionState::SUCCESS)) {
         ui->startTrackButton->setEnabled(false);
+
+        // enable calibration
+        ui->antennaTrackerCalibrateIMUButton->setEnabled(false);
     }
     else {
         ui->startTrackButton->setEnabled(true);
         ui->startTrackButton->setText(START_TRACKING_BUTTON_TEXT);
+
+        // disable calibration
+        ui->antennaTrackerCalibrateIMUButton->setEnabled(true);
     }
 }
 
@@ -566,14 +578,8 @@ void GcomController::on_antennaTrackerOverrideHeadingField_editingFinished()
 
 void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
-    // disable tracking, starting calib
-    ui->startTrackButton->setDisabled(true);
-
     // start IMU calibration method
     tracker->calibrateIMU();
-
-    // enable tracking, finished calib
-    ui->startTrackButton->setDisabled(false);
 }
 
 //===================================================================
