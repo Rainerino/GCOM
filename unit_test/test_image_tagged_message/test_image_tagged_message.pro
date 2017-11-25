@@ -14,10 +14,7 @@ TEMPLATE = app
 
 INCLUDEPATH += ../../
 
-# QT_NO_DEBUG_OUTPUT, to silence all qDebug() messages, especially from the tcp framer,
-# reducing the amount of application output during testing
-DEFINES += QT_DEPRECATED_WARNINGS \
-           QT_NO_DEBUG_OUTPUT
+DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
         test_image_tagged_message.hpp \

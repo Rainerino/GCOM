@@ -27,8 +27,8 @@ public slots:
 
 private slots:
     // Function to be tested
-    void sendTaggedImage();
-    void sendTaggedImage_data();
+    void testSendImageTagged();
+    void testSendImageTagged_data();
 
 private Q_SLOTS:
     // Functions called before and after all tests have been run
@@ -51,6 +51,5 @@ private:
     int32_t altAbs;
     int32_t altRel;
     uint16_t hdg;
-
 };
 #endif // TEST_IMAGE_TAGGED_MESSAGE_HPP

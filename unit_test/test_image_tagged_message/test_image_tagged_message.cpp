@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QSignalSpy>
 #include <QtTest/QtTest>
+#include <cstring>
 // GCOM Includes
 #include "test_image_tagged_message.hpp"
 
@@ -21,14 +22,14 @@ const QString ALT_ABS_TEST[] = {"0", "1", "-1", "401", "29383", "-500000", "5000
 const QString ALT_REL_TEST[] = {"0", "1", "-1", "399", "19273", "-500000", "500000"};
 const QString HDG_TEST[] = {"0", "1", "101", "2345", "10492", "32111", "36000"};
 const QString IMG_PATH_TEST[] = {
-                    IMAGE_PATH + QString("connected.png"),  IMAGE_PATH + QString("mavlink_connected.gif"),
-                    IMAGE_PATH + QString("kingfisher.jpg"), IMAGE_PATH + QString("flower.jpeg"),
-                    IMAGE_PATH + QString("marbles.bmp"),    IMAGE_PATH + QString("walle.jpg"),
-                    IMAGE_PATH + QString("planet.jpg")};
+        IMAGE_PATH + QString("connected.png"), IMAGE_PATH + QString("mavlink_connected.gif"),
+        IMAGE_PATH + QString("dcnc_connecting.gif"), IMAGE_PATH + QString("kingfisher.jpg"),
+        IMAGE_PATH + QString("flower.jpeg"), IMAGE_PATH + QString("marbles.bmp"),
+        IMAGE_PATH + QString("walle.jpg")};
 
 // In milliseconds
 const int SOCKET_TIMEOUT_DURATION = 5000;
-const int SIGNAL_TIMEOUT_DURATION = 120000;
+const int SIGNAL_TIMEOUT_DURATION = 5000;
 
 QTEST_MAIN(TestImageTaggedMessage)
 
@@ -50,7 +51,6 @@ void TestImageTaggedMessage::initTestCase()
     socket->connectToHost(IP_ADDRESS, PORT);
     // Verify socket connects
     QVERIFY(socket->waitForConnected(SOCKET_TIMEOUT_DURATION));
-
 }
 
 void TestImageTaggedMessage::cleanupTestCase()
@@ -82,7 +82,7 @@ void TestImageTaggedMessage::socketDisconnected()
     connectionDataStream.unsetDevice();
 }
 
-void TestImageTaggedMessage::sendTaggedImage_data() {
+void TestImageTaggedMessage::testSendImageTagged_data() {
     // Create a data table with each test as a row
 
     // Add headings
@@ -95,14 +95,15 @@ void TestImageTaggedMessage::sendTaggedImage_data() {
     QTest::addColumn<QString>("imagePath");
 
     // Add rows
-    for (int i = TEST_START_INDEX; i <= TEST_END_INDEX; i++) {
+    for (int i = TEST_START_INDEX; i <= TEST_END_INDEX; i++)
+    {
         QTest::newRow(qPrintable(QString::number(i)))
                 << SEQ_TEST[i] << LAT_TEST[i] << LON_TEST[i] << ALT_ABS_TEST[i]
                 << ALT_REL_TEST[i] << HDG_TEST[i] << IMG_PATH_TEST[i];
     }
 }
 
-void TestImageTaggedMessage::sendTaggedImage()
+void TestImageTaggedMessage::testSendImageTagged()
 {
     // Retrieve all the data from a row in the data table to test
     QFETCH(QString, sequence);
@@ -158,11 +159,8 @@ void TestImageTaggedMessage::compareImageTaggedData(std::shared_ptr<ImageTaggedM
     QCOMPARE(image->altitudeRelRaw, altRel);
     QCOMPARE(image->headingRaw, hdg);
 
-    // Compare the images byte by byte
-    unsigned int numBytes;
-    for (numBytes = 0; numBytes < image->imageData.size(); numBytes++) {
-        QCOMPARE(image->imageData[numBytes], *(sentImageData + numBytes));
-    }
+    // Compare the images and image sizes
+    QCOMPARE(memcmp(image->imageData.data(), sentImageData, image->imageData.size()), 0);
     QCOMPARE(image->imageData.size(), imageSize);
-    qInfo() << "Number of bytes checked: " << numBytes;
+    qInfo() << "Number of bytes checked: " << image->imageData.size();
 }
