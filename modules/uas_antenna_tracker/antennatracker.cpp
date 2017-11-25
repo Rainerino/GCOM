@@ -93,6 +93,7 @@ AntennaTracker::~AntennaTracker()
     {
         arduinoSerial->close();
         delete arduinoSerial;
+        delete arduinoDataStream;
     }
 
     //close serial connection to zaber if it's open
@@ -101,8 +102,6 @@ AntennaTracker::~AntennaTracker()
         zaberSerial->close();
         delete zaberSerial;
     }
-
-    delete arduinoDataStream;
 
     delete arduinoFramer;
 }
