@@ -1,5 +1,5 @@
 #include "moving_obstacle.hpp"
-/*
+
 MovingObstacle::MovingObstacle(const double latitude, const double longitude, const double altitudeMsl, const double sphereRadius)
 {
     this->latitude = latitude;
@@ -13,22 +13,22 @@ MovingObstacle::~MovingObstacle()
     // do nothing
 }
 
-MovingObstacle::getLatitude()
+double MovingObstacle::getLatitude()
 {
     return this->latitude;
 }
 
-MovingObstacle::getLongitude()
+double MovingObstacle::getLongitude()
 {
     return this->longitude;
 }
 
-MovingObstacle::getAltitudeMsl()
+double MovingObstacle::getAltitudeMsl()
 {
     return this->altitudeMsl;
 }
 
-MovingObstacle::getSphereRadius()
+double MovingObstacle::getSphereRadius()
 {
     return this->sphereRadius;
-}*/
+}
