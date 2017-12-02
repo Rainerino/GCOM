@@ -34,6 +34,9 @@ SOURCES += main.cpp\
     modules/uas_interop_system/moving_obstacle.cpp \
     modules/uas_interop_system/stationary_obstacle.cpp \
     modules/uas_interop_system/interop.cpp
+    modules/uas_message/image_untagged_message.cpp \
+    modules/uas_message/image_tagged_message.cpp \
+    modules/uas_utility/uas_utility.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -56,5 +59,15 @@ HEADERS  += \
     modules/uas_interop_system/moving_obstacle.hpp \
     modules/uas_interop_system/stationary_obstacle.hpp \
     modules/uas_interop_system/interop.hpp
+    modules/uas_message/image_untagged_message.hpp \
+    modules/uas_message/image_tagged_message.hpp \
+    modules/uas_utility/uas_utility.h	
 
-FORMS    += gcomcontroller.ui
+FORMS += \
+    gcomcontroller.ui
+
+INCLUDEPATH += Mavlink
+
+CONFIG += c++14
+
+RESOURCES = resources.qrc

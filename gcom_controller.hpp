@@ -12,7 +12,7 @@
 // GCOM Includes
 #include "modules/mavlink_relay/mavlink_relay_tcp.hpp"
 #include "modules/uas_dcnc/dcnc.hpp"
-#include "modules/uas_message/image_message.hpp"
+#include "modules/uas_message/image_untagged_message.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
 
 //===================================================================
@@ -57,6 +57,14 @@ private slots:
     void on_zaberRefreshButton_clicked();
     void on_zaberConnectButton_clicked();
     void on_startTrackButton_clicked();
+    void on_antennaTrackerGPSOverrideCheckBox_toggled(bool checked);
+    void on_antennaTrackerCalibrateIMUButton_clicked();
+    void on_antennaTrackerOverrideHeadingCheckBox_toggled(bool checked);
+    void on_antennaTrackerOverrideElevationCheckBox_toggled(bool checked);
+    void on_antennaTrackerOverrideElevationField_editingFinished();
+    void on_antennaTrackerOverrideHeadingField_editingFinished();
+    void antennaTrackerUpdateStatusGUI(float latitude, float longitude, float elevation, float heading);
+    void disableAntennaTrackingGUI(bool toggle);
 
 private:
     // Private Member Variables
