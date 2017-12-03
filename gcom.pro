@@ -12,11 +12,13 @@ TARGET = gcom
 test {
     TEMPLATE = subdirs
     SUBDIRS += \
-        unit_test/sendCommandMessage
+        unit_test/sendCommandMessage \
+        unit_test/test_image_tagged_message
 }
 else {
     TEMPLATE = app
 }
+
 INCLUDEPATH += Mavlink
 
 CONFIG += c++14
@@ -38,7 +40,7 @@ SOURCES += main.cpp\
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
     modules/uas_message/image_untagged_message.cpp \
-    modules/uas_message/image_tagged_message.cpp
+    modules/uas_message/image_tagged_message.cpp \
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -58,15 +60,9 @@ HEADERS  += \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
     modules/uas_message/image_untagged_message.hpp \
-    modules/uas_message/image_tagged_message.hpp
+    modules/uas_message/image_tagged_message.hpp \
 
 FORMS += \
     gcomcontroller.ui
-
-INCLUDEPATH += Mavlink
-
-CONFIG += c++14
-
-RESOURCES = resources.qrc
 
 
