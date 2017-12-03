@@ -28,6 +28,8 @@ class CapabilitiesMessage : public UASMessage
         enum class Capabilities : uint32_t
         {
             IMAGE_RELAY             = 0x01,
+            CAMERA_TAGGED           = 0x02,
+            CAMERA_UNTAGGED         = 0x03
         };
 
         //Public Methods
