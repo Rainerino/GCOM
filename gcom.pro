@@ -32,7 +32,12 @@ SOURCES += main.cpp\
     modules/uas_message/capabilities_message.cpp \
     modules/uas_message/image_untagged_message.cpp \
     modules/uas_message/image_tagged_message.cpp \
-    modules/uas_utility/uas_utility.cpp
+    modules/uas_utility/uas_utility.cpp \
+    modules/uas_collision_avoidance/collision_avoidance.cpp \
+    modules/uas_interop_system/InteropObjects/interop_mission.cpp \
+    modules/uas_interop_system/InteropObjects/interop_telemetry.cpp \
+    modules/uas_interop_system/InteropObjects/moving_obstacle.cpp \
+    modules/uas_interop_system/InteropObjects/stationary_obstacle.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -53,7 +58,12 @@ HEADERS  += \
     modules/uas_message/capabilities_message.hpp \
     modules/uas_message/image_untagged_message.hpp \
     modules/uas_message/image_tagged_message.hpp \
-    modules/uas_utility/uas_utility.h	
+    modules/uas_utility/uas_utility.h \	
+    modules/uas_collision_avoidance/collision_avoidance.hpp \
+    modules/uas_interop_system/InteropObjects/interop_mission.hpp \
+    modules/uas_interop_system/InteropObjects/interop_telemetry.hpp \
+    modules/uas_interop_system/InteropObjects/moving_obstacle.hpp \
+    modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp
 
 FORMS += \
     gcomcontroller.ui
