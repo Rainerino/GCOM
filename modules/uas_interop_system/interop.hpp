@@ -3,7 +3,7 @@
 
 #include <QDebug>
 #include <QtNetwork>
-#include "stationary_obstacle.hpp"
+#include "json_interpreter.hpp"
 
 class Interop : QObject
 {
@@ -14,7 +14,10 @@ public:
     ~Interop();
 
     void login(const QString url, const QString userName, const QString password);
+    void getMissions();
+    void getMissions(int missionId);
     void getObstacles();
+    void postTelemetry();
 
 protected:
 
@@ -40,6 +43,7 @@ private:
     QNetworkAccessManager *networkAccessManager;
     QString hostUrl;
     InteropRequest currRequest;
+    JsonInterpreter* jsonInterpreter;
 
     void finishLogin(QNetworkReply *reply);
     void finishGetObstacles(QNetworkReply *reply);

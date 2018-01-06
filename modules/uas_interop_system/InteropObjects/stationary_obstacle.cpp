@@ -1,11 +1,11 @@
 #include "stationary_obstacle.hpp"
 
-StationaryObstacle::StationaryObstacle(const double latitude, const double longitude, const double cylinderHeight, const double cylinderRadius)
+StationaryObstacle::StationaryObstacle(const double cylinderHeight, const double cylinderRadius, const double latitude, const double longitude)
 {
-    this->latitude = latitude;
-    this->longitude = longitude;
     this->cylinderHeight = cylinderHeight;
     this->cylinderRadius = cylinderRadius;
+    this->latitude = latitude;
+    this->longitude = longitude;
 }
 
 StationaryObstacle::~StationaryObstacle()

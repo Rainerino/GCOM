@@ -6,20 +6,20 @@ class StationaryObstacle
 
 public:
 
-    StationaryObstacle(const double latitude, const double longitude, const double cylinderHeight, const double cylinderRadius);
+    StationaryObstacle(const double cylinderHeight, const double cylinderRadius, const double latitude, const double longitude);
     ~StationaryObstacle();
 
-    double getLatitude();
-    double getLongitude();
     double getCylinderHeight();
     double getCylinderRadius();
+    double getLatitude();
+    double getLongitude();
 
 private:
 
-    double latitude;
-    double longitude;
     double cylinderHeight;
     double cylinderRadius;
+    double latitude;
+    double longitude;
 
 };
 

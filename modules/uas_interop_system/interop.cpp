@@ -16,6 +16,7 @@ Interop::Interop()
     this->networkAccessManager = new QNetworkAccessManager(this);
     this->hostUrl = "http://localhost:8000";
     this->currRequest = InteropRequest::NO_REQUEST;
+    this->jsonInterpreter = new JsonInterpreter();
 }
 
 Interop::~Interop()
@@ -45,7 +46,35 @@ void Interop::login(const QString url, const QString userName, const QString pas
     this->networkAccessManager->post(request, postParams);
 }
 
-void Interop::getObstacles() {
+void Interop::getMissions()
+{
+    QString requestUrlString = this->hostUrl + GET_MISSIONS_ENDPOINT;
+
+    QUrl requestUrl(requestUrlString);
+
+    QNetworkRequest request(requestUrl);
+
+    connect(this->networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishRequest(QNetworkReply*)));
+    this->networkAccessManager->get(request);
+}
+
+void Interop::getMissions(int missionId)
+{
+    QString missionIdPath = "/" + QString::number(missionId);
+    QString requestUrlString = this->hostUrl + GET_MISSIONS_ENDPOINT + missionIdPath;
+
+    QUrl requestUrl(requestUrlString);
+
+    QNetworkRequest request(requestUrl);
+
+    connect(this->networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finishRequest(QNetworkReply*)));
+    this->networkAccessManager->get(request);
+}
+
+void Interop::getObstacles()
+{
+    this->currRequest = InteropRequest::GET_OBSTACLES;
+
     QString requestUrlString = this->hostUrl + GET_OBSTACLES_ENDPOINT;
 
     QUrl requestUrl(requestUrlString);
@@ -95,14 +124,11 @@ void Interop::finishLogin(QNetworkReply *reply) {
 
 void Interop::finishGetObstacles(QNetworkReply *reply) {
     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
-    if(statusCode == QNetworkReply::NoError)
+    if(statusCode == 200)
     {
         QByteArray replyBody = reply->readAll();
-        qDebug() << QString(replyBody);
-    }
-    else
-    {
-        qDebug() << "shit's fucked";
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(replyBody);
+        JsonInterpreter::ObstacleSet* obsSet = jsonInterpreter->parseObstacles(jsonDoc);
     }
 }
 

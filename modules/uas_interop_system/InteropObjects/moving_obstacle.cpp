@@ -1,10 +1,10 @@
 #include "moving_obstacle.hpp"
 
-MovingObstacle::MovingObstacle(const double latitude, const double longitude, const double altitudeMsl, const double sphereRadius)
+MovingObstacle::MovingObstacle(const double altitudeMsl, const double latitude, const double longitude, const double sphereRadius)
 {
+    this->altitudeMsl = altitudeMsl;
     this->latitude = latitude;
     this->longitude = longitude;
-    this->altitudeMsl = altitudeMsl;
     this->sphereRadius = sphereRadius;
 }
 

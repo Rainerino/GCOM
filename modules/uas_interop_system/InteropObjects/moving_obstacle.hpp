@@ -6,7 +6,7 @@ class MovingObstacle
 
 public:
 
-    MovingObstacle(const double latitude, const double longitude, const double altitudeMsl, const double sphereRadius);
+    MovingObstacle(const double altitudeMsl, const double latitude, const double longitude, const double sphereRadius);
     ~MovingObstacle();
 
     double getLatitude();
@@ -16,9 +16,9 @@ public:
 
 private:
 
+    double altitudeMsl;
     double latitude;
     double longitude;
-    double altitudeMsl;
     double sphereRadius;
 };
 
