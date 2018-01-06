@@ -17,6 +17,12 @@ private:
 
     // Waypoints (points that must be hit)
     QList<InteropMission::Waypoint> missionWaypoints;
+
+    // Waypoints used to generate actual flight path
+    QVector<InteropMission::Waypoint> generateWaypoints;
+
+    // Stationary obstacles
+    QList<StationaryObstacle> stationaryObstacles;
 };
 
 
