@@ -28,6 +28,16 @@ bool InteropMission::getActive()
     return this->active;
 }
 
+void InteropMission::setAirDropPos(Position airDropPos)
+{
+    this->airDropPos = airDropPos;
+}
+
+InteropMission::Position InteropMission::getAirDropPos()
+{
+    return this->airDropPos;
+}
+
 void InteropMission::setFlyZones(QList<InteropMission::FlyZone> flyZones)
 {
     this->flyZones = flyZones;

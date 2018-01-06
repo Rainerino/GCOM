@@ -41,6 +41,7 @@ public:
 
     void setId(int id);
     void setActive(bool active);
+    void setAirDropPos(Position airDropPos);
     void setFlyZones(QList<FlyZone> flyZones);
     void setHomePosition(Position homePos);
     void setMissionWaypoints(QList<Waypoint> missionWaypoints);
@@ -50,6 +51,7 @@ public:
 
     int getId();
     bool getActive();
+    Position getAirDropPos();
     QList<FlyZone> getFlyZones();
     Position getHomePosition();
     QList<Waypoint> getMissionWaypoints();
@@ -60,6 +62,7 @@ public:
 private:
     int id;
     bool active;
+    Position airDropPos;
     QList<FlyZone> flyZones;
     Position homePos;
     QList<Waypoint> missionWaypoints;
