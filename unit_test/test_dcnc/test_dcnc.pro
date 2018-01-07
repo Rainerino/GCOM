@@ -40,3 +40,7 @@ SOURCES += \
         ../../modules/uas_message/system_info_message.cpp \
         ../../modules/uas_message/image_untagged_message.cpp \
         ../../modules/uas_message/image_tagged_message.cpp \
+
+# IMAGE_PATH=\\\"[INSERT PATH]\\\"
+# Replace [INSERT PATH] with the absolute path of the directory where the test images are located
+DEFINES += IMAGE_PATH=\\\"C:/GCOM/unit_test/test_dcnc/images/\\\"

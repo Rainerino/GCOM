@@ -258,7 +258,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     messageFramer.frameMessage(*outgoingMessage);
     // TODO: that the message is successfully sent
     connectionDataStream << messageFramer;
-    qDebug() << ((int)messageFramer.status());
+    // qDebug() << ((int)messageFramer.status());
     delete outgoingMessage;
 }
 
