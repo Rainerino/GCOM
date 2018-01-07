@@ -75,6 +75,7 @@ private slots:
     void testHandleClientMessage_imageTagged();
 
     void testCancelConnection();
+    void testReconnect();
 
 private Q_SLOTS:
     // Project initialization and cleanup

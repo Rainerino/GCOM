@@ -643,3 +643,27 @@ void TestDCNC::testCancelConnection()
     CapabilitiesMessage message(CapabilitiesMessage::Capabilities::IMAGE_RELAY);
     QVERIFY(!dcnc->sendUASMessage(std::shared_ptr<CapabilitiesMessage>(&message)));
 }
+
+void TestDCNC::testReconnect()
+{
+    socket->disconnectFromHost();
+    socket->connectToHost(IP_ADDRESS, PORT);
+
+    // Verify socket connects
+    QVERIFY(socket->waitForConnected(SOCKET_TIMEOUT_DURATION));
+
+    // Verify connection is received on DCNC end
+    QSignalSpy receivedConnectionSpy(dcnc, SIGNAL(receivedConnection()));
+    QVERIFY(receivedConnectionSpy.isValid());
+    QVERIFY(receivedConnectionSpy.wait());
+    QCOMPARE(dcnc->status(), DCNC::DCNCStatus::CONNECTED);
+    QCOMPARE(receivedConnectionSpy.count(), 1);
+
+    // Verify the DATA_SYSTEM_INFO request in DCNC's handleClientConnection sends correctly
+    connect(this, SIGNAL(receivedRequest(UASMessage::MessageID)),
+            this, SLOT(compareRequestMessage(UASMessage::MessageID)));
+    QSignalSpy receivedRequestSpy(this, SIGNAL(receivedRequest(UASMessage::MessageID)));
+    QVERIFY(receivedRequestSpy.isValid());
+    QVERIFY(receivedRequestSpy.wait());
+    QCOMPARE(receivedRequestSpy.count(), 1);
+}
