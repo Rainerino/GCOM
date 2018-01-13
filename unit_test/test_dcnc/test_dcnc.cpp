@@ -73,7 +73,6 @@ const int32_t ALT_ABS_TEST[] = { 0, -500000, 500000 };
 const int32_t ALT_REL_TEST[] = { 0, -500000, 500000 };
 const uint16_t HDG_TEST[] = { 0, 2345, 36000 };
 
-
 QTEST_MAIN(TestDCNC)
 
 void TestDCNC::initTestCase()
@@ -118,6 +117,15 @@ void TestDCNC::initTestCase()
     QVERIFY(receivedRequestSpy.isValid());
     QVERIFY(receivedRequestSpy.wait());
     QCOMPARE(receivedRequestSpy.count(), 1);
+
+    // Try connecting another socket to dcnc
+    socketOther = new QTcpSocket(this);
+    socketOther->connectToHost(IP_ADDRESS, PORT);
+    QVERIFY(socketOther->waitForConnected(SOCKET_TIMEOUT_DURATION));
+    // Verify connection is NOT received on DCNC end
+    QVERIFY(!receivedConnectionSpy.wait());
+
+    delete socketOther;
 }
 
 void TestDCNC::cleanupTestCase()

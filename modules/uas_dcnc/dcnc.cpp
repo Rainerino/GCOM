@@ -90,7 +90,7 @@ void DCNC::cancelConnection()
         clientConnection = nullptr;
         emit droppedConnection();
     }
-
+    server->setMaxPendingConnections(1);
     server->resumeAccepting();
 }
 
@@ -104,6 +104,7 @@ void DCNC::handleClientConection()
 {
     // While this connection is established stop accepting more connections
     server->pauseAccepting();
+    server->setMaxPendingConnections(0);
     // Setup the connection socket and the data stream
     // put clientConnection to connectedState
     // return a new TCP socket
@@ -125,7 +126,7 @@ void DCNC::handleClientConection()
     messageFramer.frameMessage(request);
     connectionDataStream << messageFramer;
     if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
-        droppedConnection();
+        emit droppedConnection();
     else
         emit receivedConnection();
 }
@@ -196,6 +197,7 @@ void DCNC::handleClientData()
             connectionDataStream.abortTransaction();
         }
     }
+    connectionDataStream.resetStatus();
 }
 
 
@@ -273,7 +275,7 @@ void DCNC::handleResponse(CommandMessage::Commands command,
         case CommandMessage::Commands::SYSTEM_RESET:
         {
             // simply drop the connection for a reset doesn't depend on the reset
-            droppedConnection();
+            emit droppedConnection();
 
         }
         break;
@@ -281,7 +283,7 @@ void DCNC::handleResponse(CommandMessage::Commands command,
         case CommandMessage::Commands::SYSTEM_RESUME:
         {
             if (responses != ResponseMessage::ResponseCodes::NO_ERROR)
-                 droppedConnection();
+                 emit droppedConnection();
         }
         break;
 

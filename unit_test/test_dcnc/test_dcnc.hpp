@@ -86,6 +86,7 @@ private:
     // Connection Variables
     DCNC *dcnc;
     QTcpSocket *socket;
+    QTcpSocket *socketOther;
     QDataStream connectionDataStream;
     UASMessageTCPFramer messageFramer;
 
