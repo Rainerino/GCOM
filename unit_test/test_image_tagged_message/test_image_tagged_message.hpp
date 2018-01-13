@@ -44,12 +44,12 @@ private:
 
     // Test variables
     uint8_t *sentImageData;
-    size_t imageSize;
-    uint8_t seq;
-    int32_t lat;
-    int32_t lon;
-    int32_t altAbs;
-    int32_t altRel;
-    uint16_t hdg;
+    size_t sentImageSize;
+    uint8_t sentSequenceNumber;
+    int32_t sentLatitudeRaw;
+    int32_t sentLongitudeRaw;
+    int32_t sentAltitudeAbsRaw;
+    int32_t sentAltitudeRelRaw;
+    uint16_t sentHeadingRaw;
 };
 #endif // TEST_IMAGE_TAGGED_MESSAGE_HPP
