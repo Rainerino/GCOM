@@ -47,6 +47,7 @@ private:
 
     void finishLogin(QNetworkReply *reply);
     void finishGetObstacles(QNetworkReply *reply);
+    void finishGetMissions(QNetworkReply *reply);
 
 private slots:
     void finishRequest(QNetworkReply* reply);

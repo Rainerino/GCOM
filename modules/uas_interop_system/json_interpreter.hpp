@@ -8,6 +8,7 @@
 #include "InteropObjects/interop_telemetry.hpp"
 #include "InteropObjects/moving_obstacle.hpp"
 #include "InteropObjects/stationary_obstacle.hpp""
+#include "InteropObjects/interop_odlc.hpp"
 
 class JsonInterpreter
 {
@@ -27,6 +28,8 @@ public:
     QList<InteropMission*> parseMultipleMissions(QJsonDocument json);
     InteropTelemetry* parseTelemetry(QJsonDocument json);
     ObstacleSet* parseObstacles(QJsonDocument json);
+    InteropOdlc* parseInteropOdlc(QJsonDocument json);
+    QJsonDocument encodeInteropOdlc(InteropOdlc odlc);
 
 
 private:

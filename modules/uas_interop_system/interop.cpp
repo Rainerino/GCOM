@@ -48,6 +48,8 @@ void Interop::login(const QString url, const QString userName, const QString pas
 
 void Interop::getMissions()
 {
+    this->currRequest = InteropRequest::GET_MISSIONS;
+
     QString requestUrlString = this->hostUrl + GET_MISSIONS_ENDPOINT;
 
     QUrl requestUrl(requestUrlString);
@@ -60,6 +62,8 @@ void Interop::getMissions()
 
 void Interop::getMissions(int missionId)
 {
+    this->currRequest = InteropRequest::GET_MISSION_WITH_ID;
+
     QString missionIdPath = "/" + QString::number(missionId);
     QString requestUrlString = this->hostUrl + GET_MISSIONS_ENDPOINT + missionIdPath;
 
@@ -85,7 +89,8 @@ void Interop::getObstacles()
     this->networkAccessManager->get(request);
 }
 
-void Interop::finishRequest(QNetworkReply *reply) {
+void Interop::finishRequest(QNetworkReply *reply)
+{
     switch(this->currRequest)
     {
         case InteropRequest::NO_REQUEST:
@@ -94,13 +99,18 @@ void Interop::finishRequest(QNetworkReply *reply) {
 
         case InteropRequest::LOGIN:
             finishLogin(reply);
+            break;
 
         case InteropRequest::GET_MISSIONS:
+            finishGetMissions(reply);
+            break;
+
         case InteropRequest::GET_MISSION_WITH_ID:
             break;
 
         case InteropRequest::GET_OBSTACLES:
             finishGetObstacles(reply);
+            break;
 
         case InteropRequest::POST_TELEMETRY:
         case InteropRequest::POST_ODLCS:
@@ -115,14 +125,16 @@ void Interop::finishRequest(QNetworkReply *reply) {
     }
 }
 
-void Interop::finishLogin(QNetworkReply *reply) {
+void Interop::finishLogin(QNetworkReply *reply)
+{
     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     qDebug() << statusCode.toString();
     QByteArray replyBody = reply->readAll();
     qDebug() << QString(replyBody);
 }
 
-void Interop::finishGetObstacles(QNetworkReply *reply) {
+void Interop::finishGetObstacles(QNetworkReply *reply)
+{
     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if(statusCode == 200)
     {
@@ -132,3 +144,13 @@ void Interop::finishGetObstacles(QNetworkReply *reply) {
     }
 }
 
+void Interop::finishGetMissions(QNetworkReply *reply)
+{
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    if(statusCode == 200)
+    {
+        QByteArray replyBody = reply->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(replyBody);
+        QList<InteropMission*> missions = jsonInterpreter->parseMultipleMissions(jsonDoc);
+    }
+}

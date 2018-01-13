@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QString>
 
 JsonInterpreter::JsonInterpreter()
 {
@@ -69,6 +70,47 @@ JsonInterpreter::ObstacleSet* JsonInterpreter::parseObstacles(QJsonDocument json
     }
 
     return new JsonInterpreter::ObstacleSet{movingObstList, stationaryObstList};
+}
+
+InteropOdlc* JsonInterpreter::parseInteropOdlc(QJsonDocument json)
+{
+    QJsonObject jsonObj = json.object();
+    InteropOdlc* odlc = new InteropOdlc();
+
+    odlc->setId(jsonObj["id"].toInt());
+    odlc->setUser(jsonObj["user"].toInt());
+    odlc->setType(jsonObj["type"].toString());
+    odlc->setLatitude(jsonObj["latitude"].toDouble());
+    odlc->setLongitude(jsonObj["longitude"].toDouble());
+    odlc->setOrientation(jsonObj["orientation"].toString());
+    odlc->setShape(jsonObj["shape"].toString());
+    odlc->setBackgroundColor(jsonObj["background_color"].toString());
+    odlc->setAlphanumeric(jsonObj["alphanumeric"].toString());
+    odlc->setAlphanumericColor(jsonObj["alphanumeric_color"].toString());
+    odlc->setDescription(jsonObj["description"].toString());
+    odlc->setAutonomous(jsonObj["autonomous"].toBool());
+
+    return odlc;
+}
+
+QJsonDocument JsonInterpreter::encodeInteropOdlc(InteropOdlc odlc)
+{
+    QJsonObject encodeJson;
+
+    encodeJson.insert("id", QJsonValue::fromVariant(odlc.getId()));
+    encodeJson.insert("user", QJsonValue::fromVariant(odlc.getUser()));
+    encodeJson.insert("type", QJsonValue::fromVariant(odlc.getType()));
+    encodeJson.insert("latitude", QJsonValue::fromVariant(odlc.getLatitude()));
+    encodeJson.insert("longitude", QJsonValue::fromVariant(odlc.getLongitude()));
+    encodeJson.insert("orientation", QJsonValue::fromVariant(odlc.getOrientation()));
+    encodeJson.insert("shape", QJsonValue::fromVariant(odlc.getShape()));
+    encodeJson.insert("background_color", QJsonValue::fromVariant(odlc.getBackgroundColor()));
+    encodeJson.insert("alphanumeric", QJsonValue::fromVariant(odlc.getAlphanumeric()));
+    encodeJson.insert("alphanumeric_color", QJsonValue::fromVariant(odlc.getAlphanumericColor()));
+    encodeJson.insert("description", QJsonValue::fromVariant(odlc.getDescription()));
+    encodeJson.insert("autonomous", QJsonValue::fromVariant(odlc.getAutonomous()));
+
+    return QJsonDocument(encodeJson);
 }
 
 InteropMission* JsonInterpreter::parseMission(QJsonObject obj)
@@ -174,4 +216,5 @@ InteropMission* JsonInterpreter::parseMission(QJsonObject obj)
 
     return parsedMission;
 }
+
 
