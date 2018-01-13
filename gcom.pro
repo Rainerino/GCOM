@@ -12,6 +12,7 @@ TARGET = gcom
 test {
     TEMPLATE = subdirs
     SUBDIRS += \
+        unit_test/sendCommandMessage \
         unit_test/test_image_tagged_message
 }
 else {
@@ -63,3 +64,5 @@ HEADERS  += \
 
 FORMS += \
     gcomcontroller.ui
+
+
