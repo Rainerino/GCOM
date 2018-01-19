@@ -44,7 +44,7 @@ DCNC::~DCNC()
     clientConnection = nullptr;
     //The server will no longer listen for incoming connections.
     server->close();
-
+    delete server;
 }
 
 bool DCNC::startServer(QString address, int port)
@@ -57,7 +57,7 @@ bool DCNC::startServer(QString address, int port)
     this->address = address;
     hostAddress = QHostAddress(address);
     bool startStatus = server->listen(hostAddress, port);
-    if (startStatus == true)
+    if (startStatus)
         serverStatus = DCNCStatus::SEARCHING;
 
     return startStatus;
@@ -90,8 +90,12 @@ void DCNC::cancelConnection()
         clientConnection = nullptr;
         emit droppedConnection();
     }
-    server->setMaxPendingConnections(1);
-    server->resumeAccepting();
+
+    // Restart listening for connections
+    bool listenStatus = server->listen(QHostAddress(this->address), this->port);
+
+    if (!listenStatus)
+        serverStatus = DCNCStatus::OFFLINE;
 }
 
 DCNC::DCNCStatus DCNC::status()
@@ -102,9 +106,6 @@ DCNC::DCNCStatus DCNC::status()
 //send  infomation message
 void DCNC::handleClientConection()
 {
-    // While this connection is established stop accepting more connections
-    server->pauseAccepting();
-    server->setMaxPendingConnections(0);
     // Setup the connection socket and the data stream
     // put clientConnection to connectedState
     // return a new TCP socket
@@ -120,6 +121,9 @@ void DCNC::handleClientConection()
 
     // Update the DCNC's state and notify listners
     serverStatus = DCNCStatus::CONNECTED;
+
+    // Stop listening for incoming connections
+    server->close();
 
     // Send system info request and check that the message was successfully sent
     RequestMessage request(UASMessage::MessageID::DATA_SYSTEM_INFO);

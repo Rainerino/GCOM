@@ -121,11 +121,10 @@ void TestDCNC::initTestCase()
     // Try connecting another socket to dcnc
     socketOther = new QTcpSocket(this);
     socketOther->connectToHost(IP_ADDRESS, PORT);
-    QVERIFY(socketOther->waitForConnected(SOCKET_TIMEOUT_DURATION));
+    // Verify socket does not connect
+    QVERIFY(!socketOther->waitForConnected(SOCKET_TIMEOUT_DURATION));
     // Verify connection is NOT received on DCNC end
     QVERIFY(!receivedConnectionSpy.wait());
-
-    delete socketOther;
 }
 
 void TestDCNC::cleanupTestCase()
@@ -140,6 +139,7 @@ void TestDCNC::cleanupTestCase()
     disconnect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
 
     delete socket;
+    delete socketOther;
     delete dcnc;
 }
 
@@ -320,6 +320,8 @@ void TestDCNC::testHandleClientMessage_systemInfo()
     int testNumber = QString(QTest::currentDataTag()).toInt();
     if (testNumber != 0)
         prevSystemID.assign(SYSTEM_ID_TEST[testNumber - 1]);
+    else
+        prevSystemID.assign("Not_Gremlin");
 
     connect(dcnc, SIGNAL(receivedGremlinInfo(QString, uint16_t, bool)),
             this, SLOT(compareHandleClientMessage_systemInfo(QString, uint16_t, bool)));
@@ -674,4 +676,11 @@ void TestDCNC::testReconnect()
     QVERIFY(receivedRequestSpy.isValid());
     QVERIFY(receivedRequestSpy.wait());
     QCOMPARE(receivedRequestSpy.count(), 1);
+
+    // Try connecting another socket to dcnc
+    socketOther->connectToHost(IP_ADDRESS, PORT);
+    // Verify socket does not connect
+    QVERIFY(!socketOther->waitForConnected(SOCKET_TIMEOUT_DURATION));
+    // Verify connection is NOT received on DCNC end
+    QVERIFY(!receivedConnectionSpy.wait());
 }
