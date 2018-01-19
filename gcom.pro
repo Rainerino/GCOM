@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     modules/uas_message/imu_message.cpp \
     modules/uas_message/capabilities_message.cpp \
     modules/uas_message/image_untagged_message.cpp \
-    modules/uas_message/image_tagged_message.cpp
+    modules/uas_message/image_tagged_message.cpp \
+    modules/uas_utility/uas_utility.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -59,7 +60,8 @@ HEADERS  += \
     modules/uas_message/imu_message.hpp \
     modules/uas_message/capabilities_message.hpp \
     modules/uas_message/image_untagged_message.hpp \
-    modules/uas_message/image_tagged_message.hpp
+    modules/uas_message/image_tagged_message.hpp \
+    modules/uas_utility/uas_utility.h	
 
 FORMS += \
     gcomcontroller.ui
