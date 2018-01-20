@@ -34,7 +34,7 @@ SOURCES += main.cpp\
     modules/uas_message/image_tagged_message.cpp \
     modules/uas_utility/uas_utility.cpp \
     modules/uas_image_processing/imp_main.cpp \
-    modules/uas_cas/main_cas.cpp
+    modules/uas_cas_quad/main_cas.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -57,7 +57,7 @@ HEADERS  += \
     modules/uas_message/image_tagged_message.hpp \
     modules/uas_utility/uas_utility.h \  	
     modules/uas_image_processing/imp_main.hpp \
-    modules/uas_cas/main_cas.hpp
+    modules/uas_cas_quad/main_cas.hpp
 
 FORMS += \
     gcomcontroller.ui
