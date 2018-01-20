@@ -57,10 +57,10 @@ void CollisionAvoidance::generateWaypointFile() {
     // QGC WPL <VERSION>
     // <INDEX> <CURRENT WP> <COORD FRAME> <COMMAND> <PARAM1> <PARAM2> <PARAM3> <PARAM4> <PARAM5/X/LONGITUDE> <PARAM6/Y/LATITUDE> <PARAM7/Z/ALTITUDE> <AUTOCONTINUE>
 
-    QString filename = "missionplanwaypoints.wp";
+    QString filename = "missionplanwaypoints.waypoints";
     QFile file(filename);
 
-    if(file.open(QIODevice::ReadWrite)) {
+    if(file.open(QFile::ReadWrite)) {
         QTextStream stream(&file);
         stream << QGC_VERISON << endl;
         stream << "0	1	0	0	0	0	0	0	0	0	0	1" << endl;
