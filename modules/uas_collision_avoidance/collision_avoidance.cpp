@@ -36,9 +36,9 @@ const quint8 DO_CHANGE_SPEED = 178;
 // Constructor / Deconstructor
 //===================================================================
 
-CollisionAvoidance::CollisionAvoidance(InteropMission mission) {
+CollisionAvoidance::CollisionAvoidance() {
     // retrieve mission waypoints from interop
-    missionWaypoints = mission.getMissionWaypoints();
+    // missionWaypoints = mission.getMissionWaypoints();
 
     // will also eventually retrieve from interop
     stationaryObstacles = {};

@@ -7,8 +7,10 @@
 class CollisionAvoidance
 {
 public:
-    CollisionAvoidance(InteropMission);
+    CollisionAvoidance();
     ~CollisionAvoidance();
+
+    void generateWaypointFile();
 
 private:
 
@@ -26,7 +28,7 @@ private:
                                                InteropMission::Waypoint waypointB,
                                                QList<StationaryObstacle> obstacles);
 
-    void generateWaypointFile();
+
 };
 
 
