@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QtNetwork>
 
-#include "json_interpreter.hpp"
+#include "interop_json_interpreter.hpp"
 
 class Interop : QObject
 {
@@ -44,7 +44,7 @@ private:
     QNetworkAccessManager *networkAccessManager;
     QString hostUrl;
     InteropRequest currRequest;
-    JsonInterpreter* jsonInterpreter;
+    InteropJsonInterpreter* jsonInterpreter;
 
     void finishLogin(QNetworkReply *reply);
     void finishGetObstacles(QNetworkReply *reply);
