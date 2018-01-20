@@ -337,6 +337,12 @@ void GcomController::dcncConnected()
 
 void GcomController::dcncDisconnected()
 {
+    if (dcnc->status() == DCNC::DCNCStatus::OFFLINE)
+    {
+        resetDCNCGUI();
+        return;
+    }
+
     // Update the UI
     ui->dcncConnectionButton->setText(STOP_SEARCHING_BUTTON_TEXT);
     ui->dcncStatusField->setText(SEARCHING_LABEL);

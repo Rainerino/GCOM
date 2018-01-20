@@ -44,7 +44,7 @@ DCNC::~DCNC()
     clientConnection = nullptr;
     //The server will no longer listen for incoming connections.
     server->close();
-
+    delete server;
 }
 
 bool DCNC::startServer(QString address, int port)
@@ -57,7 +57,7 @@ bool DCNC::startServer(QString address, int port)
     this->address = address;
     hostAddress = QHostAddress(address);
     bool startStatus = server->listen(hostAddress, port);
-    if (startStatus == true)
+    if (startStatus)
         serverStatus = DCNCStatus::SEARCHING;
 
     return startStatus;
@@ -91,7 +91,11 @@ void DCNC::cancelConnection()
         emit droppedConnection();
     }
 
-    server->resumeAccepting();
+    // Restart listening for connections
+    bool listenStatus = server->listen(QHostAddress(this->address), this->port);
+
+    if (!listenStatus)
+        serverStatus = DCNCStatus::OFFLINE;
 }
 
 DCNC::DCNCStatus DCNC::status()
@@ -102,8 +106,6 @@ DCNC::DCNCStatus DCNC::status()
 //send  infomation message
 void DCNC::handleClientConection()
 {
-    // While this connection is established stop accepting more connections
-    server->pauseAccepting();
     // Setup the connection socket and the data stream
     // put clientConnection to connectedState
     // return a new TCP socket
@@ -120,12 +122,15 @@ void DCNC::handleClientConection()
     // Update the DCNC's state and notify listners
     serverStatus = DCNCStatus::CONNECTED;
 
+    // Stop listening for incoming connections
+    server->close();
+
     // Send system info request and check that the message was successfully sent
     RequestMessage request(UASMessage::MessageID::DATA_SYSTEM_INFO);
     messageFramer.frameMessage(request);
     connectionDataStream << messageFramer;
     if(messageFramer.status() == UASMessageTCPFramer::TCPFramerStatus::SEND_FAILURE)
-        droppedConnection();
+        emit droppedConnection();
     else
         emit receivedConnection();
 }
@@ -196,6 +201,7 @@ void DCNC::handleClientData()
             connectionDataStream.abortTransaction();
         }
     }
+    connectionDataStream.resetStatus();
 }
 
 
@@ -258,7 +264,7 @@ void DCNC::handleClientMessage(std::shared_ptr<UASMessage> message)
     messageFramer.frameMessage(*outgoingMessage);
     // TODO: that the message is successfully sent
     connectionDataStream << messageFramer;
-    qDebug() << ((int)messageFramer.status());
+    // qDebug() << ((int)messageFramer.status());
     delete outgoingMessage;
 }
 
@@ -273,7 +279,7 @@ void DCNC::handleResponse(CommandMessage::Commands command,
         case CommandMessage::Commands::SYSTEM_RESET:
         {
             // simply drop the connection for a reset doesn't depend on the reset
-            droppedConnection();
+            emit droppedConnection();
 
         }
         break;
@@ -281,7 +287,7 @@ void DCNC::handleResponse(CommandMessage::Commands command,
         case CommandMessage::Commands::SYSTEM_RESUME:
         {
             if (responses != ResponseMessage::ResponseCodes::NO_ERROR)
-                 droppedConnection();
+                 emit droppedConnection();
         }
         break;
 
