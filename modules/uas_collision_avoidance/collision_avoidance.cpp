@@ -1,18 +1,20 @@
-// libraries
+//===================================================================
+// Includes
+//===================================================================
+// System Includes
 #include <Qfile>
 #include <QTextStream>
 #include "math.h"
 
-// modules
+// GCOM Includes
 #include "collision_avoidance.hpp"
 #include "modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp"
 #include "modules/uas_interop_system/InteropObjects/interop_mission.hpp"
 
-
 //#define M_PI = 3.141592653589793238462643;
 //#define M_PI_4 = (M_PI / 4.0);
 
-// strings
+// Strings
 const QString QGC_VERISON = "QGC WPL 110";
 
 // Mission Planner Commands
@@ -29,7 +31,10 @@ const quint8 GUIDED_ENABLE = 92;
 const quint8 PAYLOAD_PLACE = 94;
 const quint8 DO_CHANGE_SPEED = 178;
 
-// initialize
+//===================================================================
+// Constructor / Deconstructor
+//===================================================================
+
 CollisionAvoidance::CollisionAvoidance(InteropMission mission) {
     // retrieve mission waypoints from interop
     missionWaypoints = mission.getMissionWaypoints();
@@ -42,8 +47,9 @@ CollisionAvoidance::~CollisionAvoidance() {
     // do nothing
 }
 
-// methods
-
+//===================================================================
+// Methods
+//===================================================================
 
 void CollisionAvoidance::generateWaypointFile() {
     // waypoint file format:
