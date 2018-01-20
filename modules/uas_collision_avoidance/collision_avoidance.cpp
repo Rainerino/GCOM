@@ -10,6 +10,7 @@
 #include "collision_avoidance.hpp"
 #include "modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp"
 #include "modules/uas_interop_system/InteropObjects/interop_mission.hpp"
+#include "modules/uas_collision_avoidance/collision_avoidance.hpp";
 
 //#define M_PI = 3.141592653589793238462643;
 //#define M_PI_4 = (M_PI / 4.0);
