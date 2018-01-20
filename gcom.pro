@@ -38,8 +38,8 @@ SOURCES += main.cpp\
     modules/uas_interop_system/InteropObjects/moving_obstacle.cpp \
     modules/uas_interop_system/InteropObjects/stationary_obstacle.cpp \
     modules/uas_interop_system/interop.cpp \
-    modules/uas_interop_system/json_interpreter.cpp \
-    modules/uas_interop_system/InteropObjects/interop_odlc.cpp
+    modules/uas_interop_system/InteropObjects/interop_odlc.cpp \
+    modules/uas_interop_system/interop_json_interpreter.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -66,8 +66,8 @@ HEADERS  += \
     modules/uas_interop_system/InteropObjects/moving_obstacle.hpp \
     modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp \
     modules/uas_interop_system/interop.hpp \
-    modules/uas_interop_system/json_interpreter.hpp \
-    modules/uas_interop_system/InteropObjects/interop_odlc.hpp
+    modules/uas_interop_system/InteropObjects/interop_odlc.hpp \
+    modules/uas_interop_system/interop_json_interpreter.hpp
 
 FORMS += \
     gcomcontroller.ui
