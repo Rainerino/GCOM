@@ -14,6 +14,7 @@
 #include "modules/uas_dcnc/dcnc.hpp"
 #include "modules/uas_message/image_untagged_message.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
+#include "modules/uas_interop_system/interop.hpp"
 
 //===================================================================
 // Namespace Declarations
@@ -65,6 +66,8 @@ private slots:
     void on_antennaTrackerOverrideHeadingField_editingFinished();
     void antennaTrackerUpdateStatusGUI(float latitude, float longitude, float elevation, float heading);
     void disableAntennaTrackingGUI(bool toggle);
+    // AUVSI Interop Slots
+    void on_interopConnectButton_clicked();
 
 private:
     // Private Member Variables
@@ -96,6 +99,8 @@ private:
     AntennaTracker *tracker;
     // Methods
     void updateStartTrackerButton();
+
+    Interop *interop;
 };
 
 #endif // GCOMCONTROLLER_HPP
