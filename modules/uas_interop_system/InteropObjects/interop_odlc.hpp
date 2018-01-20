@@ -1,5 +1,5 @@
-#ifndef INTEROP_ODLC_H
-#define INTEROP_ODLC_H
+#ifndef INTEROP_ODLC_HPP
+#define INTEROP_ODLC_HPP
 
 #include <QString>
 
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // INTEROP_MISSION_H
+#endif // INTEROP_ODLC_HPP

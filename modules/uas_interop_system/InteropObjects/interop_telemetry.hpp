@@ -1,5 +1,5 @@
-#ifndef INTEROP_TELEMETRY_H
-#define INTEROP_TELEMETRY_H
+#ifndef INTEROP_TELEMETRY_HPP
+#define INTEROP_TELEMETRY_HPP
 
 class InteropTelemetry
 {
@@ -22,4 +22,4 @@ private:
     double uasHeading;
 };
 
-#endif // INTEROP_TELEMETRY_H
+#endif // INTEROP_TELEMETRY_HPP

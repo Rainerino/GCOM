@@ -1,5 +1,5 @@
-#ifndef JSON_INTERPRETER_H
-#define JSON_INTERPRETER_H
+#ifndef JSON_INTERPRETER_HPP
+#define JSON_INTERPRETER_HPP
 
 #include <QList>
 #include <QJsonDocument>
@@ -37,4 +37,4 @@ private:
 
 };
 
-#endif // JSON_INTERPRETER_H
+#endif // JSON_INTERPRETER_HPP

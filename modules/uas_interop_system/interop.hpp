@@ -1,8 +1,9 @@
-#ifndef INTEROP_H
-#define INTEROP_H
+#ifndef INTEROP_HPP
+#define INTEROP_HPP
 
 #include <QDebug>
 #include <QtNetwork>
+
 #include "json_interpreter.hpp"
 
 class Interop : QObject

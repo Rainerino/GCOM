@@ -1,5 +1,5 @@
-#ifndef MOVING_OBSTACLE_H
-#define MOVING_OBSTACLE_H
+#ifndef MOVING_OBSTACLE_HPP
+#define MOVING_OBSTACLE_HPP
 
 class MovingObstacle
 {
@@ -22,4 +22,4 @@ private:
     double sphereRadius;
 };
 
-#endif // MOVING_OBSTACLE_H
+#endif // MOVING_OBSTACLE_HPP
