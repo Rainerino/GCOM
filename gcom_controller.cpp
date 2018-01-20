@@ -118,6 +118,9 @@ GcomController::GcomController(QWidget *parent) :
             SIGNAL(antennaTrackerCurrentlyTracking(bool)),
             this,
             SLOT(disableAntennaTrackingGUI(bool)));
+
+    // Interop Setup
+    interop = new Interop();
 }
 
 GcomController::~GcomController()
@@ -128,6 +131,7 @@ GcomController::~GcomController()
     delete mavlinkConnectingMovie;
     delete dcnc;
     delete tracker;
+    delete interop;
 }
 
 //===================================================================
@@ -580,6 +584,15 @@ void GcomController::on_antennaTrackerCalibrateIMUButton_clicked()
 {
     // start IMU calibration method
     tracker->calibrateIMU();
+}
+
+void GcomController::on_interopConnectButton_clicked()
+{
+    QString url = ui->interopUrlField->text();
+    QString username = ui->interopUserField->text();
+    QString password = ui->interopPwField->text();
+
+    interop->login(url, username, password);
 }
 
 //===================================================================

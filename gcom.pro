@@ -4,13 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 
 TARGET = gcom
 TEMPLATE = app
 
-INCLUDEPATH += Mavlink
+INCLUDEPATH += Mavlink auvsi_suas_interop
 
 CONFIG += c++14
 
@@ -33,8 +33,13 @@ SOURCES += main.cpp\
     modules/uas_message/image_untagged_message.cpp \
     modules/uas_message/image_tagged_message.cpp \
     modules/uas_utility/uas_utility.cpp \
-    modules/uas_image_processing/imp_main.cpp \
-    modules/uas_cas_quad/main_cas.cpp
+    modules/uas_interop_system/InteropObjects/interop_mission.cpp \
+    modules/uas_interop_system/InteropObjects/interop_telemetry.cpp \
+    modules/uas_interop_system/InteropObjects/moving_obstacle.cpp \
+    modules/uas_interop_system/InteropObjects/stationary_obstacle.cpp \
+    modules/uas_interop_system/interop.cpp \
+    modules/uas_interop_system/json_interpreter.cpp \
+    modules/uas_interop_system/InteropObjects/interop_odlc.cpp
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -55,9 +60,14 @@ HEADERS  += \
     modules/uas_message/capabilities_message.hpp \
     modules/uas_message/image_untagged_message.hpp \
     modules/uas_message/image_tagged_message.hpp \
-    modules/uas_utility/uas_utility.h \  	
-    modules/uas_image_processing/imp_main.hpp \
-    modules/uas_cas_quad/main_cas.hpp
+    modules/uas_utility/uas_utility.h \
+    modules/uas_interop_system/InteropObjects/interop_mission.hpp \
+    modules/uas_interop_system/InteropObjects/interop_telemetry.hpp \
+    modules/uas_interop_system/InteropObjects/moving_obstacle.hpp \
+    modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp \
+    modules/uas_interop_system/interop.hpp \
+    modules/uas_interop_system/json_interpreter.hpp \
+    modules/uas_interop_system/InteropObjects/interop_odlc.hpp
 
 FORMS += \
     gcomcontroller.ui
