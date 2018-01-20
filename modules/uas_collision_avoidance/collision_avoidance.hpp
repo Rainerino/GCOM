@@ -12,6 +12,8 @@ public:
 
 private:
 
+    // ----PROPERTIES
+
     float longitudeToX(float);
     float latitudeToY(float);
 
@@ -23,6 +25,15 @@ private:
 
     // Stationary obstacles
     QList<StationaryObstacle> stationaryObstacles;
+
+    // ----METHODS
+
+    // Collision detection
+    bool collisionDetected(InteropMission::Waypoint waypointA,
+                                               InteropMission::Waypoint waypointB,
+                                               QList<StationaryObstacle> obstacles);
+
+    void generateWaypointFile();
 };
 
 

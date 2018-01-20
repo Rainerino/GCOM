@@ -14,10 +14,10 @@ CollisionAvoidance::CollisionAvoidance(InteropMission mission) {
     // retrieve mission waypoints from interop
     missionWaypoints = mission.getMissionWaypoints();
 
-    generateWaypoints = nullptr;
+    generateWaypoints = {};
 
     // will also eventually retrieve from interop
-    stationaryObstacles = nullptr;
+    stationaryObstacles = {};
 }
 
 CollisionAvoidance::~CollisionAvoidance() {
@@ -58,7 +58,8 @@ double distanceBetweenTwoPoints(double Ax, double Ay, double Bx, double By) {
 
 
 
-
+// def is_between(a,c,b):
+//    return distance(a,c) + distance(c,b) == distance(a,b)
 
 
 
