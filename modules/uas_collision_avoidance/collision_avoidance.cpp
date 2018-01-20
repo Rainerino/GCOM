@@ -12,25 +12,8 @@
 #include "modules/uas_interop_system/InteropObjects/interop_mission.hpp"
 #include "modules/uas_collision_avoidance/collision_avoidance.hpp";
 
-//#define M_PI = 3.141592653589793238462643;
-//#define M_PI_4 = (M_PI / 4.0);
-
 // Strings
 const QString QGC_VERISON = "QGC WPL 110";
-
-// Mission Planner Commands
-const quint8 WAYPOINT = 16;
-const quint8 SPLINE_WAYPOINT = 82;
-const quint8 LOITER_TURNS = 18;
-const quint8 LOITER_TIME = 19;
-const quint8 LOITER_UNLIM = 17;
-const quint8 RETURN_TO_LAUNCH = 20;
-const quint8 LAND = 21;
-const quint8 TAKEOFF = 22;
-const quint8 DELAY = 93;
-const quint8 GUIDED_ENABLE = 92;
-const quint8 PAYLOAD_PLACE = 94;
-const quint8 DO_CHANGE_SPEED = 178;
 
 //===================================================================
 // Constructor / Deconstructor
