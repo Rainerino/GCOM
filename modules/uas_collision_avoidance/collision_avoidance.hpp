@@ -17,19 +17,12 @@ private:
     float longitudeToX(float);
     float latitudeToY(float);
 
-    // Waypoints (points that must be hit)
     QList<InteropMission::Waypoint> missionWaypoints;
-
-    // Waypoints used to generate actual flight path
-    QVector<InteropMission::Waypoint> generateWaypoints;
-
-    // Stationary obstacles
     QList<StationaryObstacle> stationaryObstacles;
 
     // ----METHODS
 
-    // Collision detection
-    bool collisionDetected(InteropMission::Waypoint waypointA,
+    bool collisionDetectedBetweenTwoWaypoints(InteropMission::Waypoint waypointA,
                                                InteropMission::Waypoint waypointB,
                                                QList<StationaryObstacle> obstacles);
 
