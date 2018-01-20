@@ -201,6 +201,10 @@ void DCNC::handleClientData()
             connectionDataStream.abortTransaction();
         }
     }
+
+    // In the unit test, DCNC stops receiving messages after sending messages, as the
+    // connectionDataStream's status returns 1 (read past end). resetStatus
+    // resets the status to 0 (datastream is operating normally).
     connectionDataStream.resetStatus();
 }
 
