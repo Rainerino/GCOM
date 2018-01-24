@@ -37,7 +37,7 @@ class IMP_API : public QObject{
  public:
     IMP_API();
 
-    void setup(QString inputPath, QString outputPath);
+    void setup(QString inputPath);
     bool start();
     void stop();
 
