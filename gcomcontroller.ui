@@ -853,8 +853,8 @@
          <rect>
           <x>220</x>
           <y>90</y>
-          <width>351</width>
-          <height>331</height>
+          <width>321</width>
+          <height>291</height>
          </rect>
         </property>
         <property name="font">
@@ -937,17 +937,17 @@
        <widget class="QListWidget" name="obj_list">
         <property name="geometry">
          <rect>
-          <x>720</x>
+          <x>690</x>
           <y>90</y>
-          <width>171</width>
-          <height>321</height>
+          <width>131</width>
+          <height>291</height>
          </rect>
         </property>
        </widget>
        <widget class="QGraphicsView" name="objectImgOutput">
         <property name="geometry">
          <rect>
-          <x>590</x>
+          <x>560</x>
           <y>90</y>
           <width>111</width>
           <height>91</height>
@@ -962,7 +962,7 @@
        <widget class="QPushButton" name="delete_obj_button">
         <property name="geometry">
          <rect>
-          <x>590</x>
+          <x>560</x>
           <y>190</y>
           <width>111</width>
           <height>21</height>

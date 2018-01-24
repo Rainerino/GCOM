@@ -1,7 +1,6 @@
 #ifndef IMP_API_HPP
 #define IMP_API_HPP
 
-#include "modules/uas_image_processing/imp_main.hpp"
 #include <QObject>
 #include <QDebug>
 #include <QString>
