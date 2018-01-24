@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 
 TARGET = gcom
@@ -12,7 +12,9 @@ TARGET = gcom
 test {
     TEMPLATE = subdirs
     SUBDIRS += \
-        unit_test/test_dcnc
+        unit_test/sendCommandMessage \
+        unit_test/test_image_tagged_message \ 
+	unit_test/test_dcnc
 }
 else {
     TEMPLATE = app
@@ -48,7 +50,6 @@ SOURCES += main.cpp\
     modules/uas_interop_system/interop.cpp \
     modules/uas_interop_system/json_interpreter.cpp \
     modules/uas_interop_system/InteropObjects/interop_odlc.cpp \
-    modules/uas_cas_quad/main_cas.cpp \
     modules/uas_image_processing/imp_main.cpp \
     modules/uas_image_processing/imp_api.cpp \
     modules/uas_image_processing/imp_object.cpp \
@@ -82,7 +83,6 @@ HEADERS  += \
     modules/uas_interop_system/interop.hpp \
     modules/uas_interop_system/json_interpreter.hpp \
     modules/uas_interop_system/InteropObjects/interop_odlc.hpp \
-    modules/uas_cas_quad/main_cas.hpp \
     modules/uas_image_processing/imp_main.hpp \
     modules/uas_image_processing/imp_api.hpp \
     modules/uas_image_processing/imp_object.hpp \
@@ -97,6 +97,3 @@ INCLUDEPATH += Mavlink
 CONFIG += c++14
 
 RESOURCES = resources.qrc
-
-DISTFILES += \
-    ../../2018 Spring/UAS Notes and Information/mapexample
