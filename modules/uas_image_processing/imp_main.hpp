@@ -10,13 +10,13 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include "imp_object.hpp"
 
 class IMP: public QObject{
     Q_OBJECT
 private:
 
     QString dirName;
-
 
 
     //output
@@ -31,13 +31,8 @@ private:
     };
 
     //this is the output object, can be converted to interopOdlc object
-    struct object
-    {
-        //to be completed
-        object(double longi, double lat, QString orient, QString shape, QString bg_color, QString alpha, QString alpha_color) {}
-    };
 
-    QList<object> objectList;
+    QList<imp_object> objectList;
 
 
 public:
