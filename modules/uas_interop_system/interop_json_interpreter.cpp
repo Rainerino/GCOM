@@ -1,27 +1,27 @@
-#include "json_interpreter.hpp"
-
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QString>
 
-JsonInterpreter::JsonInterpreter()
+#include "interop_json_interpreter.hpp"
+
+InteropJsonInterpreter::InteropJsonInterpreter()
 {
     //do nothing
 }
 
-JsonInterpreter::~JsonInterpreter()
+InteropJsonInterpreter::~InteropJsonInterpreter()
 {
     //do nothing
 }
 
-InteropMission* JsonInterpreter::parseSingleMission(QJsonDocument json)
+InteropMission* InteropJsonInterpreter::parseSingleMission(QJsonDocument json)
 {
     QJsonObject jsonObj = json.object();
     return this->parseMission(jsonObj);
 }
 
-QList<InteropMission*> JsonInterpreter::parseMultipleMissions(QJsonDocument json)
+QList<InteropMission*> InteropJsonInterpreter::parseMultipleMissions(QJsonDocument json)
 {
     QList<InteropMission*> parsedInteropMissions;
 
@@ -36,7 +36,7 @@ QList<InteropMission*> JsonInterpreter::parseMultipleMissions(QJsonDocument json
     return parsedInteropMissions;
 }
 
-JsonInterpreter::ObstacleSet* JsonInterpreter::parseObstacles(QJsonDocument json)
+InteropJsonInterpreter::ObstacleSet* InteropJsonInterpreter::parseObstacles(QJsonDocument json)
 {
     QJsonObject jsonObj = json.object();
 
@@ -69,10 +69,10 @@ JsonInterpreter::ObstacleSet* JsonInterpreter::parseObstacles(QJsonDocument json
         stationaryObstList.append(new StationaryObstacle(cylinderHeight, cylinderRadius, latitude, longitude));
     }
 
-    return new JsonInterpreter::ObstacleSet{movingObstList, stationaryObstList};
+    return new InteropJsonInterpreter::ObstacleSet{movingObstList, stationaryObstList};
 }
 
-InteropOdlc* JsonInterpreter::parseInteropOdlc(QJsonDocument json)
+InteropOdlc* InteropJsonInterpreter::parseInteropOdlc(QJsonDocument json)
 {
     QJsonObject jsonObj = json.object();
     InteropOdlc* odlc = new InteropOdlc();
@@ -93,7 +93,7 @@ InteropOdlc* JsonInterpreter::parseInteropOdlc(QJsonDocument json)
     return odlc;
 }
 
-QJsonDocument JsonInterpreter::encodeInteropOdlc(InteropOdlc odlc)
+QJsonDocument InteropJsonInterpreter::encodeInteropOdlc(InteropOdlc odlc)
 {
     QJsonObject encodeJson;
 
@@ -113,7 +113,7 @@ QJsonDocument JsonInterpreter::encodeInteropOdlc(InteropOdlc odlc)
     return QJsonDocument(encodeJson);
 }
 
-InteropMission* JsonInterpreter::parseMission(QJsonObject obj)
+InteropMission* InteropJsonInterpreter::parseMission(QJsonObject obj)
 {
     InteropMission* parsedMission = new InteropMission();
 

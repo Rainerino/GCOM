@@ -1,6 +1,7 @@
-#include "interop.hpp"
 #include <QDebug>
 #include <QString>
+
+#include "interop.hpp"
 
 // Endpoint URL Strings
 const QString LOGIN_ENDPOINT = "/api/login";
@@ -16,7 +17,7 @@ Interop::Interop()
     this->networkAccessManager = new QNetworkAccessManager(this);
     this->hostUrl = "http://localhost:8000";
     this->currRequest = InteropRequest::NO_REQUEST;
-    this->jsonInterpreter = new JsonInterpreter();
+    this->jsonInterpreter = new InteropJsonInterpreter();
 }
 
 Interop::~Interop()
@@ -140,7 +141,7 @@ void Interop::finishGetObstacles(QNetworkReply *reply)
     {
         QByteArray replyBody = reply->readAll();
         QJsonDocument jsonDoc = QJsonDocument::fromJson(replyBody);
-        JsonInterpreter::ObstacleSet* obsSet = jsonInterpreter->parseObstacles(jsonDoc);
+        InteropJsonInterpreter::ObstacleSet* obsSet = jsonInterpreter->parseObstacles(jsonDoc);
     }
 }
 

@@ -1,5 +1,5 @@
-#ifndef JSON_INTERPRETER_H
-#define JSON_INTERPRETER_H
+#ifndef JSON_INTERPRETER_HPP
+#define JSON_INTERPRETER_HPP
 
 #include <QList>
 #include <QJsonDocument>
@@ -7,16 +7,16 @@
 #include "InteropObjects/interop_mission.hpp"
 #include "InteropObjects/interop_telemetry.hpp"
 #include "InteropObjects/moving_obstacle.hpp"
-#include "InteropObjects/stationary_obstacle.hpp""
+#include "InteropObjects/stationary_obstacle.hpp"
 #include "InteropObjects/interop_odlc.hpp"
 
-class JsonInterpreter
+class InteropJsonInterpreter
 {
 
 public:
 
-    JsonInterpreter();
-    ~JsonInterpreter();
+    InteropJsonInterpreter();
+    ~InteropJsonInterpreter();
 
     struct ObstacleSet
     {
@@ -37,4 +37,4 @@ private:
 
 };
 
-#endif // JSON_INTERPRETER_H
+#endif // JSON_INTERPRETER_HPP
