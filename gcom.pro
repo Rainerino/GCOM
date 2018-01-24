@@ -8,7 +8,15 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 
 TARGET = gcom
-TEMPLATE = app
+
+test {
+    TEMPLATE = subdirs
+    SUBDIRS += \
+        unit_test/test_dcnc
+}
+else {
+    TEMPLATE = app
+}
 
 INCLUDEPATH += Mavlink auvsi_suas_interop
 
@@ -43,7 +51,9 @@ SOURCES += main.cpp\
     modules/uas_cas_quad/main_cas.cpp \
     modules/uas_image_processing/imp_main.cpp \
     modules/uas_image_processing/imp_api.cpp \
-    modules/uas_image_processing/imp_object.cpp
+    modules/uas_image_processing/imp_object.cpp \
+    modules/uas_collision_avoidance/collision_avoidance.cpp
+
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -75,7 +85,9 @@ HEADERS  += \
     modules/uas_cas_quad/main_cas.hpp \
     modules/uas_image_processing/imp_main.hpp \
     modules/uas_image_processing/imp_api.hpp \
-    modules/uas_image_processing/imp_object.hpp
+    modules/uas_image_processing/imp_object.hpp \
+    modules/uas_collision_avoidance/collision_avoidance.hpp
+
 
 FORMS += \
     gcomcontroller.ui

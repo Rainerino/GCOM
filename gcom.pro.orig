@@ -8,7 +8,15 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network serialport
 
 TARGET = gcom
-TEMPLATE = app
+
+test {
+    TEMPLATE = subdirs
+    SUBDIRS += \
+        unit_test/test_dcnc
+}
+else {
+    TEMPLATE = app
+}
 
 INCLUDEPATH += Mavlink auvsi_suas_interop
 
@@ -33,18 +41,23 @@ SOURCES += main.cpp\
     modules/uas_message/image_untagged_message.cpp \
     modules/uas_message/image_tagged_message.cpp \
     modules/uas_utility/uas_utility.cpp \
-<<<<<<< HEAD
-    modules/uas_image_processing/imp_main.cpp \
-    modules/uas_cas_quad/main_cas.cpp
-=======
     modules/uas_interop_system/InteropObjects/interop_mission.cpp \
     modules/uas_interop_system/InteropObjects/interop_telemetry.cpp \
     modules/uas_interop_system/InteropObjects/moving_obstacle.cpp \
     modules/uas_interop_system/InteropObjects/stationary_obstacle.cpp \
     modules/uas_interop_system/interop.cpp \
+<<<<<<< HEAD
     modules/uas_interop_system/json_interpreter.cpp \
-    modules/uas_interop_system/InteropObjects/interop_odlc.cpp
->>>>>>> origin/auvsi_interop
+    modules/uas_interop_system/InteropObjects/interop_odlc.cpp \
+    modules/uas_cas_quad/main_cas.cpp \
+    modules/uas_image_processing/imp_main.cpp \
+    modules/uas_image_processing/imp_api.cpp \
+    modules/uas_image_processing/imp_object.cpp
+=======
+    modules/uas_interop_system/InteropObjects/interop_odlc.cpp \
+    modules/uas_interop_system/interop_json_interpreter.cpp \
+    modules/uas_collision_avoidance/collision_avoidance.cpp
+>>>>>>> origin/collision_avoidance
 
 HEADERS  += \
     modules/uas_message/uas_message.hpp \
@@ -65,20 +78,24 @@ HEADERS  += \
     modules/uas_message/capabilities_message.hpp \
     modules/uas_message/image_untagged_message.hpp \
     modules/uas_message/image_tagged_message.hpp \
-<<<<<<< HEAD
-    modules/uas_utility/uas_utility.h \  	
-    modules/uas_image_processing/imp_main.hpp \
-    modules/uas_cas_quad/main_cas.hpp
-=======
     modules/uas_utility/uas_utility.h \
     modules/uas_interop_system/InteropObjects/interop_mission.hpp \
     modules/uas_interop_system/InteropObjects/interop_telemetry.hpp \
     modules/uas_interop_system/InteropObjects/moving_obstacle.hpp \
     modules/uas_interop_system/InteropObjects/stationary_obstacle.hpp \
     modules/uas_interop_system/interop.hpp \
+<<<<<<< HEAD
     modules/uas_interop_system/json_interpreter.hpp \
-    modules/uas_interop_system/InteropObjects/interop_odlc.hpp
->>>>>>> origin/auvsi_interop
+    modules/uas_interop_system/InteropObjects/interop_odlc.hpp \
+    modules/uas_cas_quad/main_cas.hpp \
+    modules/uas_image_processing/imp_main.hpp \
+    modules/uas_image_processing/imp_api.hpp \
+    modules/uas_image_processing/imp_object.hpp
+=======
+    modules/uas_interop_system/InteropObjects/interop_odlc.hpp \
+    modules/uas_interop_system/interop_json_interpreter.hpp \
+    modules/uas_collision_avoidance/collision_avoidance.hpp
+>>>>>>> origin/collision_avoidance
 
 FORMS += \
     gcomcontroller.ui
@@ -88,3 +105,6 @@ INCLUDEPATH += Mavlink
 CONFIG += c++14
 
 RESOURCES = resources.qrc
+
+DISTFILES += \
+    ../../2018 Spring/UAS Notes and Information/mapexample

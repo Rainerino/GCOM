@@ -1,8 +1,10 @@
-#include "interop.hpp"
 #include <QDebug>
 #include <QString>
 
+<<<<<<< HEAD
+=======
 #include "interop.hpp"
+>>>>>>> origin/collision_avoidance
 
 // Endpoint URL Strings
 const QString LOGIN_ENDPOINT = "/api/login";

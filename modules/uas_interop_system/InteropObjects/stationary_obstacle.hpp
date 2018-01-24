@@ -1,5 +1,5 @@
-#ifndef STATIONARY_OBSTACLE_H
-#define STATIONARY_OBSTACLE_H
+#ifndef STATIONARY_OBSTACLE_HPP
+#define STATIONARY_OBSTACLE_HPP
 
 class StationaryObstacle
 {
@@ -23,4 +23,4 @@ private:
 
 };
 
-#endif // STATIONARY_OBSTACLE_H
+#endif // STATIONARY_OBSTACLE_HPP

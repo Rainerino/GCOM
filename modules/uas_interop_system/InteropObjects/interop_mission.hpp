@@ -1,5 +1,5 @@
-#ifndef INTEROP_MISSION_H
-#define INTEROP_MISSION_H
+#ifndef INTEROP_MISSION_HPP
+#define INTEROP_MISSION_HPP
 
 #include <QList>
 
@@ -72,4 +72,4 @@ private:
 
 };
 
-#endif // INTEROP_MISSION_H
+#endif // INTEROP_MISSION_HPP
