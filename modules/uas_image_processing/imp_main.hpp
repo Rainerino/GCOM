@@ -7,13 +7,17 @@
  * outptut: odlc
  * latitude, longitude, orientation, shape, background_color, alpha, alpha colar
  */
+
+#ifndef IMP_MAIN_HPP
+#define IMP_MAIN_HPP
+
 #include <QObject>
 #include <QString>
 #include <QList>
 #include "imp_object.hpp"
 
 
-class IMP_Main: public QObject{
+class IMP_Main: QObject{
     Q_OBJECT
 private:
 
@@ -44,3 +48,5 @@ public:
     void contrustObject();
 
 };
+
+#endif

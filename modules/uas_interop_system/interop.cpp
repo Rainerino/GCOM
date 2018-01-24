@@ -142,7 +142,7 @@ void Interop::finishGetObstacles(QNetworkReply *reply)
     {
         QByteArray replyBody = reply->readAll();
         QJsonDocument jsonDoc = QJsonDocument::fromJson(replyBody);
-        InteropJsonInterpreter::ObstacleSet* obsSet = jsonInterpreter->parseObstacles(jsonDoc);
+        InteropJsonInterpreter::ObstacleSet* obsSet = this->jsonInterpreter->parseObstacles(jsonDoc);
     }
 }
 
@@ -153,6 +153,6 @@ void Interop::finishGetMissions(QNetworkReply *reply)
     {
         QByteArray replyBody = reply->readAll();
         QJsonDocument jsonDoc = QJsonDocument::fromJson(replyBody);
-        QList<InteropMission*> missions = jsonInterpreter->parseMultipleMissions(jsonDoc);
+        QList<InteropMission*> missions = this->jsonInterpreter->parseMultipleMissions(jsonDoc);
     }
 }
