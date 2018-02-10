@@ -53,7 +53,8 @@ SOURCES += main.cpp\
     modules/uas_image_processing/imp_api.cpp \
     modules/uas_image_processing/imp_object.cpp \
     modules/uas_collision_avoidance/collision_avoidance.cpp \
-    modules/uas_interop_system/interop_json_interpreter.cpp
+    modules/uas_interop_system/interop_json_interpreter.cpp \
+
 
 
 HEADERS  += \
@@ -86,7 +87,8 @@ HEADERS  += \
     modules/uas_image_processing/imp_main.hpp \
     modules/uas_image_processing/imp_api.hpp \
     modules/uas_image_processing/imp_object.hpp \
-    modules/uas_collision_avoidance/collision_avoidance.hpp
+    modules/uas_collision_avoidance/collision_avoidance.hpp \
+
 
 
 
@@ -98,3 +100,7 @@ INCLUDEPATH += Mavlink
 CONFIG += c++14
 
 RESOURCES = resources.qrc
+
+DISTFILES += \
+    modules/uas_image_processing/python scripts/testdir.py \
+    modules/uas_image_processing/python scripts/testdir.py

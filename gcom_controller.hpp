@@ -15,7 +15,8 @@
 #include "modules/uas_message/image_untagged_message.hpp"
 #include "modules/uas_antenna_tracker/antennatracker.hpp"
 #include "modules/uas_interop_system/interop.hpp"
-
+//IMP Inlcude
+#include "modules/uas_image_processing/imp_api.hpp"
 //===================================================================
 // Namespace Declarations
 //===================================================================
@@ -69,6 +70,9 @@ private slots:
     // AUVSI Interop Slots
     void on_interopConnectButton_clicked();
 
+    //IMP methods
+    void impStart_clicked();
+    void impGetResult_clicked();
 private:
     // Private Member Variables
     Ui::GcomController *ui;
@@ -101,6 +105,11 @@ private:
     void updateStartTrackerButton();
 
     Interop *interop;
+
+    //IMP Variables
+
+    impApi impApi;
+
 };
 
 #endif // GCOMCONTROLLER_HPP

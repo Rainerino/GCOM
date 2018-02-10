@@ -15,7 +15,13 @@
 #include <QString>
 #include <QList>
 #include "imp_object.hpp"
-
+#include <QProcess>
+#include <QStringList>
+/**
+ * @brief The IMP_Main class
+ * The main message will create imp_object based on the request. The lower layer of this is imp_object, and the
+ * upper is the api.
+ */
 
 class IMP_Main: QObject{
     Q_OBJECT
@@ -27,11 +33,17 @@ private:
     QList<imp_object> objectList;
 
     QList<InteropOdlc> returnedInteropOdlcList;
+
+    QProcess * myProcess;
 public:
 
     IMP_Main();
+
+    QList<imp_object> getObjectsFromImage();
     //set up the file location and such
     void imageSetup();
+    //
+    void runPythonScript(QString file);
     //whenever there is a new image, process it.
     void impTrigger();
 
@@ -47,6 +59,7 @@ public:
     void geoTagImages();
     void contrustObject();
 
+    void runOutput();
 };
 
 #endif

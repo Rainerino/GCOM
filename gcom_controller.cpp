@@ -133,9 +133,12 @@ GcomController::GcomController(QWidget *parent) :
     // Interop Setup
     interop = new Interop();
 
+
     //Imp set up and inititialization
     // IMP Setup
 
+    connect(ui->start_button, SIGNAL(released()), this, SLOT(impStart_clicked()));
+    connect(ui->result_button, SIGNAL(released()), this, SLOT(impGetResult_clicked()));
 
 }
 
@@ -153,7 +156,20 @@ GcomController::~GcomController()
 //===================================================================
 // IMP Methods
 //===================================================================
+void GcomController::impStart_clicked(){
+    ui->start_button->setText("Start");
+    qDebug() << "Start clicked\n";
+    //impApi = new impApi();
 
+    ui->start_button->setText("set up");
+}
+void GcomController::impGetResult_clicked(){
+    ui->result_button->setText("Processing");
+    qDebug() << "result clicked\n";
+
+
+    ui->result_button->setText("Finished");
+}
 
 //===================================================================
 // MAVLink Methods

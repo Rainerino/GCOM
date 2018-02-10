@@ -31,28 +31,38 @@ using namespace std;
  * The output is an UI, the goal of UI is be able to monitor the image processing results, with each of the i
  * images and its tags displayed, ,and at the same time, delete objects that are observed to be incorrect
  */
-class IMP_API : public QObject{
+class impApi : public QObject{
     Q_OBJECT
  public:
-    IMP_API();
 
-    void setup(QString inputPath);
-    bool start();
-    void stop();
+    /**
+     * @brief impApi
+     * This constructor just initializa everything.
+     */
+    impApi();
+
+    /**
+     * @brief setup
+     * @param inputPath
+     * Set up the reading path of the files.
+     *
+     */
+    void setupImpApi(QString dirName, QString jsonReadingFile, QString jsonStoringFile, QStringList arguments);
 
     /**
      * @brief OneimageProcessing
      * his will take one image and process it with out algorithm, enable us real time processing and uploading
-     * @return list of imp_object
+     * @return json file list of the output
      */
-    QList<imp_object> OneimageProcessing(QString fileName);
+    void OneimageProcessing(QString fileName);
 
     /**
      * @brief updateImpObjectList
      * This function takes new object list and update the list by comparing data between them.
-     * It will call the overlap as its helper
+     * It will call the overlap as its helper.
      */
-    void updateImpObjectList( QList<imp_object>);
+    void updateImpObjectList( QString jsonStoringFile);
+
     /**
      * @brief getNewFileList
      * This is go to the predefined dir location and get the new files that have been added since.
@@ -60,30 +70,51 @@ class IMP_API : public QObject{
      * images that are taken at a short interval, outputing a list is more ideal.
      * @return new files list in QString
      */
-    QList<QString> getNewFileList();
+    QStringList getNewFileList(QString dirName);
 
 
+    /**
+     * @brief objectOverLapCheck
+     * check the objects 1 by 1 to make sure there is no oeverlap. Modify the file if there is
+     * @return nothing
+     */
+    void objectOverLapCheck(QList<QString>);
 
 
 private:
-    QList<imp_object> objectList;
 
+    //this is the reading directary
     QString dirName;
 
-    //for coordinates calculations
-    const double EARTH_RADIUS = 6356.7523;
-    const double DEGREE_FOV_H = 80.5;
-    const double DEGREE_FOV_V = 60.3;
+    //This is the file that will contains the processed files
+    QString jsonStoringFile;
+
+    //This is the filename that will contains the newly processed files
+    QString jsonReadingFile;
+
+    //this contains the processed files.
+    QStringList processedFileList;
+
+    QProcess imageProcess;
+
+    // THis will store all the pending images to be processed
+    //Queue<STUFF>
+
+    // TODO
+    // SLOT THAT TAKES IN INPUT FROM IGORS MODULE
+    // THis will perform the following, 1. it will check if process is running, if it is then add the
+    // data received to the queue, if the proces was not started then strat the process with the data and dot add to queue
 
 
-    //helper internel functions
+
+private slots:
+    // TODO If queue is not emty restart the proces again on the first item from the queue
     /**
-     * @brief objectOverLapCheck
-     * check the objects 1 by 1 to make sure there is no oeverlap.
-     * @return no overlapped objects
+     * @brief imageProcessDone
+     * @param exitCode
+     * @param exitStatus
      */
-    QList<imp_object> objectOverLapCheck(QList<imp_object>);
-
+    void imageProcessDone(int exitCode, QProcess::ExitStatus exitStatus);
 
 
 };

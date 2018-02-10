@@ -116,6 +116,7 @@ void DCNC::handleClientConection()
     // Connect the connection slot's signals
     connect(clientConnection, SIGNAL(readyRead()),
             this, SLOT(handleClientData()));
+
     connect(clientConnection, SIGNAL(disconnected()),
             this, SLOT(handleClientDisconnected()));
 
